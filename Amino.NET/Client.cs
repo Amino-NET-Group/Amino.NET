@@ -11,7 +11,7 @@ namespace Amino
         public string deviceID { get; } 
         public string sessionID { get; }
         //public bool renew_device { get; }
-        public string signiture { get; }
+        //+public string signiture { get; }
 
         public IDictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -24,8 +24,6 @@ namespace Amino
             headers.Add("Host", "service.narvii.com");
             headers.Add("Accept-Encoding", "gzip");
             headers.Add("Connection", "Keep-Alive");
-
-            if(signiture != null) { headers.Add("NDC-MSG-SIG", signiture); }
             if(sessionID != null) { headers.Add("NDCAUTH", $"sid={sessionID}"); }
             
             return Task.CompletedTask;
@@ -55,8 +53,35 @@ namespace Amino
             }
         }
 
+        public Task Login(string _email, string _password, string _secret = null)
+        {
+            try
+            {
+                Int32 unixTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                string secret;
+                if (_secret == null) { secret = $"0 {_password}"; } else { secret = _secret; }
+                var data = new { email = _email, v = 2, secret = secret, deviceID = deviceID, clientType = 100, action = "normal", timestamp = unixTimestamp };
 
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/auth/login");
+                request.AddHeaders(headers);
+                request.AddJsonBody(data);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(data.ToString()));
+                var response = client.ExecutePost(request);
+                if(response.StatusCode.ToString() != "200") { throw new Exception(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
 
+            
+
+        }
+    }
+
+    class WebSockets
+    {
 
     }
 }
