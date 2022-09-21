@@ -56,9 +56,14 @@ namespace Amino
         }
 
 
-        public static String GetTimestamp(DateTime value)
+        public static double GetTimestamp()
         {
-            return value.ToString("yyyyMMddHHmmssffff");
+
+            TimeSpan epochTicks = new TimeSpan(new DateTime(1970, 1, 1).Ticks);
+            TimeSpan unixTicks = new TimeSpan(DateTime.UtcNow.Ticks) - epochTicks;
+            double unixTime = unixTicks.TotalSeconds;
+
+            return unixTime;
         }
 
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -40,11 +41,11 @@ namespace Amino
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/auth/request-security-validation");
+                RestRequest request = new RestRequest("/g/s/auth/request-security-validation", Method.Post);
                 if(!resetPassword) { request.AddJsonBody(new { identity = email, type = 1, deviceID = deviceID}); } else { request.AddJsonBody(new { identity = email, type = 1, deviceID = deviceID, level = 2, purpose = "reset-password"}); }
                 request.AddHeaders(headers);
                 var response = client.ExecutePost(request);
-                if(response.StatusCode.ToString() != "200") { throw new Exception(response.Content); }
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 return Task.CompletedTask;
 
             }catch(Exception e)
@@ -53,23 +54,24 @@ namespace Amino
             }
         }
 
-        public Task Login(string _email, string _password, string _secret = null)
+        public void Login(string _email, string _password, string _secret = null)
         {
             try
             {
-                Int32 unixTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
                 string secret;
                 if (_secret == null) { secret = $"0 {_password}"; } else { secret = _secret; }
-                var data = new { email = _email, v = 2, secret = secret, deviceID = deviceID, clientType = 100, action = "normal", timestamp = unixTimestamp };
+                var data = new { email = _email, v = 2, secret = secret, deviceID = deviceID, clientType = 100, action = "normal", timestamp = helpers.GetTimestamp() * 1000};
 
                 RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/auth/login");
+                RestRequest request = new RestRequest("/g/s/auth/login", Method.Post);
                 request.AddHeaders(headers);
                 request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(data.ToString()));
+                
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                //var response = client.Execute(request, System.Threading.CancellationToken.None);
                 var response = client.ExecutePost(request);
-                if(response.StatusCode.ToString() != "200") { throw new Exception(response.Content); }
-                return Task.CompletedTask;
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                return;
             }catch(Exception e)
             {
                 throw new Exception(e.Message);
