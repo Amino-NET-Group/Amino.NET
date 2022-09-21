@@ -68,10 +68,9 @@ namespace Amino
                 request.AddJsonBody(data);
                 
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
-                //var response = client.Execute(request, System.Threading.CancellationToken.None);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                return;
+                return Task.CompletedTask;
             }catch(Exception e)
             {
                 throw new Exception(e.Message);
