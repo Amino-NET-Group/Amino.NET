@@ -54,7 +54,7 @@ namespace Amino
             }
         }
 
-        public void Login(string _email, string _password, string _secret = null)
+        public Task Login(string _email, string _password, string _secret = null)
         {
             try
             {
@@ -76,9 +76,6 @@ namespace Amino
             {
                 throw new Exception(e.Message);
             }
-
-            
-
         }
     }
 
