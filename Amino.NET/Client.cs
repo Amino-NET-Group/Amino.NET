@@ -11,14 +11,18 @@ namespace Amino
     {
         public string deviceID { get; } 
         public string sessionID { get; }
+        public string secret { get; }
+        public string userID { get; }
+
         //public bool renew_device { get; }
-        //+public string signiture { get; }
+        //public string signiture { get; }
 
         public IDictionary<string, string> headers = new Dictionary<string, string>();
 
         //Handles the header stuff
         private Task headerBuilder()
         {
+            headers.Clear();
             headers.Add("NDCDEVICEID", deviceID);
             headers.Add("Accept-Language", "en-US");
             headers.Add("Content-Type", "application/json; charset=utf-8");
@@ -76,7 +80,50 @@ namespace Amino
                 throw new Exception(e.Message);
             }
         }
+
+        public Task Register(string _name, string _email, string _password, string _verificationCode, string _deviceID = null)
+        {
+            try
+            {
+                if (_deviceID == null) { _deviceID = helpers.generate_device_id(); } else { _deviceID = deviceID; }
+                var data = new
+                {
+                    secret = $"0 {_password}",
+                    deviceID = _deviceID,
+                    email = _email,
+                    clientType = 100,
+                    nickname = _name,
+                    latitude = 0,
+                    longtitude = 0,
+                    address = String.Empty,
+                    clientCallbackURL = "narviiapp://relogin",
+                    validationContext = new
+                    {
+                        data = new { code = _verificationCode },
+                        type = 1,
+                        identity = _email
+                    },
+                    type = 1,
+                    identity = _email,
+                    timestamp = helpers.GetTimestamp() * 1000
+                };
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/auth/register");
+                request.AddHeaders(headers);
+                request.AddJsonBody(data);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
     }
+
+
 
     class WebSockets
     {
