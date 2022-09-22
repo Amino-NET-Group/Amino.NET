@@ -13,6 +13,7 @@ namespace Amino
         public string sessionID { get; }
         public string secret { get; }
         public string userID { get; }
+        public string json { get; }
 
         //public bool renew_device { get; }
         //public string signiture { get; }
@@ -30,7 +31,7 @@ namespace Amino
             headers.Add("Accept-Encoding", "gzip");
             headers.Add("Connection", "Keep-Alive");
             if(sessionID != null) { headers.Add("NDCAUTH", $"sid={sessionID}"); }
-            
+
             return Task.CompletedTask;
         }
 
@@ -42,6 +43,7 @@ namespace Amino
 
         public Task request_verify_code(string email, bool resetPassword = false)
         {
+           
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
@@ -70,10 +72,10 @@ namespace Amino
                 RestRequest request = new RestRequest("/g/s/auth/login", Method.Post);
                 request.AddHeaders(headers);
                 request.AddJsonBody(data);
-                
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+
                 return Task.CompletedTask;
             }catch(Exception e)
             {
@@ -85,7 +87,7 @@ namespace Amino
         {
             try
             {
-                if (_deviceID == null) { _deviceID = helpers.generate_device_id(); } else { _deviceID = deviceID; }
+                if (_deviceID == null) { if (deviceID != null) { _deviceID = deviceID; } else { _deviceID = helpers.generate_device_id(); } }
                 var data = new
                 {
                     secret = $"0 {_password}",
@@ -114,6 +116,7 @@ namespace Amino
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                
                 return Task.CompletedTask;
             }catch(Exception e)
             {
@@ -121,12 +124,39 @@ namespace Amino
             }
         }
 
-    }
+        public Task Restore_account(string _email, string _password, string _deviceID = null)
+        {
+            try
+            {
+                if (_deviceID == null) { if (deviceID != null) { _deviceID = deviceID; } else { _deviceID = helpers.generate_device_id(); } }
+                var data = new { secret = $"0 {_password}", deviceID = _deviceID, email = _email, timestamp = helpers.GetTimestamp() * 1000 };
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/account/delete-request/cancel");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+        public Task Delete_account(string _password)
+        {
+            var data = new { deviceID = deviceID, secret = $"0 {_password}" };
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/account/delete-request");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
-
-
-    class WebSockets
-    {
 
     }
 }
