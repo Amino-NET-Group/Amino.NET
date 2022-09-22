@@ -134,6 +134,7 @@ namespace Amino
                 RestRequest request = new RestRequest("/g/s/account/delete-request/cancel");
                 request.AddHeaders(headers);
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 return Task.CompletedTask;
@@ -148,6 +149,7 @@ namespace Amino
                 RestRequest request = new RestRequest("/g/s/account/delete-request");
                 request.AddHeaders(headers);
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 return Task.CompletedTask;
@@ -156,7 +158,28 @@ namespace Amino
                 throw new Exception(e.Message);
             }
         }
-
+        public Task activate_account(string _email, string _verificationCode, string _deviceID = null)
+        {
+            if (_deviceID == null) { if (deviceID != null) { _deviceID = deviceID; } else { _deviceID = helpers.generate_device_id(); } }
+            var data = new
+            {
+                type = 1,
+                identity = _email,
+                data = new { code = _verificationCode },
+                deviceID = _deviceID
+            };
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/auth/activate-email");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
 
     }
 }
