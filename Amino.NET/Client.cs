@@ -14,6 +14,15 @@ namespace Amino
         public string secret { get; private set; }
         public string userID { get; private set; }
         public string json { get; private set; }
+        public string googleID { get; private set; }
+        public string appleID { get; private set; }
+        public string facebookID { get; private set; }
+        public string twitterID { get; private set; }
+        public string iconURL { get; private set; }
+        public string aminoID { get; private set; }
+        public string email { get; private set; }
+        public string phoneNumber { get; private set; }
+        public bool is_Global { get; private set; }
         public bool debug { get; set; } = false;
 
         //public bool renew_device { get; }
@@ -77,6 +86,7 @@ namespace Amino
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                json = response.Content;
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
