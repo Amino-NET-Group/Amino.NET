@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace Amino
 {
     public class Client
     {
-        public string deviceID { get; } 
-        public string sessionID { get; }
-        public string secret { get; }
-        public string userID { get; }
-        public string json { get; }
+        public string deviceID { get; private set; } 
+        public string sessionID { get; private set; }
+        public string secret { get; private set; }
+        public string userID { get; private set; }
+        public string json { get; private set; }
+        public bool debug { get; set; } = false;
 
         //public bool renew_device { get; }
         //public string signiture { get; }
@@ -52,6 +53,7 @@ namespace Amino
                 request.AddHeaders(headers);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
 
             }catch(Exception e)
@@ -75,7 +77,7 @@ namespace Amino
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-
+                if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
             {
@@ -116,7 +118,7 @@ namespace Amino
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                
+                if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
             {
@@ -137,6 +139,7 @@ namespace Amino
                 request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e) { throw new Exception(e.Message); }
         }
@@ -152,6 +155,7 @@ namespace Amino
                 request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
             {
@@ -177,8 +181,43 @@ namespace Amino
                 request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task configure_account(Types.account_gender _gender, int _age)
+        {
+            if(_age <= 12) { throw new Exception("The given account age is too low"); }
+            int gender;
+            switch(_gender)
+            {
+                case Types.account_gender.Male:
+                    gender = 1;
+                    break;
+                case Types.account_gender.Female:
+                    gender = 2;
+                    break;
+                case Types.account_gender.Non_Binary:
+                    gender = 255;
+                    break;
+                default:
+                    gender = 255;
+                    break;
+            }
+            var data = new { age = _age, gender = gender, timestamp = helpers.GetTimestamp() * 1000 };
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/persona/profile/basic");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            } catch(Exception e) { throw new Exception(e.Message); }
         }
 
     }
