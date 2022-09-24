@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace Amino
@@ -22,6 +24,7 @@ namespace Amino
         public string aminoID { get; private set; }
         public string email { get; private set; }
         public string phoneNumber { get; private set; }
+        public string nickname { get; private set; }
         public bool is_Global { get; private set; }
         public bool debug { get; set; } = false;
 
@@ -83,10 +86,29 @@ namespace Amino
                 RestRequest request = new RestRequest("/g/s/auth/login", Method.Post);
                 request.AddHeaders(headers);
                 request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 json = response.Content;
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(json);
+                try
+                {
+                    sessionID = (string)["sid"];
+                    this.secret = (string)["secret"];
+                    userID = (string)jsonObj["account"]["uid"];
+                    googleID = (string)jsonObj["account"]["googleID"];
+                    appleID = (string)jsonObj["account"]["appleID"];
+                    facebookID = (string)jsonObj["account"]["facebookID"];
+                    twitterID = (string)jsonObj["account"]["twitterID"];
+                    iconURL = (string)jsonObj["userProfile"]["icon"];
+                    aminoID = (string)jsonObj["account"]["aminoId"];
+                    email = (string)jsonObj["account"]["email"];
+                    phoneNumber = (string)jsonObj["account"]["phoneNumber"];
+                    nickname = (string)jsonObj["userProfile"]["nickname"];
+                    is_Global = (bool)jsonObj["userProfile"]["isGlobal"];
+
+                    
+                }catch(Exception e) { throw new Exception(e.Message); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
