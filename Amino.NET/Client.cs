@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using System.Net.WebSockets;
+
+
 
 namespace Amino
 {
@@ -93,8 +96,8 @@ namespace Amino
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(json);
                 try
                 {
-                    sessionID = (string)["sid"];
-                    this.secret = (string)["secret"];
+                    sessionID = (string)jsonObj["sid"];
+                    this.secret = (string)jsonObj["secret"];
                     userID = (string)jsonObj["account"]["uid"];
                     googleID = (string)jsonObj["account"]["googleID"];
                     appleID = (string)jsonObj["account"]["appleID"];
@@ -106,9 +109,8 @@ namespace Amino
                     phoneNumber = (string)jsonObj["account"]["phoneNumber"];
                     nickname = (string)jsonObj["userProfile"]["nickname"];
                     is_Global = (bool)jsonObj["userProfile"]["isGlobal"];
-
-                    
                 }catch(Exception e) { throw new Exception(e.Message); }
+                headerBuilder();
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
@@ -147,7 +149,7 @@ namespace Amino
                 RestRequest request = new RestRequest("/g/s/auth/register");
                 request.AddHeaders(headers);
                 request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
@@ -167,7 +169,7 @@ namespace Amino
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/account/delete-request/cancel");
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
                 request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -183,7 +185,7 @@ namespace Amino
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/account/delete-request");
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
                 request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -209,7 +211,7 @@ namespace Amino
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/activate-email");
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
                 request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -243,7 +245,7 @@ namespace Amino
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/persona/profile/basic");
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
                 request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -252,5 +254,69 @@ namespace Amino
             } catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        public Task Change_password(string _email, string _password, string _verificationCode)
+        {
+            var data = new
+            {
+                updateSecret = $"0 {_password}",
+                emailValidationContext = new
+                {
+                    data = new { code = _verificationCode },
+                    type = 1,
+                    identity = _email,
+                    level = 2,
+                    deviceID = deviceID
+                },
+                phoneNumberValidationContext = String.Empty,
+                deviceID = deviceID
+            };
+
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/auth/reset-password");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+            
+        }
+        private class WebSockets
+        {
+
+            private IDictionary<string, string> client_headers = new Dictionary<string, string>();
+            private IDictionary<string, string> ws_headers = new Dictionary<string, string>();
+            private string WebSocketURL = "wss://ws1.narvii.com";
+
+            public WebSockets(Amino.Client client)
+            {
+                client_headers = client.headers;
+                var final = $"{client.deviceID}|{(int)helpers.GetTimestamp() * 1000}";
+                ws_headers.Add("NDCDEVICEID", client.deviceID);
+                ws_headers.Add("NDCAUTH", $"sid={client.sessionID}");
+                ws_headers.Add("NDC-MSG-SIG", helpers.generate_signiture(final));
+
+                startSocket(client);
+
+            }
+
+            private void startSocket(Amino.Client _client)
+            {
+                var final = $"{_client.deviceID}|{(int)helpers.GetTimestamp() * 1000}";
+                ClientWebSocket client = new ClientWebSocket();
+                client.Options.KeepAliveInterval = TimeSpan.FromSeconds(30);
+                client.Options.SetRequestHeader("NDCDEVICEID", _client.deviceID);
+                client.Options.SetRequestHeader("NDCAUTH", $"sid={_client.sessionID}");
+                client.Options.SetRequestHeader("NDC-MSG-SIG", helpers.generate_signiture(final));
+                client.ConnectAsync(new Uri($"{WebSocketURL}/?signbody={final.Replace('|', '%7')}"), System.Threading.CancellationToken.None);
+                var responseTask = client.ReceiveAsync(, System.Threading.CancellationToken.None);
+
+            }
+        }
     }
 }
