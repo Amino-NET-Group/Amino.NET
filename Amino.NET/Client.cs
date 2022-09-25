@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using System.Net.WebSockets;
-
+//using System.Net.WebSockets;
+using WebSocketSharp;
 
 
 namespace Amino
@@ -111,6 +111,7 @@ namespace Amino
                     is_Global = (bool)jsonObj["userProfile"]["isGlobal"];
                 }catch(Exception e) { throw new Exception(e.Message); }
                 headerBuilder();
+                WebSockets socket = new WebSockets(this);
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
@@ -284,9 +285,8 @@ namespace Amino
                 return Task.CompletedTask;
             }
             catch (Exception e) { throw new Exception(e.Message); }
-            
         }
-        private class WebSockets
+        internal class WebSockets
         {
 
             private IDictionary<string, string> client_headers = new Dictionary<string, string>();
@@ -308,15 +308,34 @@ namespace Amino
             private void startSocket(Amino.Client _client)
             {
                 var final = $"{_client.deviceID}|{(int)helpers.GetTimestamp() * 1000}";
+                /*
                 ClientWebSocket client = new ClientWebSocket();
                 client.Options.KeepAliveInterval = TimeSpan.FromSeconds(30);
                 client.Options.SetRequestHeader("NDCDEVICEID", _client.deviceID);
                 client.Options.SetRequestHeader("NDCAUTH", $"sid={_client.sessionID}");
                 client.Options.SetRequestHeader("NDC-MSG-SIG", helpers.generate_signiture(final));
-                client.ConnectAsync(new Uri($"{WebSocketURL}/?signbody={final.Replace('|', '%7')}"), System.Threading.CancellationToken.None);
-                var responseTask = client.ReceiveAsync(, System.Threading.CancellationToken.None);
+                client.ConnectAsync(new Uri($"{WebSocketURL}/?signbody={final.Replace("|", "%7")}"), System.Threading.CancellationToken.None); */
+
+
+
+                using (var ws = new WebSocket($"{WebSocketURL}?signbody={final.Replace("|", "%7")}"))
+                {
+                    ws.OnMessage += (sender, e) => Console.WriteLine(e.Data);
+                    ws.OnOpen += (sender, e) => Console.WriteLine("Opened!");
+                    ws.OnError += (sender, e) => Console.WriteLine("Failed: " + e.Message);
+                    ws.OnClose += (sender, e) => Console.WriteLine("Closed! " + e.Reason);
+                    ws.SetCredentials("NDCDEVICEID", _client.deviceID, false);
+                    ws.SetCredentials("NDCAUTH", $"sid={_client.sessionID}", false);
+                    ws.SetCredentials("NDC-MSG-SIG", helpers.generate_signiture(final), false);
+                    
+                    
+                    ws.Connect();
+                }
+
+
 
             }
         }
+
     }
 }
