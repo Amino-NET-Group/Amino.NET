@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.WebSockets;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 //using System.Net.WebSockets;
-using WebSocketSharp;
+using Websocket.Client;
 
 
 namespace Amino
@@ -288,52 +290,53 @@ namespace Amino
         }
         internal class WebSockets
         {
+            private string WebSocketURL = "wss://ws3.aminoapps.com";
 
-            private IDictionary<string, string> client_headers = new Dictionary<string, string>();
-            private IDictionary<string, string> ws_headers = new Dictionary<string, string>();
-            private string WebSocketURL = "wss://ws1.narvii.com";
-
-            public WebSockets(Amino.Client client)
+            public WebSockets(Amino.Client _client)
             {
-                client_headers = client.headers;
-                var final = $"{client.deviceID}|{(int)helpers.GetTimestamp() * 1000}";
-                ws_headers.Add("NDCDEVICEID", client.deviceID);
-                ws_headers.Add("NDCAUTH", $"sid={client.sessionID}");
-                ws_headers.Add("NDC-MSG-SIG", helpers.generate_signiture(final));
 
-                startSocket(client);
-
-            }
-
-            private void startSocket(Amino.Client _client)
-            {
                 var final = $"{_client.deviceID}|{(int)helpers.GetTimestamp() * 1000}";
-                /*
-                ClientWebSocket client = new ClientWebSocket();
-                client.Options.KeepAliveInterval = TimeSpan.FromSeconds(30);
-                client.Options.SetRequestHeader("NDCDEVICEID", _client.deviceID);
-                client.Options.SetRequestHeader("NDCAUTH", $"sid={_client.sessionID}");
-                client.Options.SetRequestHeader("NDC-MSG-SIG", helpers.generate_signiture(final));
-                client.ConnectAsync(new Uri($"{WebSocketURL}/?signbody={final.Replace("|", "%7")}"), System.Threading.CancellationToken.None); */
-
-
-
-                using (var ws = new WebSocket($"{WebSocketURL}?signbody={final.Replace("|", "%7")}"))
+                var factory = new Func<ClientWebSocket>(() => 
                 {
-                    ws.OnMessage += (sender, e) => Console.WriteLine(e.Data);
-                    ws.OnOpen += (sender, e) => Console.WriteLine("Opened!");
-                    ws.OnError += (sender, e) => Console.WriteLine("Failed: " + e.Message);
-                    ws.OnClose += (sender, e) => Console.WriteLine("Closed! " + e.Reason);
-                    ws.SetCredentials("NDCDEVICEID", _client.deviceID, false);
-                    ws.SetCredentials("NDCAUTH", $"sid={_client.sessionID}", false);
-                    ws.SetCredentials("NDC-MSG-SIG", helpers.generate_signiture(final), false);
+                    var client = new ClientWebSocket
+                    {
+                        Options =
+                        {
+                            KeepAliveInterval = TimeSpan.FromSeconds(30)
+                        }
+                    };
+                    client.Options.SetRequestHeader("NDCDEVICEID", _client.deviceID);
+                    client.Options.SetRequestHeader("NDCAUTH", $"sid={_client.sessionID}");
+                    client.Options.SetRequestHeader("NDC-MSG-SIG", helpers.generate_signiture(final));
+                    client.Options.SetRequestHeader("Upgrade", "websocket");
+                    client.Options.SetRequestHeader("Connection", "Upgrade");
+                    return client;
+                
+                });
+                try
+                {
                     
-                    
-                    ws.Connect();
+                    using (IWebsocketClient ws_client = new WebsocketClient(new Uri($"{WebSocketURL}/?signbody={final.Replace("|", "%7C")}"), factory))
+                    {
+                        
+                        var exitEvent = new ManualResetEvent(false);
+                        
+                        //ws_client.NativeClient.Options.SetRequestHeader("NDCDEVICEID", _client.deviceID);
+                        //ws_client.NativeClient.Options.SetRequestHeader("NDCAUTH", _client.sessionID);
+                        //ws_client.NativeClient.Options.SetRequestHeader("NDC-MSG-SIG", helpers.generate_signiture(final));
+
+                        ws_client.ReconnectTimeout = TimeSpan.FromSeconds(30);
+                        ws_client.DisconnectionHappened.Subscribe(info => { Console.WriteLine("Disconnected: " + info.Exception); });
+                        ws_client.ReconnectionHappened.Subscribe(info => { Console.WriteLine("Reconnected: " + info.Type); });
+                        ws_client.MessageReceived.Subscribe(msg => { Console.WriteLine("Received Message: " + msg); });
+                        ws_client.Start().Wait();
+                        exitEvent.WaitOne();
+
+                    }
+                }catch(Exception e)
+                {
+                    throw new Exception(e.Message);
                 }
-
-
-
             }
         }
 
