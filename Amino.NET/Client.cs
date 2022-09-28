@@ -295,7 +295,7 @@ namespace Amino
             public WebSockets(Amino.Client _client)
             {
 
-                var final = $"{_client.deviceID}|{(int)helpers.GetTimestamp() * 1000}";
+                var final = $"{_client.deviceID}|{(Math.Round(helpers.GetTimestamp())) * 1000}";
                 var factory = new Func<ClientWebSocket>(() => 
                 {
                     var client = new ClientWebSocket
@@ -321,10 +321,6 @@ namespace Amino
                         
                         var exitEvent = new ManualResetEvent(false);
                         
-                        //ws_client.NativeClient.Options.SetRequestHeader("NDCDEVICEID", _client.deviceID);
-                        //ws_client.NativeClient.Options.SetRequestHeader("NDCAUTH", _client.sessionID);
-                        //ws_client.NativeClient.Options.SetRequestHeader("NDC-MSG-SIG", helpers.generate_signiture(final));
-
                         ws_client.ReconnectTimeout = TimeSpan.FromSeconds(30);
                         ws_client.DisconnectionHappened.Subscribe(info => { Console.WriteLine("Disconnected: " + info.Exception); });
                         ws_client.ReconnectionHappened.Subscribe(info => { Console.WriteLine("Reconnected: " + info.Type); });
