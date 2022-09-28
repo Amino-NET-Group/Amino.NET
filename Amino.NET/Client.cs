@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.WebSockets;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-//using System.Net.WebSockets;
-using Websocket.Client;
 
 
 namespace Amino
@@ -33,8 +28,7 @@ namespace Amino
         public bool is_Global { get; private set; }
         public bool debug { get; set; } = false;
 
-        //public bool renew_device { get; }
-        //public string signiture { get; }
+        private Amino.WebSocketHandler webSocket;
 
         public IDictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -113,7 +107,8 @@ namespace Amino
                     is_Global = (bool)jsonObj["userProfile"]["isGlobal"];
                 }catch(Exception e) { throw new Exception(e.Message); }
                 headerBuilder();
-                WebSockets socket = new WebSockets(this);
+                Amino.WebSocketHandler _webSocket = new WebSocketHandler(this);
+                this.webSocket = _webSocket;
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
@@ -121,7 +116,45 @@ namespace Amino
                 throw new Exception(e.Message);
             }
         }
+        public Task Logout()
+        {
+            try
+            {
+                var data = new
+                {
+                    deviceID = this.deviceID,
+                    clientType = 100,
+                    timestamp = helpers.GetTimestamp() * 1000
+                };
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/auth/logout");
+                request.AddJsonBody(data);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                deviceID = null;
+                sessionID = null;
+                secret = null;
+                userID = null;
+                json = null;
+                googleID = null;
+                appleID = null;
+                facebookID = null;
+                twitterID = null;
+                iconURL = null;
+                aminoID = null;
+                email = null;
+                phoneNumber = null;
+                nickname = null;
+                is_Global = false;
+                headerBuilder();
+                _ = webSocket.disconnect_socket();
+                return Task.CompletedTask;
 
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
         public Task Register(string _name, string _email, string _password, string _verificationCode, string _deviceID = null)
         {
             try
@@ -287,53 +320,6 @@ namespace Amino
                 return Task.CompletedTask;
             }
             catch (Exception e) { throw new Exception(e.Message); }
-        }
-        internal class WebSockets
-        {
-            private string WebSocketURL = "wss://ws3.aminoapps.com";
-
-            public WebSockets(Amino.Client _client)
-            {
-
-                var final = $"{_client.deviceID}|{(Math.Round(helpers.GetTimestamp())) * 1000}";
-                var factory = new Func<ClientWebSocket>(() => 
-                {
-                    var client = new ClientWebSocket
-                    {
-                        Options =
-                        {
-                            KeepAliveInterval = TimeSpan.FromSeconds(30)
-                        }
-                    };
-                    client.Options.SetRequestHeader("NDCDEVICEID", _client.deviceID);
-                    client.Options.SetRequestHeader("NDCAUTH", $"sid={_client.sessionID}");
-                    client.Options.SetRequestHeader("NDC-MSG-SIG", helpers.generate_signiture(final));
-                    client.Options.SetRequestHeader("Upgrade", "websocket");
-                    client.Options.SetRequestHeader("Connection", "Upgrade");
-                    return client;
-                
-                });
-                try
-                {
-                    
-                    using (IWebsocketClient ws_client = new WebsocketClient(new Uri($"{WebSocketURL}/?signbody={final.Replace("|", "%7C")}"), factory))
-                    {
-                        
-                        var exitEvent = new ManualResetEvent(false);
-                        
-                        ws_client.ReconnectTimeout = TimeSpan.FromSeconds(30);
-                        ws_client.DisconnectionHappened.Subscribe(info => { Console.WriteLine("Disconnected: " + info.Exception); });
-                        ws_client.ReconnectionHappened.Subscribe(info => { Console.WriteLine("Reconnected: " + info.Type); });
-                        ws_client.MessageReceived.Subscribe(msg => { Console.WriteLine("Received Message: " + msg); });
-                        ws_client.Start().Wait();
-                        exitEvent.WaitOne();
-
-                    }
-                }catch(Exception e)
-                {
-                    throw new Exception(e.Message);
-                }
-            }
         }
 
     }
