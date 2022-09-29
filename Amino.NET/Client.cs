@@ -11,6 +11,7 @@ namespace Amino
 {
     public class Client
     {
+        //Values the Amino Client can hold
         public string deviceID { get; private set; } 
         public string sessionID { get; private set; }
         public string secret { get; private set; }
@@ -28,8 +29,13 @@ namespace Amino
         public bool is_Global { get; private set; }
         public bool debug { get; set; } = false;
 
+
+        //Events
+        public event Amino.Events.messageEventHandler onMessage;
+        //The value to access the websocket manager
         private Amino.WebSocketHandler webSocket;
 
+        //headers.
         public IDictionary<string, string> headers = new Dictionary<string, string>();
 
         //Handles the header stuff

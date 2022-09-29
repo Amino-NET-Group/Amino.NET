@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Amino.Objects;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
@@ -15,12 +17,13 @@ namespace Amino
         private string WebSocketURL = "wss://ws3.aminoapps.com";
         private IWebsocketClient ws_client;
 
+        Amino.Events.messageEventHandler onMessage;
+        
         /// <summary>
         /// If you're trying to experiment with this package, there's no one to stop you, tho playing with the WebSocketHandler can lead to runtime issues I will not account for.
         /// </summary>
         public WebSocketHandler(Amino.Client client)
         {
-
             _ = Task.Run(async () => { startWebSocket(client); });
         }
 
@@ -54,7 +57,16 @@ namespace Amino
                 ws_client.ReconnectTimeout = TimeSpan.FromSeconds(30);
                 ws_client.DisconnectionHappened.Subscribe(info => { Console.WriteLine("Disconnected: " + info.CloseStatusDescription); });
                 ws_client.ReconnectionHappened.Subscribe(info => { Console.WriteLine("Reconnected: " + info.Type); });
-                ws_client.MessageReceived.Subscribe(msg => { Console.WriteLine("Received Message: " + msg); });
+                ws_client.MessageReceived.Subscribe(msg =>
+                {
+                    Amino.Objects.Message _message = new Amino.Objects.Message((JObject)JObject.Parse(msg.Text));
+                    
+                    if (onMessage != null)
+                    {
+                        Console.WriteLine("Invoking event");
+                        onMessage(this, _message);
+                    }
+                });
                 ws_client.Start().Wait();
                 exitEvent.WaitOne();
             }

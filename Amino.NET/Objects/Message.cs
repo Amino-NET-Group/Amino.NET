@@ -18,7 +18,7 @@ namespace Amino.Objects
         public string? json { get; private set; }
         public int? communityId { get; private set; }
         public string? chatBubbleId { get; private set; }
-        Author? author { get; }
+        public Author? author { get; }
 
         public Message(JObject _json)
         {
@@ -29,29 +29,31 @@ namespace Amino.Objects
             chatId = (string)jsonObj["o"]["chatMessage"]["threadId"];
             objectId = (string)jsonObj["o"]["chatMessage"]["uid"];
             json = _json.ToString();
-            communityId = (int)jsonObj["o"]["ndcid"];
+            communityId = (int)jsonObj["o"]["ndcId"];
             chatBubbleId = (string)jsonObj["o"]["chatBubbleId"];
         }
-       
-    }
-    class Author
-    {
-        string? userName { get; }
-        string? userId { get; }
-        int? userLevel { get; }
-        string? iconUrl { get; }
-        int? userReputation { get; }
-        string? frameId { get; }
 
-        public Author(JObject _json)
+
+        public class Author
         {
-            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            userName = (string)jsonObj["o"]["chatMessage"]["author"]["nickname"];
-            userId = (string)jsonObj["o"]["chatMessage"]["author"]["uid"];
-            userLevel = (int)jsonObj["o"]["chatMessage"]["author"]["level"];
-            iconUrl = (string)jsonObj["o"]["chatMessage"]["author"]["icon"];
-            userReputation = (int)jsonObj["o"]["chatMessage"]["author"]["reputation"];
-            frameId = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["frameId"];
+            public string? userName { get; }
+            public string? userId { get; }
+            public int? userLevel { get; }
+            public string? iconUrl { get; }
+            public int? userReputation { get; }
+            public string? frameId { get; }
+
+            public Author(JObject _json)
+            {
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
+                userName = (string)jsonObj["o"]["chatMessage"]["author"]["nickname"];
+                userId = (string)jsonObj["o"]["chatMessage"]["author"]["uid"];
+                userLevel = (int)jsonObj["o"]["chatMessage"]["author"]["level"];
+                iconUrl = (string)jsonObj["o"]["chatMessage"]["author"]["icon"];
+                userReputation = (int)jsonObj["o"]["chatMessage"]["author"]["reputation"];
+                try { frameId = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["frameId"]; } catch { }
+            }
         }
     }
+
 }
