@@ -16,14 +16,14 @@ namespace Amino
     {
         private string WebSocketURL = "wss://ws3.aminoapps.com";
         private IWebsocketClient ws_client;
-
-        Amino.Events.messageEventHandler onMessage;
+        private Amino.Client _client;
         
         /// <summary>
         /// If you're trying to experiment with this package, there's no one to stop you, tho playing with the WebSocketHandler can lead to runtime issues I will not account for.
         /// </summary>
         public WebSocketHandler(Amino.Client client)
         {
+            _client = client;
             _ = Task.Run(async () => { startWebSocket(client); });
         }
 
@@ -59,13 +59,14 @@ namespace Amino
                 ws_client.ReconnectionHappened.Subscribe(info => { Console.WriteLine("Reconnected: " + info.Type); });
                 ws_client.MessageReceived.Subscribe(msg =>
                 {
-                    Amino.Objects.Message _message = new Amino.Objects.Message((JObject)JObject.Parse(msg.Text));
-                    
-                    if (onMessage != null)
+                    try
                     {
-                        Console.WriteLine("Invoking event");
-                        onMessage(this, _message);
+                        Amino.Objects.Message _message = new Amino.Objects.Message((JObject)JObject.Parse(msg.Text));
+                        Client.Events events = new Client.Events();
+                        events.callMessageEvent(_client, this, _message);
                     }
+                    catch { }
+
                 });
                 ws_client.Start().Wait();
                 exitEvent.WaitOne();

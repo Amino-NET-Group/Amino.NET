@@ -30,17 +30,18 @@ namespace Amino
         public bool debug { get; set; } = false;
 
 
-        //Events
-        public event Amino.Events.messageEventHandler onMessage;
+
         //The value to access the websocket manager
         private Amino.WebSocketHandler webSocket;
-
+        //Events
+        public event EventHandler<Amino.Events.messageEvent> onMessage;
         //headers.
         public IDictionary<string, string> headers = new Dictionary<string, string>();
 
         //Handles the header stuff
         private Task headerBuilder()
         {
+            
             headers.Clear();
             headers.Add("NDCDEVICEID", deviceID);
             headers.Add("Accept-Language", "en-US");
@@ -328,5 +329,13 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
+
+        public class Events
+        {
+            public void callMessageEvent(Amino.Client _client, object _sender, Amino.Objects.Message _message)
+            {
+                _client.onMessage.Invoke(_sender, new Amino.Events.messageEvent(_message));
+            }
+        }
     }
 }

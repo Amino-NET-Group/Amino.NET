@@ -7,18 +7,12 @@ using System.Threading.Tasks;
 namespace Amino.Events
 {
 
-    public delegate void messageEventHandler(object source, Objects.Message message);
-
     public class messageEvent : EventArgs
     {
-        private Amino.Objects.Message msg;
-        public messageEvent(Objects.Message message)
+        public Objects.Message message { get; private set; }
+        public messageEvent(Objects.Message _message)
         {
-            msg = message;
-        }
-        public Amino.Objects.Message message()
-        {
-            return msg;
+            message = _message;
         }
     }
 }
