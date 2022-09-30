@@ -125,6 +125,7 @@ namespace Amino
         }
         public Task Logout()
         {
+            if(sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             try
             {
                 var data = new
@@ -205,6 +206,7 @@ namespace Amino
 
         public Task Restore_account(string _email, string _password, string _deviceID = null)
         {
+            
             try
             {
                 if (_deviceID == null) { if (deviceID != null) { _deviceID = deviceID; } else { _deviceID = helpers.generate_device_id(); } }
@@ -265,7 +267,8 @@ namespace Amino
 
         public Task configure_account(Types.account_gender _gender, int _age)
         {
-            if(_age <= 12) { throw new Exception("The given account age is too low"); }
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (_age <= 12) { throw new Exception("The given account age is too low"); }
             int gender;
             switch(_gender)
             {
@@ -299,6 +302,7 @@ namespace Amino
 
         public Task Change_password(string _email, string _password, string _verificationCode)
         {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             var data = new
             {
                 updateSecret = $"0 {_password}",
@@ -328,7 +332,22 @@ namespace Amino
             }
             catch (Exception e) { throw new Exception(e.Message); }
         }
+        public Task get_user_info(string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
 
+
+        }
 
         public class Events
         {
