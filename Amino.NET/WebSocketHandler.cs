@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -55,10 +56,11 @@ namespace Amino
                 var exitEvent = new ManualResetEvent(false);
 
                 ws_client.ReconnectTimeout = TimeSpan.FromSeconds(30);
-                ws_client.DisconnectionHappened.Subscribe(info => { Console.WriteLine("Disconnected: " + info.CloseStatusDescription); });
-                ws_client.ReconnectionHappened.Subscribe(info => { Console.WriteLine("Reconnected: " + info.Type); });
+                ws_client.DisconnectionHappened.Subscribe(info => { if (_client.debug) { Trace.WriteLine($"WebSocket: Disconnected\nReason: {info.CloseStatusDescription}"); } });
+                ws_client.ReconnectionHappened.Subscribe(info => { if (_client.debug) { Trace.WriteLine($"WebSocket: Reconnected\nMessage: {info.Type}"); } });
                 ws_client.MessageReceived.Subscribe(msg =>
                 {
+                    if (_client.debug) { Trace.WriteLine($"WebSocket: Received Message: {msg.Text}"); }
                     try
                     {
                         Amino.Objects.Message _message = new Amino.Objects.Message((JObject)JObject.Parse(msg.Text));
@@ -66,7 +68,6 @@ namespace Amino
                         events.callMessageEvent(_client, this, _message);
                     }
                     catch { }
-
                 });
                 ws_client.Start().Wait();
                 exitEvent.WaitOne();
@@ -76,11 +77,12 @@ namespace Amino
                 throw new Exception(e.Message);
             }
         }
-
         public async Task disconnect_socket()
         {
             await ws_client.Stop(WebSocketCloseStatus.NormalClosure, "WebSocket closed successfully");
             ws_client.Dispose();
+            if (_client.debug) { Trace.WriteLine("WebSocket closed successfully."); }
+            
             
         }
     }

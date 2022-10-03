@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,7 +37,7 @@ namespace Amino
         //Events
         public event EventHandler<Amino.Events.messageEvent> onMessage;
         //headers.
-        public IDictionary<string, string> headers = new Dictionary<string, string>();
+        private IDictionary<string, string> headers = new Dictionary<string, string>();
 
         //Handles the header stuff
         private Task headerBuilder()
@@ -142,7 +143,6 @@ namespace Amino
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                deviceID = null;
                 sessionID = null;
                 secret = null;
                 userID = null;
@@ -332,21 +332,20 @@ namespace Amino
             }
             catch (Exception e) { throw new Exception(e.Message); }
         }
-        public Task get_user_info(string userId)
+
+        public Amino.Objects.userProfile get_user_info(string _userId)
         {
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}");
+                RestRequest request = new RestRequest($"/g/s/user-profile/{_userId}");
                 request.AddHeaders(headers);
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                Console.WriteLine(response.Content);
-                return Task.CompletedTask;
+                Amino.Objects.userProfile profile = new Amino.Objects.userProfile((JObject)JObject.Parse(response.Content));
+                return profile;
             }catch(Exception e) { throw new Exception(e.Message); }
-
-
         }
 
         public class Events
