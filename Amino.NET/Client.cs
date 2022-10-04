@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Http;
+using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -333,7 +334,7 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Amino.Objects.userProfile get_user_info(string _userId)
+        public Amino.Objects.globalProfile get_user_info(string _userId)
         {
             try
             {
@@ -343,9 +344,36 @@ namespace Amino
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                Amino.Objects.userProfile profile = new Amino.Objects.userProfile((JObject)JObject.Parse(response.Content));
+                Amino.Objects.globalProfile profile = new Amino.Objects.globalProfile((JObject)JObject.Parse(response.Content));
                 return profile;
             }catch(Exception e) { throw new Exception(e.Message); }
+        }
+        public bool check_device(string deviceId)
+        {
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            var data = new
+            {
+                deviceID = deviceId,
+                bundleID = "com.narvii.amino.master",
+                clientType = 100,
+                systemPushEnabled = true,
+                timezone = 0,
+                locale = currentCulture.Name,
+                timestamp = helpers.GetTimestamp() * 1000
+            };
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/device");
+                request.AddHeaders(headers);
+                                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                return true;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public class Events

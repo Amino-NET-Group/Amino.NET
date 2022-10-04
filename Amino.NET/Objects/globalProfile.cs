@@ -5,52 +5,49 @@ using Newtonsoft.Json.Linq;
 namespace Amino.Objects
 {
 
-    public class userProfile
+    public class globalProfile
     {
-        public int? status { get; private set; }
-        public string? moodSticker { get; private set; }
-        public int? itemsCount { get; private set; }
-        public int? checkInStreak { get; private set; }
+        public int? status { get; private set; } = new int?();
+        public int? itemsCount { get; private set; } = new int?();
         public string? userId { get; private set; }
         public string? modifiedTime { get; private set; }
-        public int? followingStatus { get; private set; }
-        public int? onlineStatus { get; private set; }
-        public int? accountMembershipStatus { get; private set; }
+        public int? followingStatus { get; private set; } = new int?();
+        public int? onlineStatus { get; private set; } = new int?();
+        public int? accountMembershipStatus { get; private set; } = new int?();
         public bool? isGlobal { get; private set; }
         public string? avatarFrameId { get; private set; }
-        public int? reputation { get; private set; }
-        public int? postsCount { get; private set; }
-        public int? memberCount { get; private set; }
+        public int? reputation { get; private set; } = new int?();
+        public int? postsCount { get; private set; } = new int?();
+        public int? memberCount { get; private set; } = new int?();
         public string? nickname { get; private set; }
         public string? iconUrl { get; private set; }
         public bool? isNicknameVerified { get; private set; }
-        public int? visitorsCount { get; private set; }
-        public int? level { get; private set; }
-        public int? notificationSubscriptionStatus { get; private set; }
+        public int? visitorsCount { get; private set; } = new int?();
+        public int? level { get; private set; } = new int?();
+        public int? notificationSubscriptionStatus { get; private set; } = new int?();
         public bool? pushEnabled { get; private set; }
-        public int? membershipStatus { get; private set; }
+        public int? membershipStatus { get; private set; } = new int?();
         public string? content { get; private set; }
-        public int? joinedCount { get; private set; }
-        public int? role { get; private set; }
-        public int? commentsCount { get; private set; }
+        public int? joinedCount { get; private set; } = new int?();
+        public int? role { get; private set; } = new int?();
+        public int? commentsCount { get; private set; } = new int?();
         public string? aminoId { get; private set; }
         public string? communityId { get; private set; }
         public string? createdTime { get; private set; }
-        public int? visitPrivacy { get; private set; }
-        public int? storiesCount { get; private set; }
-        public int? blogsCount { get; private set; }
+        public int? visitPrivacy { get; private set; } = new int?();
+        public int? storiesCount { get; private set; } = new int?();
+        public int? blogsCount { get; private set; } = new int?();
         public string? json { get; private set; }
         public userFrame? userProfileFrame { get; }
 
 
 
-        public userProfile(JObject _json)
+        public globalProfile(JObject _json)
         {
 
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
             status = (int)jsonObj["userProfile"]["status"];
             itemsCount = (int)jsonObj["userProfile"]["itemsCount"];
-            checkInStreak = (int)jsonObj["userProfile"]["consecutiveCheckInDays"];
             userId = (string)jsonObj["userProfile"]["uid"];
             modifiedTime = (string)jsonObj["userProfile"]["modifiedTime"];
             followingStatus = (int)jsonObj["userProfile"]["followingStatus"];
@@ -60,7 +57,7 @@ namespace Amino.Objects
             avatarFrameId = (string)jsonObj["userProfile"]["avatarFrameId"];
             reputation = (int)jsonObj["userProfile"]["reputation"];
             postsCount = (int)jsonObj["userProfile"]["postsCount"];
-            memberCount = (int)jsonObj["userProfile"]["usersCount"];
+            memberCount = (int)jsonObj["userProfile"]["membersCount"];
             nickname = (string)jsonObj["userProfile"]["nickname"];
             iconUrl = (string)jsonObj["userProfile"]["icon"];
             isNicknameVerified = (bool)jsonObj["userProfile"]["isNicknameVerified"];
@@ -85,13 +82,13 @@ namespace Amino.Objects
         }
         public class userFrame
         {
-            public int? status { get; private set; }
-            public int? ownershipStatus { get; private set; }
-            public int? version { get; private set; }
+            public int? status { get; private set; } = new int?();
+            public int? ownershipStatus { get; private set; } = new int?();
+            public int? version { get; private set; } = new int?();
             public string? resourceUrl { get; private set; }
             public string? name { get; private set; }
             public string? iconUrl { get; private set; }
-            public int? frameType { get; private set; }
+            public int? frameType { get; private set; } = new int?();
             public string? frameId { get; private set; }
 
             public userFrame(JObject _json)
