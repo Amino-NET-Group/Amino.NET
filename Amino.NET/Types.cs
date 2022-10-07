@@ -57,7 +57,14 @@
             Image,
             Stream
         }
-
+        /// <summary>
+        /// Supported File types for raw uploads
+        /// </summary>
+        public enum upload_File_Types
+        {
+            Audio, 
+            Image
+        }
         /// <summary>
         /// Sorting types for stuff
         /// </summary>

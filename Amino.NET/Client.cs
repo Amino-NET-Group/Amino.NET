@@ -348,32 +348,45 @@ namespace Amino
                 return profile;
             }catch(Exception e) { throw new Exception(e.Message); }
         }
-        public bool check_device(string deviceId)
+        public bool check_device(string _deviceId)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var data = new
             {
-                deviceID = deviceId,
+                deviceID = _deviceId,
                 bundleID = "com.narvii.amino.master",
                 clientType = 100,
                 systemPushEnabled = true,
                 timezone = 0,
                 locale = currentCulture.Name,
-                timestamp = helpers.GetTimestamp() * 1000
+                timestamp = (Math.Round(helpers.GetTimestamp())) * 1000
             };
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/device");
                 request.AddHeaders(headers);
-                                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
                 var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if ((int)response.StatusCode != 200) { return false; }
                 if (debug) { Trace.WriteLine(response.Content); }
-                Console.WriteLine(response.Content);
                 return true;
             }
             catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task upload_media(Amino.Types.upload_File_Types fileType, byte[] file)
+        {
+
+            switch(fileType)
+            {
+                case Amino.Types.upload_File_Types.Audio:
+                    break;
+                case Amino.Types.upload_File_Types.Image:
+                    break;
+            }
+
+            return Task.CompletedTask;
         }
 
         public class Events
