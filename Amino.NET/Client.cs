@@ -377,13 +377,33 @@ namespace Amino
 
         public Task upload_media(Amino.Types.upload_File_Types fileType, byte[] file)
         {
-
+            string mediaType = "image/jpg";
             switch(fileType)
             {
                 case Amino.Types.upload_File_Types.Audio:
+                    mediaType = "audio/aac";
                     break;
                 case Amino.Types.upload_File_Types.Image:
+                    mediaType = "image/jpg";
                     break;
+                default:
+                    mediaType = "image/jpg";
+                    break;
+            }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/media/upload");
+                request.AddHeaders(headers);
+                request.AddOrUpdateHeader("Content-Type", mediaType);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(file.ToString()));
+                request.AddHeader("Content-Length", file.Length);
+                request.AddJsonBody(file);
+                var response = client.ExecutePost(request);
+                Console.WriteLine(response.Content);
+            }catch(Exception e)
+            {
+                throw new Exception(e.Message);
             }
 
             return Task.CompletedTask;
