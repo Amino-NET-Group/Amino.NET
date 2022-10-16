@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Amino.Objects
 {
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class Message
     {
         public string? content { get; private set; }
@@ -28,7 +29,7 @@ namespace Amino.Objects
             chatBubbleId = (string)jsonObj["o"]["chatBubbleId"];
         }
 
-
+        [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
         public class Author
         {
             public string? userName { get; }

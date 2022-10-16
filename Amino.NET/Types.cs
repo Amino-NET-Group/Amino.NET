@@ -18,6 +18,7 @@
         public enum Call_Types
         {
             None,
+            Voice,
             Video,
             Avatar,
             Screen_Room

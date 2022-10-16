@@ -77,6 +77,14 @@ namespace Amino
                 throw new Exception(e.Message);
             }
         }
+
+        public Task send_socket_data(JObject _data)
+        {
+            string data = _data.ToString().Replace('=', ':');
+            ws_client.Send(data);
+            return Task.CompletedTask;
+        }
+
         public async Task disconnect_socket()
         {
             await ws_client.Stop(WebSocketCloseStatus.NormalClosure, "WebSocket closed successfully");

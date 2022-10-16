@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Amino.Objects
 {
-
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class globalProfile
     {
         public int? status { get; private set; } = new int?();

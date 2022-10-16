@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -11,6 +12,7 @@ using RestSharp;
 
 namespace Amino
 {
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class Client
     {
         //Values the Amino Client can hold
@@ -348,6 +350,7 @@ namespace Amino
                 return profile;
             }catch(Exception e) { throw new Exception(e.Message); }
         }
+
         public bool check_device(string _deviceId)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
@@ -375,9 +378,84 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
+        public Amino.Objects.eventLog get_event_log()
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/eventlog/profile?language=en");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                Amino.Objects.eventLog eventLog = new Amino.Objects.eventLog(JObject.Parse(response.Content));
+                return eventLog;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+
+        public List<Objects.Community> get_subClient_communities(int start = 0, int size = 25)
+        {
+            List<Amino.Objects.Community> communityList = new List<Objects.Community>();
+
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/community/joined?v=1&start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray _jsonArray = jsonObj["communityList"];
+                foreach(JObject _communityJson in _jsonArray)
+                {
+                    Amino.Objects.Community community = new Objects.Community(_communityJson);
+                    communityList.Add(community);
+                }
+                return communityList;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Objects.communityProfile> get_subClient_profiles(int start = 0, int size = 25)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.communityProfile> profileList = new List<Objects.communityProfile>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/community/joined?v=1&start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                var profiles = ((JObject)JObject.Parse(response.Content)["userInfoInCommunities"])
+                .Properties()
+                .Select(x => x.Value)
+                .Cast<JObject>()
+                .ToList();
+                foreach(var profile in profiles)
+                {
+                    Objects.communityProfile C_Profile = new Objects.communityProfile(profile);
+                    profileList.Add(C_Profile);
+                }
+
+                return profileList;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+
+        }
+        /* WILL BE ADDED LATER
         public Task upload_media(Amino.Types.upload_File_Types fileType, byte[] file)
         {
-            string mediaType = "image/jpg";
+            string mediaType;
             switch(fileType)
             {
                 case Amino.Types.upload_File_Types.Audio:
@@ -397,7 +475,7 @@ namespace Amino
                 request.AddHeaders(headers);
                 request.AddOrUpdateHeader("Content-Type", mediaType);
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(file.ToString()));
-                request.AddHeader("Content-Length", file.Length);
+                request.AddHeader("Content-Length", file.ToString().Length);
                 request.AddJsonBody(file);
                 var response = client.ExecutePost(request);
                 Console.WriteLine(response.Content);
@@ -408,12 +486,18 @@ namespace Amino
 
             return Task.CompletedTask;
         }
+        */
+
+       
 
         public class Events
         {
             public void callMessageEvent(Amino.Client _client, object _sender, Amino.Objects.Message _message)
             {
-                _client.onMessage.Invoke(_sender, new Amino.Events.messageEvent(_message));
+                if(_client.onMessage != null)
+                {
+                    _client.onMessage.Invoke(_sender, new Amino.Events.messageEvent(_message));
+                }
             }
         }
     }
