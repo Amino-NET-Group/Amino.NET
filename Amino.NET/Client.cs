@@ -450,8 +450,26 @@ namespace Amino
                 return profileList;
             }
             catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task get_account_info()
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/account");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
 
         }
+
         /* WILL BE ADDED LATER
         public Task upload_media(Amino.Types.upload_File_Types fileType, byte[] file)
         {
