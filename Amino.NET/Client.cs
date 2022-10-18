@@ -452,7 +452,7 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task get_account_info()
+        public Objects.userAccount get_account_info()
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             try
@@ -463,13 +463,50 @@ namespace Amino
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                Console.WriteLine(response.Content);
-                return Task.CompletedTask;
+                Objects.userAccount account = new Objects.userAccount(JObject.Parse(response.Content));
+                return account;
+               
             }
             catch (Exception e) { throw new Exception(e.Message); }
 
         }
 
+        public Task get_chat_threads(int start = 0, int size = 25)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread?type=joined-me&start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                return Task.CompletedTask;
+
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task get_chat_thread(string chatId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
         /* WILL BE ADDED LATER
         public Task upload_media(Amino.Types.upload_File_Types fileType, byte[] file)
         {
