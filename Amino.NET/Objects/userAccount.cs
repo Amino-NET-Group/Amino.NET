@@ -56,8 +56,6 @@ namespace Amino.Objects
             aminoId = (string)jsonObj["account"]["aminoId"];
             createdTime = (string)jsonObj["account"]["createdTime"];
             email = (string)jsonObj["account"]["email"];
-
-
         }
 
 
