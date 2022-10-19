@@ -30,13 +30,46 @@ namespace Amino.Objects
         public int communityId { get; private set; }
         public string createdTime { get; private set; }
         public string json { get; private set; }
-        public List<_member> MemberSummary { get; }
+        public List<_member> MemberSummary { get; } = new List<_member>();
         public _author Author { get; }
         public _extensions Extensions { get; }
 
         public chatThreads(JObject _json)
         {
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
             json = _json.ToString();
+
+            userId = (string)jsonObj["uid"];
+            membersQuota = (int)jsonObj["membersQuota"];
+            threadId = (string)jsonObj["threadId"];
+            keywords = (string)jsonObj["keywords"];
+            membersCount = (int)jsonObj["membersCount"];
+            strategyInfo = (string)jsonObj["strategyInfo"];
+            isPinned = (bool)jsonObj["isPinned"];
+            title = (string)jsonObj["title"];
+            membershipStatus = (int)jsonObj["membershipStatus"];
+            content = (string)jsonObj["content"];
+            needHidden = (bool)jsonObj["needHidden"];
+            alertOption = (int)jsonObj["alertOption"];
+            lastReadTime = (string)jsonObj["lastReadTime"];
+            type = (int)jsonObj["type"];
+            status = (int)jsonObj["status"];
+            modifiedTime = (string)jsonObj["modifiedTime"];
+            condition = (int)jsonObj["condition"];
+            iconUrl = (string)jsonObj["icon"];
+            communityId = (int)jsonObj["ndcId"];
+            createdTime = (string)jsonObj["createdTime"];
+            JArray _memberList = jsonObj["membersSummary"];
+
+            foreach (JObject _member in _memberList)
+            {
+                _member member = new _member(_member);
+
+                MemberSummary.Add(member);
+            }
+
+            Author = new _author(_json);
+            Extensions = new _extensions(_json);
         }
 
         [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
@@ -51,7 +84,13 @@ namespace Amino.Objects
 
             public _member(JObject _json)
             {
-
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
+                status = (int)jsonObj["status"];
+                userId = (string)jsonObj["uid"];
+                membershipStatus = (int)jsonObj["membershipStatus"];
+                role = (int)jsonObj["role"];
+                nickname = (string)jsonObj["nickname"];
+                iconUrl = (string)jsonObj["icon"];
             }
         }
 
@@ -70,7 +109,15 @@ namespace Amino.Objects
 
             public _lastMessageSummary(JObject _json)
             {
-
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
+                userId = (string)jsonObj["lastMessageSummary"]["uid"];
+                isHidden = (bool)jsonObj["lastMessageSummary"]["isHidden"];
+                mediaType = (string)jsonObj["lastMessageSummary"]["mediaType"];
+                content = (string)jsonObj["lastMessageSummary"]["content"];
+                messageId = (string)jsonObj["lastMessageSummary"]["messageId"];
+                createdTime = (string)jsonObj["lastMessageSummary"]["createdTime"];
+                type = (int)jsonObj["lastMessageSummary"]["type"];
+                mediaType = (string)jsonObj["lastMessageSummary"]["mediaType"];
             }
         }
 
@@ -96,7 +143,22 @@ namespace Amino.Objects
 
             public _author(JObject _json)
             {
-
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
+                status = (int)jsonObj["author"]["status"];
+                isNicknameVerified = (bool)jsonObj["author"]["isNicknameVerified"];
+                userId = (string)jsonObj["author"]["uid"];
+                level = (int)jsonObj["author"]["level"];
+                followingStatus = (int)jsonObj["author"]["followingStatus"];
+                accountMembershipStatus = (int)jsonObj["author"]["accountMembershipStatus"];
+                isGlobal = (bool)jsonObj["author"]["isGlobal"];
+                membershipStatus = (int)jsonObj["author"]["membershipStatus"];
+                reputation = (int)jsonObj["author"]["reputation"];
+                role = (int)jsonObj["author"]["role"];
+                communityId = (int)jsonObj["author"]["ndcId"];
+                membersCount = (int)jsonObj["author"]["membersCount"];
+                nickname = (string)jsonObj["author"]["nickname"];
+                iconUrl = (string)jsonObj["author"]["icon"];
+                    
             }
         }
 
@@ -106,10 +168,15 @@ namespace Amino.Objects
         {
             public bool viewOnly { get; private set; }
             public int lastMembersSummaryUpdateTime { get; private set; }
+            public string channelType { get; private set; }
 
             public _extensions(JObject _json)
             {
-
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
+                
+                if (jsonObj["extensions"]["viewOnly"] != null) { viewOnly = (bool)jsonObj["extensions"]["viewOnly"]; }
+                lastMembersSummaryUpdateTime = (int)jsonObj["extensions"]["lastMembersSummaryUpdateTime"];
+                if (jsonObj["extensions"]["channelType"] != null) { channelType = (string)jsonObj["extensions"]["channelType"]; }
             }
         }
     }
