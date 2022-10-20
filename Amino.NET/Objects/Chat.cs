@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Amino.Objects
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class chatThread
+    public class Chat
     {
         public string userId { get; private set; }
         public int membersQuota { get; private set; }
@@ -34,7 +34,7 @@ namespace Amino.Objects
         public _author Author { get; }
         public _extensions Extensions { get; }
 
-        public chatThread(JObject _json)
+        public Chat(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
             json = _json.ToString();

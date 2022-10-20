@@ -471,14 +471,14 @@ namespace Amino
 
         }
 
-        public List<Objects.chatThread> get_chat_threads(int start = 0, int size = 25)
+        public List<Objects.Chat> get_chat_threads(int start = 0, int size = 25)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
 
             try
             {
-                List<Objects.chatThread> chatList = new List<Objects.chatThread>();
+                List<Objects.Chat> chatList = new List<Objects.Chat>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s/chat/thread?type=joined-me&start={start}&size={size}");
                 request.AddHeaders(headers);
@@ -490,7 +490,7 @@ namespace Amino
                 JArray _chatList = jsonObj["threadList"];
                 foreach (JObject chatJson in _chatList)
                 {
-                    Objects.chatThread chat = new Objects.chatThread(chatJson);
+                    Objects.Chat chat = new Objects.Chat(chatJson);
 
                     chatList.Add(chat);
                 }
@@ -501,7 +501,7 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
-        public Objects.chatThread get_chat_thread(string chatId)
+        public Objects.Chat get_chat_thread(string chatId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
 
@@ -514,10 +514,34 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                Objects.chatThread chat = new Objects.chatThread(jsonObj["thread"]);
+                Objects.Chat chat = new Objects.Chat(jsonObj["thread"]);
                 return chat;
             }
             catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Objects.chatMember> get_chat_users(string chatId, int start = 0, int size = 25)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.chatMember> chatMembers = new List<Objects.chatMember>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member?start={start}&size={size}&type=default&cv=1.2");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray chatUserList = jsonObj["memberList"];
+                foreach(JObject chatUser in chatUserList)
+                {
+                    Objects.chatMember member = new Objects.chatMember(chatUser);
+                    chatMembers.Add(member);
+                }
+                return chatMembers;
+            }catch(Exception e) { throw new Exception(e.Message); }
         }
         /* WILL BE ADDED LATER
         public Task upload_media(Amino.Types.upload_File_Types fileType, byte[] file)
