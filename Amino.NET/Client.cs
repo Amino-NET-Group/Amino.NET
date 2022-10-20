@@ -471,14 +471,14 @@ namespace Amino
 
         }
 
-        public List<Objects.chatThreads> get_chat_threads(int start = 0, int size = 25)
+        public List<Objects.chatThread> get_chat_threads(int start = 0, int size = 25)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
 
             try
             {
-                List<Objects.chatThreads> chatList = new List<Objects.chatThreads>();
+                List<Objects.chatThread> chatList = new List<Objects.chatThread>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s/chat/thread?type=joined-me&start={start}&size={size}");
                 request.AddHeaders(headers);
@@ -490,7 +490,7 @@ namespace Amino
                 JArray _chatList = jsonObj["threadList"];
                 foreach (JObject chatJson in _chatList)
                 {
-                    Objects.chatThreads chat = new Objects.chatThreads(chatJson);
+                    Objects.chatThread chat = new Objects.chatThread(chatJson);
 
                     chatList.Add(chat);
                 }
@@ -501,7 +501,7 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task get_chat_thread(string chatId)
+        public Objects.chatThread get_chat_thread(string chatId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
 
@@ -513,8 +513,9 @@ namespace Amino
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                Console.WriteLine(response.Content);
-                return Task.CompletedTask;
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                Objects.chatThread chat = new Objects.chatThread(jsonObj["thread"]);
+                return chat;
             }
             catch (Exception e) { throw new Exception(e.Message); }
         }
