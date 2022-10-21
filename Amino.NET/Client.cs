@@ -45,7 +45,6 @@ namespace Amino
         //Handles the header stuff
         private Task headerBuilder()
         {
-            
             headers.Clear();
             headers.Add("NDCDEVICEID", deviceID);
             headers.Add("Accept-Language", "en-US");
@@ -54,7 +53,6 @@ namespace Amino
             headers.Add("Accept-Encoding", "gzip");
             headers.Add("Connection", "Keep-Alive");
             if(sessionID != null) { headers.Add("NDCAUTH", $"sid={sessionID}"); }
-
             return Task.CompletedTask;
         }
 
@@ -543,6 +541,68 @@ namespace Amino
                 return chatMembers;
             }catch(Exception e) { throw new Exception(e.Message); }
         }
+        public Task join_chat(string chatId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userID}");
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task leave_chat(string chatId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userID}");
+                request.AddHeaders(headers);
+                request.Method = Method.Delete;
+                var response = client.Execute(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+
+        /* Not a part of Client
+        public Task start_chat(string[] userIds, string message, string title = null, string content = null, bool isGlobal = false, bool publishToGlobal = false)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/chat/thread");
+                request.AddHeaders(headers);
+                JObject json = new JObject();
+                json.Add("title", title);
+                json.Add("inviteeUids", JToken.FromObject(new { userIds }));
+                json.Add("initialMessageContent", message);
+                json.Add("content", content);
+                json.Add("timestamp", (Math.Round(helpers.GetTimestamp())) * 1000);
+                if(isGlobal) { json.Add("type", 2); json.Add("eventSource", "GlobalComposeMenu"); } else { json.Add("type", 0); }
+                if(publishToGlobal) { json.Add("publishToGlobal", 1); } else { json.Add("publishToGlobal", 0); }
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(JsonConvert.SerializeObject(json))));
+                request.AddJsonBody(JsonConvert.SerializeObject(json));
+
+                Console.WriteLine(json.ToString());
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+               
+            }catch(Exception e) { throw new Exception(e.Message); }
+        } */
+
         /* WILL BE ADDED LATER
         public Task upload_media(Amino.Types.upload_File_Types fileType, byte[] file)
         {
