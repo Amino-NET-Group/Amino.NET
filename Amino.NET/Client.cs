@@ -572,7 +572,67 @@ namespace Amino
             }
             catch (Exception e) { throw new Exception(e.Message); }
         }
+        public Task invite_to_chat(string[] userIds, string chatId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                JObject data = new JObject();
+                data.Add("timestamp", (Math.Round(helpers.GetTimestamp())) * 1000);
+                data.Add("uids", JToken.FromObject(new { userIds }));
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/invite");
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
 
+        public Task kick_from_chat(string userId, string chatId, bool allowRejoin = true)
+        {
+            int _allowRejoin;
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (allowRejoin) { _allowRejoin = 1; } else { _allowRejoin = 0; }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userId}?allowRejoin={_allowRejoin}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Objects.messageCollection> get_chat_messages(string chatId, int size = 25, string pageToken = null)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            string endPoint;
+            if (pageToken != null) { endPoint = $"/g/s/chat/thread/{chatId}/message?v=2&pagingType=t&pageToken={pageToken}&size={size}"; } else { endPoint = $"/g/s/chat/thread/{chatId}/message?v=2&pagingType=t&size={size}"; }
+            try
+            {
+                List<Objects.messageCollection> messageCollection = new List<Objects.messageCollection>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest(endPoint);
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray chatMessageList = jsonObj["messageList"];
+                foreach (JObject chatMessage in chatMessageList)
+                {
+                    Objects.messageCollection message = new Objects.messageCollection(chatMessage);
+                    messageCollection.Add(message);
+                }
+                return messageCollection;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
 
         /* Not a part of Client
         public Task start_chat(string[] userIds, string message, string title = null, string content = null, bool isGlobal = false, bool publishToGlobal = false)
