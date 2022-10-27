@@ -216,5 +216,18 @@
             Welcome_Message,
             Invite_Message
         }
+        public enum Post_Types
+        {
+            Wiki,
+            Blog,
+            Quiz,
+            Shared_File
+        }
+        public enum Flag_Targets
+        {
+            User,
+            Blog,
+            Wiki
+        }
     }
 }

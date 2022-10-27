@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 namespace Amino.Objects
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class communityProfile
+    public class CommunityProfile
     {
         public int status { get; private set; }
         public bool isNicknameVerified { get; private set; }
@@ -22,7 +22,7 @@ namespace Amino.Objects
         public int communityId { get; private set; }
         public string json { get; private set; }
 
-        public communityProfile(JObject _json)
+        public CommunityProfile(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
 

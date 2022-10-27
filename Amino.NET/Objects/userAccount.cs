@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 namespace Amino.Objects
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class userAccount
+    public class UserAccount
     {
         public string userName { get; private set; }
         public int? status { get; private set; }
@@ -27,14 +27,14 @@ namespace Amino.Objects
         public string createdTime { get; private set; }
         public string email { get; private set; }
         public string json { get; private set; }
-        public _advancedSettings AdvancedSettings { get; }
-        public _extensions Extensions { get; }
+        public _AdvancedSettings AdvancedSettings { get; }
+        public _Extensions Extensions { get; }
 
-        public userAccount(JObject _json)
+        public UserAccount(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            AdvancedSettings = new _advancedSettings(_json);
-            Extensions = new _extensions(_json);
+            AdvancedSettings = new _AdvancedSettings(_json);
+            Extensions = new _Extensions(_json);
             json = _json.ToString();
             userName = (string)jsonObj["account"]["username"];
             status = (int)jsonObj["account"]["status"];
@@ -60,11 +60,11 @@ namespace Amino.Objects
 
 
         [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-        public class _advancedSettings
+        public class _AdvancedSettings
         {
             public int? analyticsEnabled { get; private set; }
 
-            public _advancedSettings(JObject _json)
+            public _AdvancedSettings(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
                 analyticsEnabled = (int)jsonObj["account"]["advancedSettings"]["analyticsEnabled"];
@@ -74,7 +74,7 @@ namespace Amino.Objects
 
 
         [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-        public class _extensions
+        public class _Extensions
         {
             public string contentLanguage { get; private set; }
             public int? adsFlags { get; private set; }
@@ -83,12 +83,12 @@ namespace Amino.Objects
             public string avatarFrameId { get; private set; }
             public bool mediaLabAdsMigrationAugust2020 { get; private set; }
             public bool adsEnabled { get; private set; }
-            public _deviceInfo DeviceInfo { get; }
+            public _DeviceInfo DeviceInfo { get; }
 
-            public _extensions(JObject _json)
+            public _Extensions(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-                DeviceInfo = new _deviceInfo(_json);
+                DeviceInfo = new _DeviceInfo(_json);
                 contentLanguage = (string)jsonObj["account"]["extensions"]["contentLanguage"];
                 adsFlags = (int)jsonObj["account"]["extensions"]["adsFlags"];
                 mediaLabAdsMigrationJuly2020 = (bool)jsonObj["account"]["extensions"]["mediaLabAdsMigrationJuly2020"];
@@ -99,11 +99,11 @@ namespace Amino.Objects
             }
 
             [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-            public class _deviceInfo
+            public class _DeviceInfo
             {
                 public int? lastClientType { get; private set; }
 
-                public _deviceInfo(JObject _json)
+                public _DeviceInfo(JObject _json)
                 {
                     dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
                     lastClientType = (int)jsonObj["account"]["extensions"]["deviceInfo"]["lastClientType"];

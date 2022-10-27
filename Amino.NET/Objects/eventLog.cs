@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 namespace Amino.Objects
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class eventLog
+    public class EventLog
     {
         public string? globalStrategyInfo { get; private set; }
         public string? userId { get; private set; }
@@ -18,9 +18,9 @@ namespace Amino.Objects
         public string? amino_userId { get; private set; }
         public bool? needTriggerInterestPicker { get; private set; }
         public string? json { get; private set; }
-        public _participatedExperiments participatedExperiments { get; private set; }
+        public _ParticipatedExperiments ParticipatedExperiments { get; private set; }
 
-        public eventLog(JObject _json)
+        public EventLog(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
             globalStrategyInfo = (string)jsonObj["globalStrategyInfo"];
@@ -35,11 +35,11 @@ namespace Amino.Objects
             needTriggerInterestPicker = (bool)jsonObj["needTriggerInterestPicker"];
             json = _json.ToString();
 
-            participatedExperiments = new _participatedExperiments(_json);
+            ParticipatedExperiments = new _ParticipatedExperiments(_json);
         }
 
 
-        public class _participatedExperiments
+        public class _ParticipatedExperiments
         {
             public int? chatMembersCommonChannel { get; private set; }
             public int? couponPush { get; private set; }
@@ -48,7 +48,7 @@ namespace Amino.Objects
             public int? userVectorCommunitySimilarityChannel { get; private set; }
 
 
-            public _participatedExperiments(JObject _json)
+            public _ParticipatedExperiments(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
                 chatMembersCommonChannel = (int)jsonObj["participatedExperiments"]["chatMembersCommonChannel"];

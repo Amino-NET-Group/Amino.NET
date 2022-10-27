@@ -14,12 +14,12 @@ namespace Amino.Objects
         public string? json { get; private set; }
         public int? communityId { get; private set; }
         public string? chatBubbleId { get; private set; }
-        public Author? author { get; }
+        public _Author? Author { get; }
 
         public Message(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            author = new Author(_json);
+            Author = new _Author(_json);
             content = (string)jsonObj["o"]["chatMessage"]["content"];
             messageId = (string)jsonObj["o"]["chatMessage"]["messageId"];
             chatId = (string)jsonObj["o"]["chatMessage"]["threadId"];
@@ -30,7 +30,7 @@ namespace Amino.Objects
         }
 
         [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-        public class Author
+        public class _Author
         {
             public string? userName { get; }
             public string? userId { get; }
@@ -39,7 +39,7 @@ namespace Amino.Objects
             public int? userReputation { get; }
             public string? frameId { get; }
 
-            public Author(JObject _json)
+            public _Author(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
                 userName = (string)jsonObj["o"]["chatMessage"]["author"]["nickname"];

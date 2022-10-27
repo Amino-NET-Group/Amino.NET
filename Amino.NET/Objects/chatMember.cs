@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Amino.Objects
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class chatMember
+    public class ChatMember
     {
         public int status { get; private set; }
         public bool isNicknameVerified { get; private set; }
@@ -22,9 +22,9 @@ namespace Amino.Objects
         public string nickname { get; private set; }
         public string iconUrl { get; private set; }
         public string json { get; private set; }
-        public _avatarFrame AvatarFrame { get; }
+        public _AvatarFrame AvatarFrame { get; }
 
-        public chatMember(JObject _json)
+        public ChatMember(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
             status = (int)jsonObj["status"];
@@ -38,12 +38,12 @@ namespace Amino.Objects
             nickname = (string)jsonObj["nickname"];
             iconUrl = (string)jsonObj["icon"];
             json = _json.ToString();
-            if (jsonObj["avatarFrame"] != null) { AvatarFrame = new _avatarFrame(_json); }
+            if (jsonObj["avatarFrame"] != null) { AvatarFrame = new _AvatarFrame(_json); }
         }
 
 
         [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-        public class _avatarFrame
+        public class _AvatarFrame
         {
             public int status { get; private set; }
             public int ownershipStatus { get; private set; }
@@ -54,7 +54,7 @@ namespace Amino.Objects
             public int frameType { get; private set; }
             public string frameId { get; private set; }
 
-            public _avatarFrame(JObject _json)
+            public _AvatarFrame(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
                 status = (int)jsonObj["avatarFrame"]["status"];

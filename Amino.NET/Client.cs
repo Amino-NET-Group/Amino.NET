@@ -334,7 +334,7 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Amino.Objects.globalProfile get_user_info(string _userId)
+        public Amino.Objects.GlobalProfile get_user_info(string _userId)
         {
             try
             {
@@ -344,7 +344,7 @@ namespace Amino
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                Amino.Objects.globalProfile profile = new Amino.Objects.globalProfile((JObject)JObject.Parse(response.Content));
+                Amino.Objects.GlobalProfile profile = new Amino.Objects.GlobalProfile((JObject)JObject.Parse(response.Content));
                 return profile;
             }catch(Exception e) { throw new Exception(e.Message); }
         }
@@ -376,7 +376,7 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Amino.Objects.eventLog get_event_log()
+        public Amino.Objects.EventLog get_event_log()
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             try
@@ -387,7 +387,7 @@ namespace Amino
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                Amino.Objects.eventLog eventLog = new Amino.Objects.eventLog(JObject.Parse(response.Content));
+                Amino.Objects.EventLog eventLog = new Amino.Objects.EventLog(JObject.Parse(response.Content));
                 return eventLog;
             }
             catch (Exception e) { throw new Exception(e.Message); }
@@ -421,13 +421,13 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public List<Objects.communityProfile> get_subClient_profiles(int start = 0, int size = 25)
+        public List<Objects.CommunityProfile> get_subClient_profiles(int start = 0, int size = 25)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
             try
             {
-                List<Objects.communityProfile> profileList = new List<Objects.communityProfile>();
+                List<Objects.CommunityProfile> profileList = new List<Objects.CommunityProfile>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s/community/joined?v=1&start={start}&size={size}");
                 request.AddHeaders(headers);
@@ -441,7 +441,7 @@ namespace Amino
                 .ToList();
                 foreach(var profile in profiles)
                 {
-                    Objects.communityProfile C_Profile = new Objects.communityProfile(profile);
+                    Objects.CommunityProfile C_Profile = new Objects.CommunityProfile(profile);
                     profileList.Add(C_Profile);
                 }
 
@@ -450,7 +450,7 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Objects.userAccount get_account_info()
+        public Objects.UserAccount get_account_info()
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             try
@@ -461,7 +461,7 @@ namespace Amino
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                Objects.userAccount account = new Objects.userAccount(JObject.Parse(response.Content));
+                Objects.UserAccount account = new Objects.UserAccount(JObject.Parse(response.Content));
                 return account;
                
             }
@@ -518,13 +518,13 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public List<Objects.chatMember> get_chat_users(string chatId, int start = 0, int size = 25)
+        public List<Objects.ChatMember> get_chat_users(string chatId, int start = 0, int size = 25)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
             try
             {
-                List<Objects.chatMember> chatMembers = new List<Objects.chatMember>();
+                List<Objects.ChatMember> chatMembers = new List<Objects.ChatMember>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member?start={start}&size={size}&type=default&cv=1.2");
                 request.AddHeaders(headers);
@@ -535,7 +535,7 @@ namespace Amino
                 JArray chatUserList = jsonObj["memberList"];
                 foreach(JObject chatUser in chatUserList)
                 {
-                    Objects.chatMember member = new Objects.chatMember(chatUser);
+                    Objects.ChatMember member = new Objects.ChatMember(chatUser);
                     chatMembers.Add(member);
                 }
                 return chatMembers;
@@ -608,98 +608,287 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
-        public List<Objects.messageCollection> get_chat_messages(string chatId, int size = 25, string pageToken = null)
+        public List<Objects.MessageCollection> get_chat_messages(string chatId, int size = 25, string pageToken = null)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             string endPoint;
-            if (pageToken != null) { endPoint = $"/g/s/chat/thread/{chatId}/message?v=2&pagingType=t&pageToken={pageToken}&size={size}"; } else { endPoint = $"/g/s/chat/thread/{chatId}/message?v=2&pagingType=t&size={size}"; }
+            if (!string.IsNullOrEmpty(pageToken) || !string.IsNullOrWhiteSpace(pageToken)) { endPoint = $"/g/s/chat/thread/{chatId}/message?v=2&pagingType=t&pageToken={pageToken}&size={size}"; } else { endPoint = $"/g/s/chat/thread/{chatId}/message?v=2&pagingType=t&size={size}"; }
             try
             {
-                List<Objects.messageCollection> messageCollection = new List<Objects.messageCollection>();
+                List<Objects.MessageCollection> messageCollection = new List<Objects.MessageCollection>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest(endPoint);
                 request.AddHeaders(headers);
                 var response = client.ExecuteGet(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
-                Console.WriteLine(response.Content);
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
                 JArray chatMessageList = jsonObj["messageList"];
                 foreach (JObject chatMessage in chatMessageList)
                 {
-                    Objects.messageCollection message = new Objects.messageCollection(chatMessage);
+                    Objects.MessageCollection message = new Objects.MessageCollection(chatMessage, JObject.Parse(response.Content));
                     messageCollection.Add(message);
                 }
                 return messageCollection;
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
-        /* Not a part of Client
-        public Task start_chat(string[] userIds, string message, string title = null, string content = null, bool isGlobal = false, bool publishToGlobal = false)
+        public List<Objects.CommunityInfo> search_community(string aminoId)
+        {
+            try
+            {
+                List<Objects.CommunityInfo> communityInfoList = new List<Objects.CommunityInfo>(); 
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/search/amino-id-and-link?q={aminoId}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray communityInfo = jsonObj["resultList"];
+                foreach(JObject community in communityInfo)
+                {
+                    Objects.CommunityInfo com = new Objects.CommunityInfo(community);
+                    communityInfoList.Add(com);
+                }
+                return communityInfoList;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Objects.UserFollowings> get_user_following(string userId, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserFollowings> userFollowingsList = new List<Objects.UserFollowings>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/joined?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userFollowings = jsonObj["userProfileList"];
+                foreach (JObject following in userFollowings)
+                {
+                    Objects.UserFollowings _following = new Objects.UserFollowings(following);
+                    userFollowingsList.Add(_following);
+                }
+                return userFollowingsList;
+
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Objects.UserFollowings> get_user_followers(string userId, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserFollowings> userFollowerList = new List<Objects.UserFollowings>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/member?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userFollowers = jsonObj["userProfileList"];
+                foreach (JObject follower in userFollowers)
+                {
+                    Objects.UserFollowings _follower = new Objects.UserFollowings(follower);
+                    userFollowerList.Add(_follower);
+                }
+                return userFollowerList;
+
+            }catch(Exception e) { throw new Exception(e.Message); }
+
+        }
+
+        public List<Objects.UserVisitor> get_user_visitors(string userId, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserVisitor> userVisitorList = new List<Objects.UserVisitor>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/visitors?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userVisitors = jsonObj["visitors"];
+                foreach (JObject visitor in userVisitors)
+                {
+                    Objects.UserVisitor _visitor = new Objects.UserVisitor(visitor, jsonObj);
+                    userVisitorList.Add(_visitor);
+                }
+                return userVisitorList;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Objects.BlockedUser> get_blocked_users(int start = 0, int size = 25)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.BlockedUser> blockedUserList = new List<Objects.BlockedUser>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/block?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.StatusCode); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray blockedUsers = jsonObj["userProfileList"];
+                foreach (JObject user in blockedUsers)
+                {
+                    Objects.BlockedUser _blockedUser = new Objects.BlockedUser(user);
+                    blockedUserList.Add(_blockedUser);
+                }
+                return blockedUserList;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<string> get_blocker_users(int start = 0, int size = 25)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<string> blockerUserList = new List<string>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/block/full-list?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray blockerUsers = jsonObj["blockerUidList"];
+                foreach(var user in blockerUsers)
+                {
+                    blockerUserList.Add(user.ToString());
+                }
+                return blockerUserList;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+        public List<Objects.Comment> get_wall_comments(string userId, Types.Sorting_Types type, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.Comment> commentList = new List<Objects.Comment>();
+                string _sorting_type;
+                switch(type)
+                {
+                    case Types.Sorting_Types.Newest:
+                        _sorting_type = "newest";
+                        break;
+                    case Types.Sorting_Types.Oldest:
+                        _sorting_type = "oldest";
+                        break;
+                    case Types.Sorting_Types.Top:
+                        _sorting_type = "vote";
+                        break;
+                    default:
+                        _sorting_type = "newest";
+                        break;
+                }
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/g-comment?sort={_sorting_type}&start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray comments = jsonObj["commentList"];
+                foreach (JObject comment in comments)
+                {
+                    Objects.Comment _comment = new Objects.Comment(comment);
+                    commentList.Add(_comment);
+                }
+                return commentList;
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task flag(string reason, Types.Flag_Types flagType, Types.Flag_Targets targetType, string targetId, bool asGuest)
+        {
+            if(!asGuest) { if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); } }
+            int _objectType;
+            int _flagType;
+            string _flag;
+            switch(targetType)
+            {
+                case Types.Flag_Targets.User:
+                    _objectType = 0;
+                    break;
+                case Types.Flag_Targets.Blog:
+                    _objectType = 1;
+                    break;
+                case Types.Flag_Targets.Wiki:
+                    _objectType = 2;
+                    break;
+                default:
+                    _objectType = 0;
+                    break;
+            }
+            switch(flagType)
+            {
+                case Types.Flag_Types.Aggression:
+                    _flagType = 0;
+                    break;
+                case Types.Flag_Types.Spam:
+                    _flagType = 2;
+                    break;
+                case Types.Flag_Types.Off_Topic:
+                    _flagType = 4;
+                    break;
+                case Types.Flag_Types.Violence:
+                    _flagType = 106;
+                    break;
+                case Types.Flag_Types.Intolerance:
+                    _flagType = 107;
+                    break;
+                case Types.Flag_Types.Suicide:
+                    _flagType = 108;
+                    break;
+                case Types.Flag_Types.Trolling:
+                    _flagType = 109;
+                    break;
+                case Types.Flag_Types.Pronography:
+                    _flagType = 110;
+                    break;
+                default:
+                    _flagType = 0;
+                    break;
+            }
+            if(asGuest) { _flag = "g-flag"; } else { _flag = "flag"; }
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/chat/thread");
+                RestRequest request = new RestRequest($"/g/s/{_flag}");
+                var data = new
+                {
+                    flagType = _flagType,
+                    message = reason,
+                    timestamp = helpers.GetTimestamp() * 1000,
+                    objectId = targetId,
+                    objetType = _objectType
+                };
                 request.AddHeaders(headers);
-                JObject json = new JObject();
-                json.Add("title", title);
-                json.Add("inviteeUids", JToken.FromObject(new { userIds }));
-                json.Add("initialMessageContent", message);
-                json.Add("content", content);
-                json.Add("timestamp", (Math.Round(helpers.GetTimestamp())) * 1000);
-                if(isGlobal) { json.Add("type", 2); json.Add("eventSource", "GlobalComposeMenu"); } else { json.Add("type", 0); }
-                if(publishToGlobal) { json.Add("publishToGlobal", 1); } else { json.Add("publishToGlobal", 0); }
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(JsonConvert.SerializeObject(json))));
-                request.AddJsonBody(JsonConvert.SerializeObject(json));
-
-                Console.WriteLine(json.ToString());
+                request.AddJsonBody(data);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-               
             }catch(Exception e) { throw new Exception(e.Message); }
-        } */
-
-        /* WILL BE ADDED LATER
-        public Task upload_media(Amino.Types.upload_File_Types fileType, byte[] file)
-        {
-            string mediaType;
-            switch(fileType)
-            {
-                case Amino.Types.upload_File_Types.Audio:
-                    mediaType = "audio/aac";
-                    break;
-                case Amino.Types.upload_File_Types.Image:
-                    mediaType = "image/jpg";
-                    break;
-                default:
-                    mediaType = "image/jpg";
-                    break;
-            }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/media/upload");
-                request.AddHeaders(headers);
-                request.AddOrUpdateHeader("Content-Type", mediaType);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(file.ToString()));
-                request.AddHeader("Content-Length", file.ToString().Length);
-                request.AddJsonBody(file);
-                var response = client.ExecutePost(request);
-                Console.WriteLine(response.Content);
-            }catch(Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-
-            return Task.CompletedTask;
         }
-        */
-
-       
 
         public class Events
         {

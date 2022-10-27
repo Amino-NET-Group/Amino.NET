@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 namespace Amino.Objects
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class messageCollection
+    public class MessageCollection
     {
         public bool includedInSummary { get; private set; }
         public string authorId { get; private set; }
@@ -19,10 +19,10 @@ namespace Amino.Objects
         public int type { get; private set; }
         public string mediaUrl { get; private set; }
         public string json { get; private set; }
-        public _Author Author { get; }
-        public _Paging Paging { get; }
+        public _Author? Author { get; }
+        public _Paging? Paging { get; }
 
-        public messageCollection(JObject _json)
+        public MessageCollection(JObject _json, JObject _fullJson)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
             includedInSummary = (bool)jsonObj["includedInSummary"];
@@ -38,8 +38,8 @@ namespace Amino.Objects
             type = (int)jsonObj["type"];
             mediaUrl = (string)jsonObj["mediaValue"];
             json = _json.ToString();
-            Paging = new _Paging(_json);
-            Author = 
+            Paging = new _Paging(_fullJson);
+            Author = new _Author(_json);
         }
 
         [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
@@ -51,6 +51,7 @@ namespace Amino.Objects
             public _Paging(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
+                
                 nextPageToken = (string)jsonObj["paging"]["nextPageToken"];
                 prevPageToken = (string)jsonObj["paging"]["prevPageToken"];
             }
@@ -94,7 +95,7 @@ namespace Amino.Objects
                 membersCount = (int)jsonObj["author"]["membersCount"];
                 nickname = (string)jsonObj["author"]["nickname"];
                 iconUrl = (string)jsonObj["author"]["icon"];
-                AvatarFrame = new _avatarFrame(_json);
+                if(jsonObj["author"]["avatarFrame"] != null) { AvatarFrame = new _avatarFrame(_json); }
             }
 
             [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]

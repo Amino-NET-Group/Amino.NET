@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 namespace Amino.Objects
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class globalProfile
+    public class GlobalProfile
     {
         public int? status { get; private set; } = new int?();
         public int? itemsCount { get; private set; } = new int?();
@@ -38,11 +38,11 @@ namespace Amino.Objects
         public int? storiesCount { get; private set; } = new int?();
         public int? blogsCount { get; private set; } = new int?();
         public string? json { get; private set; }
-        public userFrame? userProfileFrame { get; }
+        public UserFrame? UserProfileFrame { get; }
 
 
 
-        public globalProfile(JObject _json)
+        public GlobalProfile(JObject _json)
         {
 
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
@@ -77,10 +77,10 @@ namespace Amino.Objects
             storiesCount = (int)jsonObj["userProfile"]["storiesCount"];
             blogsCount = (int)jsonObj["userProfile"]["blogsCount"];
             json = _json.ToString();
-            userProfileFrame = new userFrame(_json);
+            UserProfileFrame = new UserFrame(_json);
 
         }
-        public class userFrame
+        public class UserFrame
         {
             public int? status { get; private set; } = new int?();
             public int? ownershipStatus { get; private set; } = new int?();
@@ -91,7 +91,7 @@ namespace Amino.Objects
             public int? frameType { get; private set; } = new int?();
             public string? frameId { get; private set; }
 
-            public userFrame(JObject _json)
+            public UserFrame(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
                 status = (int)jsonObj["userProfile"]["avatarFrame"]["status"];

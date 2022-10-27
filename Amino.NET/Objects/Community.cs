@@ -26,7 +26,7 @@ namespace Amino.Objects
         public int templateId { get; private set; }
         public string createdTime { get; private set; }
         public string json { get; private set; }
-        public _agent Agent { get; private set; }
+        public _Agent Agent { get; private set; }
 
 
         public Community(JObject _json)
@@ -51,10 +51,10 @@ namespace Amino.Objects
             templateId = (int)jsonObj["templateId"];
             createdTime = (string)jsonObj["createdTime"];
             json = _json.ToString();
-            Agent = new _agent(_json);
+            Agent = new _Agent(_json);
         }
 
-        public class _agent
+        public class _Agent
         {
             public bool isNickNameVerified { get; private set; }
             public string userId { get; private set; }
@@ -65,7 +65,7 @@ namespace Amino.Objects
             public int reputation { get; private set; }
             public int membersCount { get; private set; }
 
-            public _agent(JObject _json)
+            public _Agent(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
                 isNickNameVerified = (bool)jsonObj["agent"]["isNicknameVerified"];
