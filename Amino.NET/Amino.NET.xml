@@ -1,0 +1,430 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Amino.NET</name>
+    </assembly>
+    <members>
+        <member name="M:Amino.Client.#ctor(System.String)">
+            <summary>
+            Creates an instance of the Amino.Client object and builds headers
+            
+            <para>This object can hold a deviceId, if left empty, it will generate one.</para>
+            </summary>
+            <param>This object can hold a deviceId, if left empty, it will generate one.</param>
+            <param name="_deviceID"></param>
+        </member>
+        <member name="M:Amino.Client.request_verify_code(System.String,System.Boolean)">
+            <summary>
+            Allows you to request a verification code for amino
+            <para>This function requires an email address, to reset a password, put the resetPassword alue to true</para>
+            </summary>
+            <param name="email"></param>
+            <param name="resetPassword"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.Login(System.String,System.String,System.String)">
+            <summary>
+            Allows you to log into your account
+            <para>This function will set all client values and wíll enable the webSocket to activate</para>
+            <para>Successfully calling this function will enable the Client events</para>
+            </summary>
+            <param name="_email"></param>
+            <param name="_password"></param>
+            <param name="_secret"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.Logout">
+            <summary>
+            Allows you to log out of the current account
+            <para>A successful function call will clear the Client values and close the webSocket connection</para>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.Register(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Allows you to register an Amino account
+            <para>This function requires a verification code, refer to <b>request_verify_code()</b></para>
+            </summary>
+            <param name="_name"></param>
+            <param name="_email"></param>
+            <param name="_password"></param>
+            <param name="_verificationCode"></param>
+            <param name="_deviceID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.Restore_account(System.String,System.String,System.String)">
+            <summary>
+            Allows you to restore an Amino account
+            </summary>
+            <param name="_email"></param>
+            <param name="_password"></param>
+            <param name="_deviceID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.Delete_account(System.String)">
+            <summary>
+            Allows you to delete the current Amino account
+            <para>This function requires a verification code, refer to <b>request_verify_code()</b></para>
+            </summary>
+            <param name="_password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.activate_account(System.String,System.String,System.String)">
+            <summary>
+            Allows you to activate the current Amino account
+            <para>This function requires a verification code, refer to <b>request_verify_code()</b></para>
+            </summary>
+            <param name="_email"></param>
+            <param name="_verificationCode"></param>
+            <param name="_deviceID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.configure_account(Amino.Types.account_gender,System.Int32)">
+            <summary>
+            Allows you to configure the current Amino account
+            </summary>
+            <param name="_gender"></param>
+            <param name="_age"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.Change_password(System.String,System.String,System.String)">
+            <summary>
+            Allows you to change the password of the current Amino account
+            </summary>
+            <param name="_email"></param>
+            <param name="_password"></param>
+            <param name="_verificationCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.get_user_info(System.String)">
+            <summary>
+            Allows you to get information about a user Profile
+            </summary>
+            <param name="_userId"></param>
+            <returns>Object : Amino.Objects.GlobalProfile</returns>
+        </member>
+        <member name="M:Amino.Client.check_device(System.String)">
+            <summary>
+            Allows you to check if a Device ID is valid
+            </summary>
+            <param name="_deviceId"></param>
+            <returns>bool : true / false</returns>
+        </member>
+        <member name="M:Amino.Client.get_event_log">
+            <summary>
+            Allows you to get the event log of the current Amino account
+            </summary>
+            <returns>Object : Amino.Objects.EventLog</returns>
+        </member>
+        <member name="M:Amino.Client.get_subClient_communities(System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of Communities the current Amino account is in
+            </summary>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.Community</returns>
+        </member>
+        <member name="M:Amino.Client.get_subClient_profiles(System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of community profiles of the current Amino account
+            </summary>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.CommunityProfile</returns>
+        </member>
+        <member name="M:Amino.Client.get_account_info">
+            <summary>
+            Allows you to get information about the current Amino account
+            </summary>
+            <returns>Object : Amino.Objects.UserAccount</returns>
+        </member>
+        <member name="M:Amino.Client.get_chat_threads(System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of chat threads the current Amino account is in 
+            </summary>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.Chat</returns>
+        </member>
+        <member name="M:Amino.Client.get_chat_thread(System.String)">
+            <summary>
+            Allows you to get a single chat thread using a chatId
+            </summary>
+            <param name="chatId"></param>
+            <returns>Object : Amino.Objects.Chat</returns>
+        </member>
+        <member name="M:Amino.Client.get_chat_users(System.String,System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of users within a chat thread
+            </summary>
+            <param name="chatId"></param>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.ChatMember</returns>
+        </member>
+        <member name="M:Amino.Client.join_chat(System.String)">
+            <summary>
+            Allows you to join a chat with the current Amino account
+            </summary>
+            <param name="chatId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.leave_chat(System.String)">
+            <summary>
+            Allows you to leave a chat with the current Amino account
+            </summary>
+            <param name="chatId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.invite_to_chat(System.String[],System.String)">
+            <summary>
+            Allows you to invite one or multiple members into a chat thread with the current Amino account
+            </summary>
+            <param name="userIds"></param>
+            <param name="chatId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.kick_from_chat(System.String,System.String,System.Boolean)">
+            <summary>
+            Allows you to kick someone from a chat thread with the current Amino account
+            </summary>
+            <param name="userId"></param>
+            <param name="chatId"></param>
+            <param name="allowRejoin"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.get_chat_messages(System.String,System.Int32,System.String)">
+            <summary>
+            Allows you to get a list of chat messages of a specific chat
+            </summary>
+            <param name="chatId"></param>
+            <param name="size"></param>
+            <param name="pageToken"></param>
+            <returns>List : Amino.Objects.MessageCollection</returns>
+        </member>
+        <member name="M:Amino.Client.search_community(System.String)">
+            <summary>
+            Allows you to search a community based on its ID (aminoId <b>not</b> objectId) and get information about it
+            </summary>
+            <param name="aminoId"></param>
+            <returns>List : Amino.Objects.CommunityInfo</returns>
+        </member>
+        <member name="M:Amino.Client.get_user_following(System.String,System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of users a person is following
+            </summary>
+            <param name="userId"></param>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.UserFollowings</returns>
+        </member>
+        <member name="M:Amino.Client.get_user_followers(System.String,System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of users that follow a person
+            </summary>
+            <param name="userId"></param>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Obejcts.UserFollowings</returns>
+        </member>
+        <member name="M:Amino.Client.get_user_visitors(System.String,System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of users that visited a persons Amino account page
+            </summary>
+            <param name="userId"></param>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.UserVisitor</returns>
+        </member>
+        <member name="M:Amino.Client.get_blocked_users(System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of users the current Amino account has blocked
+            </summary>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.BlockedUser</returns>
+        </member>
+        <member name="M:Amino.Client.get_blocker_users(System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of userIds of the users that have blocked the current Amino account
+            </summary>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : string</returns>
+        </member>
+        <member name="M:Amino.Client.get_wall_comments(System.String,Amino.Types.Sorting_Types,System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of wall comments on a persons Amino Profile
+            </summary>
+            <param name="userId"></param>
+            <param name="type"></param>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.Comment</returns>
+        </member>
+        <member name="M:Amino.Client.flag(System.String,Amino.Types.Flag_Types,Amino.Types.Flag_Targets,System.String,System.Boolean)">
+            <summary>
+            Allows you to flag a post with or without the current Amino account
+            </summary>
+            <param name="reason"></param>
+            <param name="flagType"></param>
+            <param name="targetType"></param>
+            <param name="targetId"></param>
+            <param name="asGuest"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.delete_message(System.String,System.String,System.Boolean,System.String)">
+            <summary>
+            Allows you to delete a message in a chat thread with the current Amino account
+            </summary>
+            <param name="chatId"></param>
+            <param name="messageId"></param>
+            <param name="asStaff"></param>
+            <param name="reason"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.mark_as_read(System.String,System.String)">
+            <summary>
+            Allows you to mark a message as read with the current Amino account
+            </summary>
+            <param name="_chatId"></param>
+            <param name="_messageId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.visit(System.String)">
+            <summary>
+            Allows you to visit a users Amino profile
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.follow_user(System.String)">
+            <summary>
+            Allows you to follow a user with the current Amino account
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.unfollow_user(System.String)">
+            <summary>
+            Allows you to unfollow a user with the current Amino account
+            </summary>
+            <param name="_userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.block_user(System.String)">
+            <summary>
+            Allows you to block a user with the current Amino account
+            </summary>
+            <param name="_userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.unblock_user(System.String)">
+            <summary>
+            Allows you to unblock a user with the current Amino account
+            </summary>
+            <param name="_userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.join_community(System.String,System.String)">
+            <summary>
+            Allows you to join a community with the current Amino account
+            </summary>
+            <param name="communityId"></param>
+            <param name="invitationCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.join_community_request(System.String,System.String)">
+            <summary>
+            Allows you to request membership to a community with the current Amino account
+            </summary>
+            <param name="communityId"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.leave_community(System.String)">
+            <summary>
+            Allows you to leave a community with the current Amino account
+            </summary>
+            <param name="communityId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.flag_community(System.String,System.String,Amino.Types.Flag_Types,System.Boolean)">
+            <summary>
+            Allows you to flag a community usign the current Amino account
+            </summary>
+            <param name="communityId"></param>
+            <param name="reason"></param>
+            <param name="flagType"></param>
+            <param name="asGuest"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.edit_profile(System.String,System.String,System.Byte[],System.String,System.String,System.String)">
+            <summary>
+            Allows you to edit the profile page of the current Amino account
+            </summary>
+            <param name="nickname"></param>
+            <param name="content"></param>
+            <param name="icon"></param>
+            <param name="backgroundColor"></param>
+            <param name="backgroundMediaUrl"></param>
+            <param name="defaultChatbubbleId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Amino.Types.account_gender">
+            <summary>
+            Account gender properties
+            </summary>
+        </member>
+        <member name="T:Amino.Types.Call_Types">
+            <summary>
+            Types of different Amino calls
+            </summary>
+        </member>
+        <member name="T:Amino.Types.Call_Permission_Types">
+            <summary>
+            Types for call permissions
+            </summary>
+        </member>
+        <member name="T:Amino.Types.Flag_Types">
+            <summary>
+            Types to flag stuff
+            </summary>
+        </member>
+        <member name="T:Amino.Types.File_Types">
+            <summary>
+            Aminos supported file types
+            </summary>
+        </member>
+        <member name="T:Amino.Types.upload_File_Types">
+            <summary>
+            Supported File types for raw uploads
+            </summary>
+        </member>
+        <member name="T:Amino.Types.Sorting_Types">
+            <summary>
+            Sorting types for stuff
+            </summary>
+        </member>
+        <member name="T:Amino.Types.Repair_Types">
+            <summary>
+            Repair types for Amino+
+            </summary>
+        </member>
+        <member name="T:Amino.Types.Activity_Status_Types">
+            <summary>
+            Activity status types.
+            </summary>
+        </member>
+        <member name="T:Amino.Types.Chat_Publish_Types">
+            <summary>
+            Types for chat settings
+            </summary>
+        </member>
+        <member name="M:Amino.WebSocketHandler.#ctor(Amino.Client)">
+            <summary>
+            If you're trying to experiment with this package, there's no one to stop you, tho playing with the WebSocketHandler can lead to runtime issues I will not account for.
+            </summary>
+        </member>
+    </members>
+</doc>

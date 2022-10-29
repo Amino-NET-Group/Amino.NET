@@ -41,6 +41,15 @@ namespace Amino
         }
 
 
+        public static string generate_file_signiture(byte[] data)
+        {
+            string prefix = "42";
+            string key = "f8e7a61ac3f725941e3ac7cae2d688be97f30b93";
+            HMACSHA1 hmac = new HMACSHA1(StringToByteArray(key));
+            byte[] result = hmac.ComputeHash(data);
+            return Convert.ToBase64String(CombineTwoArrays(StringToByteArray(prefix), result));
+        }
+
         public static string generate_device_id()
         {
             string prefix = "42";

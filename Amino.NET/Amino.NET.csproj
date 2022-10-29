@@ -2,7 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Version>1.0.0-Dev-6.6.9.8</Version>
+    <Version>1.0.0-Dev-6.7.6</Version>
+    <Authors>FabioTheFox</Authors>
+    <Company>FabiDev</Company>
+    <Description>An unofficial C# wrapper for Aminos REST API</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/FabioGaming/Amino.NET</PackageProjectUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <RepositoryUrl>https://github.com/FabioGaming/Amino.NET</RepositoryUrl>
+    <PackageReleaseNotes />
+    <PackageTags>Amino, rest, api, rest api, Amino.py, aminoapps, narvii, Amino.Net, C# wrapper, rest wrapper, appi wrapper</PackageTags>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\Fabio\Documents\GitHub\Amino.NET\Amino.NET\Amino.NET.xml</DocumentationFile>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
 
   <ItemGroup>

@@ -54,6 +54,7 @@ namespace Amino
                 ws_client = new WebsocketClient(new Uri($"{WebSocketURL}/?signbody={final.Replace("|", "%7C")}"), factory);
 
                 var exitEvent = new ManualResetEvent(false);
+                var eventHandler = new Events.EventHandler();
 
                 ws_client.ReconnectTimeout = TimeSpan.FromSeconds(30);
                 ws_client.DisconnectionHappened.Subscribe(info => { if (_client.debug) { Trace.WriteLine($"WebSocket: Disconnected\nReason: {info.CloseStatusDescription}"); } });
@@ -61,13 +62,7 @@ namespace Amino
                 ws_client.MessageReceived.Subscribe(msg =>
                 {
                     if (_client.debug) { Trace.WriteLine($"WebSocket: Received Message: {msg.Text}"); }
-                    try
-                    {
-                        Amino.Objects.Message _message = new Amino.Objects.Message((JObject)JObject.Parse(msg.Text));
-                        Client.Events events = new Client.Events();
-                        events.callMessageEvent(_client, this, _message);
-                    }
-                    catch { }
+                    eventHandler.ReceiveEvent(JObject.Parse(msg.Text), _client);
                 });
                 ws_client.Start().Wait();
                 exitEvent.WaitOne();
