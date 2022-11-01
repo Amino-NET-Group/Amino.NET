@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Amino.Objects
 {
+    //MediaType: 0
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class Message
     {

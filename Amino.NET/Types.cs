@@ -140,7 +140,7 @@
             Item,
             Comment,
             Blog_Category,
-            Blog_Category__Item_Tag,
+            Blog_Category_Item_Tag,
             Featured_Item,
             Chat_Message,
             Reputationlog_Item,

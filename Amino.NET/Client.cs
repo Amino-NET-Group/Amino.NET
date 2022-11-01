@@ -16,21 +16,69 @@ namespace Amino
     public class Client
     {
         //Values the Amino Client can hold
+        /// <summary>
+        /// Represents the current device ID used by the current Client
+        /// </summary>
         public string deviceID { get; private set; } 
+        /// <summary>
+        /// Represents the current Session ID of the current Client / Amino account instance
+        /// </summary>
         public string sessionID { get; private set; }
+        /// <summary>
+        /// Represents the Login Secret of the current Amino account
+        /// </summary>
         public string secret { get; private set; }
+        /// <summary>
+        /// Represents the current user ID (object ID) of the current Amino account
+        /// </summary>
         public string userID { get; private set; }
+        /// <summary>
+        /// Represents the full JSON response of the current Amino account
+        /// </summary>
         public string json { get; private set; }
+        /// <summary>
+        /// Represents the google ID of the current Amino account
+        /// </summary>
         public string googleID { get; private set; }
+        /// <summary>
+        /// Represents the apple ID of the current Amino account
+        /// </summary>
         public string appleID { get; private set; }
+        /// <summary>
+        /// Represents the facebook ID of the current Amino account
+        /// </summary>
         public string facebookID { get; private set; }
+        /// <summary>
+        /// Represents the twitter ID of the current Amino account
+        /// </summary>
         public string twitterID { get; private set; }
+        /// <summary>
+        /// Represents the Icon image URL of the current Amino account
+        /// </summary>
         public string iconURL { get; private set; }
+        /// <summary>
+        /// Represents the amino ID of the current Amino account
+        /// </summary>
         public string aminoID { get; private set; }
+        /// <summary>
+        /// Represents the email address of the current Amino account
+        /// </summary>
         public string email { get; private set; }
+        /// <summary>
+        /// Represents the phone number of the current Amino account
+        /// </summary>
         public string phoneNumber { get; private set; }
+        /// <summary>
+        /// Represents the nickname of the current Amino account
+        /// </summary>
         public string nickname { get; private set; }
+        /// <summary>
+        /// Represents if the current Amino accounts profile is profile or not
+        /// </summary>
         public bool is_Global { get; private set; }
+        /// <summary>
+        /// Represents the current Clients debug state, if put to true, all API responses and webSocket messages get printed to Trace
+        /// </summary>
         public bool debug { get; set; } = false;
 
 
@@ -38,8 +86,19 @@ namespace Amino
         //The value to access the websocket manager
         private Amino.WebSocketHandler webSocket;
         //Events
-        public event EventHandler<Amino.Events.messageEvent> onMessage;
-        public event EventHandler<Amino.Events.webSocketMessageEvent> onWebSocketMessage;
+        //public event EventHandler<Objects.Message> onMessage;
+        /// <summary>
+        /// Fires each time an Amino Text Message has been received by the current Amino account
+        /// </summary>
+        public event Action<Objects.Message> onMessage;
+        /// <summary>
+        /// Fires each time an Amino Image Message has been received by the current Amino account
+        /// </summary>
+        public event Action<Objects.ImageMessage> onImageMessage;
+        /// <summary>
+        /// Fires each time an Amino WebSocket Message has been receveived by the current Amino Client
+        /// </summary>
+        public event Action<string> onWebSocketMessage;
 
         //headers.
         private IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -60,7 +119,6 @@ namespace Amino
 
         /// <summary>
         /// Creates an instance of the Amino.Client object and builds headers
-        /// 
         /// <para>This object can hold a deviceId, if left empty, it will generate one.</para>
         /// </summary>
         /// <param>This object can hold a deviceId, if left empty, it will generate one.</param>
@@ -727,6 +785,7 @@ namespace Amino
                 request.AddJsonBody(JsonConvert.SerializeObject(data));
                 request.AddHeaders(headers);
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+                
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
@@ -960,7 +1019,6 @@ namespace Amino
                 var response = client.ExecuteGet(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
-                Console.WriteLine(response.Content);
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
                 JArray blockerUsers = jsonObj["blockerUidList"];
                 foreach(var user in blockerUsers)
@@ -1457,26 +1515,210 @@ namespace Amino
             data.Add("eventSource", "UserProfileView");
             data.Add("timestamp", helpers.GetTimestamp() * 1000);
             if(nickname != null) { data.Add("nickname", nickname); }
+            if(icon != null) { data.Add("icon", upload_media(icon, Types.upload_File_Types.Image)); }
+            if(content != null) { data.Add("content", content); }
+            if (backgroundColor != null) {
 
+                if(data["extensions"] != null)
+                {
+                    JObject subDataColor = (JObject)data["extensions"]["style"];
+                    subDataColor.Add(new JObject(new JProperty("backgroundColor", backgroundColor)));
+                    data.AddAnnotation(subDataColor);
+                } else
+                {
+                    data.Add(new JProperty("extensions", new JObject(new JProperty("style", new JObject(new JProperty("backgroundColor", backgroundColor))))));
+                }
+            }
+            if(backgroundMediaUrl != null)
+            {
+                var jsonArray = new object[][]
+                {
+                    new object[]
+                    {
+                        100,
+                        backgroundMediaUrl,
+                        null,
+                        null,
+                        null
+                    }
+                };
+                if (data["extensions"] != null)
+                {
 
-            return Task.CompletedTask;
+                    //100, backgroundColor, null, null, null
+                    JObject subDataMedia = (JObject)data["extensions"]["style"];
+                    subDataMedia.Add(new JProperty("backgroundMediaList", JArray.FromObject(jsonArray)));
+                    data.AddAnnotation(subDataMedia);
+                } else
+                {
+                    data.Add(new JProperty("extensions", new JObject(new JProperty("style", new JObject(new JProperty("backgroundMediaList", JArray.FromObject(jsonArray)))))));
+                }
 
+            }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"g/s/user-profile/{userID}");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
         }
+
+        public Task set_privacy_status(bool isAnonymous = false, bool getNotifications = true)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            int _privacyMode;
+            int _notificationStatus;
+            if(isAnonymous) { _privacyMode = 2; } else { _privacyMode = 1; }
+            if (getNotifications) { _notificationStatus = 2; } else { _notificationStatus = 1; }
+            var data = new
+            {
+                timestamp = helpers.GetTimestamp() * 1000,
+                notificationStatus = _notificationStatus,
+                privacyMode = _privacyMode
+            };
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/account/visit-settings");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task set_amino_id(string aminoId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            var data = new
+            {
+                timestamp = helpers.GetTimestamp() * 1000,
+                aminoId = aminoId
+            };
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/account/change-amino-id");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task add_linked_community(int communityId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile/{userID}/linked-community/{communityId}");
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task remove_linked_community(int communityId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile/{userID}/linked-community/{communityId}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Objects.FromCode get_from_code(string aminoUrl)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/link-resolution?q={aminoUrl}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                Amino.Objects.FromCode fromCode = new Objects.FromCode(jsonObj);
+                return fromCode;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+        
+        public Objects.FromId get_from_id(string objectId, Amino.Types.Object_Types type, string communityId = null)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            int _type = helpers.get_ObjectTypeID(type);
+            var data = new
+            {
+                objectId = objectId,
+                targetCode = 1,
+                timestamp = helpers.GetTimestamp() * 1000,
+                objectType = _type
+            };
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest();
+                if(communityId != null)
+                {
+                    request.Resource = $"/g/s-x{communityId}/link-resolution";
+                } else { request.Resource = $"/g/s/link-resolution"; }
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                Amino.Objects.FromId fromId = new Objects.FromId(jsonObj);
+                return fromId;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
         public class Events
         {
             public void callMessageEvent(Amino.Client _client, object _sender, Amino.Objects.Message _message)
             {
                 if(_client.onMessage != null)
                 {
-                    _client.onMessage.Invoke(_sender, new Amino.Events.messageEvent(_message));
+                    _client.onMessage.Invoke(_message);
                 }
             }
 
-            public void callWebSocketMessageEvent(Amino.Client _client, object _sender, JObject _webSocketMessage)
+            public void callWebSocketMessageEvent(Amino.Client _client, JObject _webSocketMessage)
             {
                 if(_client.onWebSocketMessage != null)
                 {
-                    _client.onWebSocketMessage.Invoke(_sender, new Amino.Events.webSocketMessageEvent(_webSocketMessage));
+                    _client.onWebSocketMessage.Invoke(_webSocketMessage.ToString());
+                }
+            }
+
+            public void callImageMessageEvent(Amino.Client _client, Amino.Objects.ImageMessage _image)
+            {
+                if(_client.onImageMessage != null)
+                {
+                    _client.onImageMessage.Invoke(_image);
                 }
             }
         }

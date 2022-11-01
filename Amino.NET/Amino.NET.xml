@@ -4,10 +4,104 @@
         <name>Amino.NET</name>
     </assembly>
     <members>
+        <member name="P:Amino.Client.deviceID">
+            <summary>
+            Represents the current device ID used by the current Client
+            </summary>
+        </member>
+        <member name="P:Amino.Client.sessionID">
+            <summary>
+            Represents the current Session ID of the current Client / Amino account instance
+            </summary>
+        </member>
+        <member name="P:Amino.Client.secret">
+            <summary>
+            Represents the Login Secret of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.userID">
+            <summary>
+            Represents the current user ID (object ID) of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.json">
+            <summary>
+            Represents the full JSON response of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.googleID">
+            <summary>
+            Represents the google ID of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.appleID">
+            <summary>
+            Represents the apple ID of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.facebookID">
+            <summary>
+            Represents the facebook ID of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.twitterID">
+            <summary>
+            Represents the twitter ID of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.iconURL">
+            <summary>
+            Represents the Icon image URL of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.aminoID">
+            <summary>
+            Represents the amino ID of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.email">
+            <summary>
+            Represents the email address of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.phoneNumber">
+            <summary>
+            Represents the phone number of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.nickname">
+            <summary>
+            Represents the nickname of the current Amino account
+            </summary>
+        </member>
+        <member name="P:Amino.Client.is_Global">
+            <summary>
+            Represents if the current Amino accounts profile is profile or not
+            </summary>
+        </member>
+        <member name="P:Amino.Client.debug">
+            <summary>
+            Represents the current Clients debug state, if put to true, all API responses and webSocket messages get printed to Trace
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onMessage">
+            <summary>
+            Fires each time an Amino Text Message has been received by the current Amino account
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onImageMessage">
+            <summary>
+            Fires each time an Amino Image Message has been received by the current Amino account
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onWebSocketMessage">
+            <summary>
+            Fires each time an Amino WebSocket Message has been receveived by the current Amino Client
+            </summary>
+        </member>
         <member name="M:Amino.Client.#ctor(System.String)">
             <summary>
             Creates an instance of the Amino.Client object and builds headers
-            
             <para>This object can hold a deviceId, if left empty, it will generate one.</para>
             </summary>
             <param>This object can hold a deviceId, if left empty, it will generate one.</param>

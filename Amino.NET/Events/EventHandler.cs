@@ -13,12 +13,24 @@ namespace Amino.Events
         public Task ReceiveEvent(JObject webSocketMessage, Client client)
         {
             Client.Events eventCall = new Client.Events();
-            eventCall.callWebSocketMessageEvent(client, this, webSocketMessage);
+            eventCall.callWebSocketMessageEvent(client, webSocketMessage);
             try
             {
-                Amino.Objects.Message _message = new Amino.Objects.Message(webSocketMessage);
-                Client.Events events = new Client.Events();
-                events.callMessageEvent(client, this, _message);
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(webSocketMessage.ToString());
+                if(jsonObj["o"]["chatMessage"]["mediaType"] != null)
+                {
+                    switch((int)jsonObj["o"]["chatMessage"]["mediaType"])
+                    {
+                        case 0: //TextMessage
+                            Amino.Objects.Message _message = new Amino.Objects.Message(webSocketMessage);
+                            eventCall.callMessageEvent(client, this, _message);
+                            break;
+                        case 100: //ImageMessage
+                            Amino.Objects.ImageMessage _imageMessage = new Amino.Objects.ImageMessage(webSocketMessage);
+                            eventCall.callImageMessageEvent(client, _imageMessage);
+                            break;
+                    }
+                }
             }
             catch { }
 

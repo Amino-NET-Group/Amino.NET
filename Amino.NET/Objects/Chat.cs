@@ -178,6 +178,7 @@ namespace Amino.Objects
                 lastMembersSummaryUpdateTime = (int)jsonObj["extensions"]["lastMembersSummaryUpdateTime"];
                 if (jsonObj["extensions"]["channelType"] != null) { channelType = (string)jsonObj["extensions"]["channelType"]; }
             }
+            
         }
     }
 }
