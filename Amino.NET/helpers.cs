@@ -33,7 +33,7 @@ namespace Amino
         {
             string prefix = "42";
             string key = "f8e7a61ac3f725941e3ac7cae2d688be97f30b93";
-
+             
             HMACSHA1 hmac = new HMACSHA1(StringToByteArray(key));
             byte[] buffer = Encoding.Default.GetBytes(data);
             byte[] result = hmac.ComputeHash(buffer);

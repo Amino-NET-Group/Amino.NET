@@ -139,7 +139,6 @@ namespace Amino
         /// <returns></returns>
         public Task request_verify_code(string email, bool resetPassword = false)
         {
-           
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
@@ -166,7 +165,7 @@ namespace Amino
         /// <param name="_password"></param>
         /// <param name="_secret"></param>
         /// <returns></returns>
-        public Task Login(string _email, string _password, string _secret = null)
+        public Task login(string _email, string _password, string _secret = null)
         {
             try
             {
@@ -215,7 +214,7 @@ namespace Amino
         /// <para>A successful function call will clear the Client values and close the webSocket connection</para>
         /// </summary>
         /// <returns></returns>
-        public Task Logout()
+        public Task logout()
         {
             if(sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             try
@@ -265,7 +264,7 @@ namespace Amino
         /// <param name="_verificationCode"></param>
         /// <param name="_deviceID"></param>
         /// <returns></returns>
-        public Task Register(string _name, string _email, string _password, string _verificationCode, string _deviceID = null)
+        public Task register(string _name, string _email, string _password, string _verificationCode, string _deviceID = null)
         {
             try
             {
@@ -313,7 +312,7 @@ namespace Amino
         /// <param name="_password"></param>
         /// <param name="_deviceID"></param>
         /// <returns></returns>
-        public Task Restore_account(string _email, string _password, string _deviceID = null)
+        public Task restore_account(string _email, string _password, string _deviceID = null)
         {
             
             try
@@ -338,7 +337,7 @@ namespace Amino
         /// </summary>
         /// <param name="_password"></param>
         /// <returns></returns>
-        public Task Delete_account(string _password)
+        public Task delete_account(string _password)
         {
             var data = new { deviceID = deviceID, secret = $"0 {_password}" };
             try
