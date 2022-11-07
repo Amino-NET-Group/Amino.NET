@@ -453,6 +453,22 @@
             <param name="asGuest"></param>
             <returns></returns>
         </member>
+        <member name="M:Amino.Client.upload_media(System.String,Amino.Types.upload_File_Types)">
+            <summary>
+            Allows you to upload media files to the Amino servers
+            </summary>
+            <param name="filePath"></param>
+            <param name="type"></param>
+            <returns>string : The URL to the media file you just uploaded</returns>
+        </member>
+        <member name="M:Amino.Client.upload_media(System.Byte[],Amino.Types.upload_File_Types)">
+            <summary>
+            Allows you to upload media files to the Amino servers
+            </summary>
+            <param name="file"></param>
+            <param name="type"></param>
+            <returns>string : The URL to the media file you just uploaded</returns>
+        </member>
         <member name="M:Amino.Client.edit_profile(System.String,System.String,System.Byte[],System.String,System.String,System.String)">
             <summary>
             Allows you to edit the profile page of the current Amino account
@@ -464,6 +480,162 @@
             <param name="backgroundMediaUrl"></param>
             <param name="defaultChatbubbleId"></param>
             <returns></returns>
+        </member>
+        <member name="M:Amino.Client.set_privacy_status(System.Boolean,System.Boolean)">
+            <summary>
+            Allows you to set the privacy status of the current Amino account
+            </summary>
+            <param name="isAnonymous"></param>
+            <param name="getNotifications"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.set_amino_id(System.String)">
+            <summary>
+            Allows you to set the Amino ID of the current Amino account
+            </summary>
+            <param name="aminoId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.add_linked_community(System.Int32)">
+            <summary>
+            Adds a linked community to the current Amino profile
+            </summary>
+            <param name="communityId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.remove_linked_community(System.Int32)">
+            <summary>
+            Removes a linked community from the current Amino profile
+            </summary>
+            <param name="communityId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.comment(System.String,Amino.Types.Comment_Types,System.String)">
+            <summary>
+            Allows you to comment on a wall / post using the current Amino account
+            </summary>
+            <param name="message"></param>
+            <param name="type"></param>
+            <param name="objectId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.delete_comment(System.String,Amino.Types.Comment_Types,System.String)">
+            <summary>
+            Allows you to delete a comment from a users wall / post using the current Amino account
+            </summary>
+            <param name="commentId"></param>
+            <param name="type"></param>
+            <param name="objectId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.like_post(System.String,Amino.Types.Post_Types)">
+            <summary>
+            Allows you to like a post using the current Amino account
+            </summary>
+            <param name="objectId"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.unlike_post(System.String,Amino.Types.Post_Types)">
+            <summary>
+            Allows you to remove a like on a post using the current Amino account
+            </summary>
+            <param name="objectId"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.get_membership_info">
+            <summary>
+            Allows you to get the Amino+ membership status of the current Amino account
+            </summary>
+            <returns>Object : Amino.Objects.MembershipInfo</returns>
+        </member>
+        <member name="M:Amino.Client.get_ta_announcements(Amino.Types.Supported_Languages,System.Int32,System.Int32)">
+            <summary>
+            Allows you to get the Team Amino announcement Posts
+            </summary>
+            <param name="language"></param>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Obejcts.Amino.Post</returns>
+        </member>
+        <member name="M:Amino.Client.get_wallet_info">
+            <summary>
+            Allows you to get the current Amino accounts wallet info
+            </summary>
+            <returns>Object : Objects.WalletInfo</returns>
+        </member>
+        <member name="M:Amino.Client.get_wallet_history(System.Int32,System.Int32)">
+            <summary>
+            Allows you to get the wallet transaction history of the current Amino account
+            </summary>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.CoinHistoryEntry</returns>
+        </member>
+        <member name="M:Amino.Client.get_from_deviceId(System.String)">
+            <summary>
+            Allows you to get a user ID based on a device ID
+            </summary>
+            <param name="deviceId"></param>
+            <returns>string : the target users ID</returns>
+        </member>
+        <member name="M:Amino.Client.get_from_code(System.String)">
+            <summary>
+            Allows you to get information an Amino URL
+            </summary>
+            <param name="aminoUrl"></param>
+            <returns>Object : Amino.Objects.FromCode</returns>
+        </member>
+        <member name="M:Amino.Client.get_from_id(System.String,Amino.Types.Object_Types,System.String)">
+            <summary>
+            Allows you to get information about an Amino ID
+            </summary>
+            <param name="objectId"></param>
+            <param name="type"></param>
+            <param name="communityId"></param>
+            <returns>Object : Amino.Objects.FromId</returns>
+        </member>
+        <member name="M:Amino.Client.get_supported_languages">
+            <summary>
+            Allows you to get the supported langauges of Amino
+            </summary>
+            <returns>string[] : language keys</returns>
+        </member>
+        <member name="M:Amino.Client.claim_new_user_coupon">
+            <summary>
+            Allows you to claim the new user coupon using the current Amino account
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.get_all_users(System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of Amino users
+            </summary>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Objects.UserProfile</returns>
+        </member>
+        <member name="M:Amino.Client.accept_host(System.String,System.String)">
+            <summary>
+            Allows you to accept host / organizer of a chatroom with the current Amino account
+            </summary>
+            <param name="chatId"></param>
+            <param name="requestId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.accept_organizer(System.String,System.String)">
+            <summary>
+            Allows you to accept host / organizer of a chatroom with the current Amino account
+            </summary>
+            <param name="chatId"></param>
+            <param name="requestId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Amino.Client.Events">
+            <summary>
+            Handles the Event calls, do not manually interact with this Class or its functions!
+            </summary> 
         </member>
         <member name="T:Amino.Types.account_gender">
             <summary>

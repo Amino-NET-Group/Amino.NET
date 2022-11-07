@@ -229,5 +229,30 @@
             Blog,
             Wiki
         }
+
+        public enum Comment_Types
+        {
+            User,
+            Blog,
+            Wiki,
+            Reply
+        }
+
+        public enum Supported_Languages
+        {
+            english,
+            spanish,
+            portuguese,
+            arabic,
+            russian,
+            french,
+            german
+        }
+
+        public enum Wallet_Config_Levels
+        {
+            lvl_1,
+            lvl_2
+        }
     }
 }

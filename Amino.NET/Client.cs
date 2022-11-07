@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1461,7 +1462,23 @@ namespace Amino
 
         }
 
+        /// <summary>
+        /// Allows you to upload media files to the Amino servers
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="type"></param>
+        /// <returns>string : The URL to the media file you just uploaded</returns>
+        public string upload_media(string filePath, Types.upload_File_Types type)
+        {
+            return upload_media(File.ReadAllBytes(filePath), type);
+        }
 
+        /// <summary>
+        /// Allows you to upload media files to the Amino servers
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="type"></param>
+        /// <returns>string : The URL to the media file you just uploaded</returns>
         public string upload_media(byte[] file, Types.upload_File_Types type)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
@@ -1569,6 +1586,12 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to set the privacy status of the current Amino account
+        /// </summary>
+        /// <param name="isAnonymous"></param>
+        /// <param name="getNotifications"></param>
+        /// <returns></returns>
         public Task set_privacy_status(bool isAnonymous = false, bool getNotifications = true)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
@@ -1596,6 +1619,11 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to set the Amino ID of the current Amino account
+        /// </summary>
+        /// <param name="aminoId"></param>
+        /// <returns></returns>
         public Task set_amino_id(string aminoId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
@@ -1618,6 +1646,11 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Adds a linked community to the current Amino profile
+        /// </summary>
+        /// <param name="communityId"></param>
+        /// <returns></returns>
         public Task add_linked_community(int communityId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
@@ -1633,6 +1666,11 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Removes a linked community from the current Amino profile
+        /// </summary>
+        /// <param name="communityId"></param>
+        /// <returns></returns>
         public Task remove_linked_community(int communityId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
@@ -1648,6 +1686,339 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to comment on a wall / post using the current Amino account
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="type"></param>
+        /// <param name="objectId"></param>
+        /// <returns></returns>
+        public Task comment(string message, Types.Comment_Types type, string objectId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            string _eventSource;
+            bool _isReply = false;
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest();
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("content", message);
+                data.Add("stickerId", null);
+                data.Add("type", 0);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+
+
+                switch(type)
+                {
+                    case Types.Comment_Types.User:
+                        request.Resource = $"/g/s/user-profile/{objectId}/g-comment";
+                        _eventSource = "UserProfileView";
+                        break;
+                    case Types.Comment_Types.Blog:
+                        request.Resource = $"/g/s/blog/{objectId}/g-comment";
+                        _eventSource = "PostDetailView";
+                        break;
+                    case Types.Comment_Types.Wiki:
+                        request.Resource = $"/g/s/item/{objectId}/g-comment";
+                        _eventSource = "PostDetailView";
+                        break;
+                    case Types.Comment_Types.Reply:
+                        _isReply = true;
+                        _eventSource = "";
+                        break;
+                    default:
+                        request.Resource = $"/g/s/user-profile/{objectId}/g-comment";
+                        _eventSource = "UserProfileView";
+                        break;
+                }
+                if(!_isReply) { data.Add("eventSource", _eventSource); } else { data.Add("respondTo", objectId); }
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to delete a comment from a users wall / post using the current Amino account
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <param name="type"></param>
+        /// <param name="objectId"></param>
+        /// <returns></returns>
+        public Task delete_comment(string commentId, Types.Comment_Types type, string objectId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient();
+                RestRequest request = new RestRequest();
+                switch(type)
+                {
+                    case Types.Comment_Types.User:
+                        request.Resource = $"/g/s/user-profile/{objectId}/g-comment/{commentId}";
+                        break;
+                    case Types.Comment_Types.Blog:
+                        request.Resource = $"/g/s/blog/{objectId}/g-comment/{commentId}";
+                        break;
+                    case Types.Comment_Types.Wiki:
+                        request.Resource = $"/g/s/item/{objectId}/g-comment/{commentId}";
+                        break;
+                    default:
+                        request.Resource = $"/g/s/user-profile/{objectId}/g-comment/{commentId}";
+                        break;
+                }
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+                
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to like a post using the current Amino account
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public Task like_post(string objectId, Types.Post_Types type)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            string _eventSource;
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest();
+                switch(type)
+                {
+                    case Types.Post_Types.Blog:
+                        request.Resource = $"/g/s/blog/{objectId}/g-vote?cv=1.2";
+                        _eventSource = "UserProfileView";
+                        break;
+                    case Types.Post_Types.Wiki:
+                        request.Resource = $"/g/s/item/{objectId}/g-vote?cv=1.2";
+                        _eventSource = "PostDetailView";
+                        break;
+                    default:
+                        request.Resource = $"/g/s/blog/{objectId}/g-vote?cv=1.2";
+                        _eventSource = "UserProfileView";
+                        break;
+                }
+                var data = new
+                {
+                    value = 4,
+                    timestamp = helpers.GetTimestamp() * 1000,
+                    eventSource = _eventSource
+                };
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to remove a like on a post using the current Amino account
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public Task unlike_post(string objectId, Types.Post_Types type)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest();
+                request.AddHeaders(headers);
+
+                switch(type)
+                {
+                    case Types.Post_Types.Blog:
+                        request.Resource = $"/g/s/blog/{objectId}/g-vote?eventSource=UserProfileView";
+                        break;
+                    case Types.Post_Types.Wiki:
+                        request.Resource = $"/g/s/item/{objectId}/g-vote?eventSource=PostDetailView";
+                        break;
+                    default:
+                        request.Resource = $"/g/s/blog/{objectId}/g-vote?eventSource=UserProfileView";
+                        break;
+                }
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to get the Amino+ membership status of the current Amino account
+        /// </summary>
+        /// <returns>Object : Amino.Objects.MembershipInfo</returns>
+        public Objects.MembershipInfo get_membership_info()
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/membership?force=true");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                Objects.MembershipInfo membershipInfo = new Objects.MembershipInfo(JObject.Parse(response.Content));
+                return membershipInfo;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to get the Team Amino announcement Posts
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="start"></param>
+        /// <param name="size"></param>
+        /// <returns>List : Obejcts.Amino.Post</returns>
+        public List<Objects.Post> get_ta_announcements(Types.Supported_Languages language = Types.Supported_Languages.english, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            string _language;
+            switch(language)
+            {
+                case Types.Supported_Languages.english:
+                    _language = "en";
+                    break;
+                case Types.Supported_Languages.spanish:
+                    _language = "es";
+                    break;
+                case Types.Supported_Languages.portuguese:
+                    _language = "pt";
+                    break;
+                case Types.Supported_Languages.arabic:
+                    _language = "ar";
+                    break;
+                case Types.Supported_Languages.russian:
+                    _language = "ru";
+                    break;
+                case Types.Supported_Languages.french:
+                    _language = "fr";
+                    break;
+                case Types.Supported_Languages.german:
+                    _language = "de";
+                    break;
+                default:
+                    _language = "en";
+                    break;
+            }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/announcement?language={_language}&start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray announcements = jsonObj["blogList"];
+                List<Objects.Post> ta_announcements = new List<Objects.Post>();
+                foreach (JObject post in announcements)
+                {
+                    Objects.Post _post = new Objects.Post(post);
+                    ta_announcements.Add(_post);
+                }
+                return ta_announcements;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to get the current Amino accounts wallet info
+        /// </summary>
+        /// <returns>Object : Objects.WalletInfo</returns>
+        public Objects.WalletInfo get_wallet_info()
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/wallet");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                JObject jsonObj = JObject.Parse(response.Content);
+                Objects.WalletInfo _walletInfo = new Objects.WalletInfo(jsonObj);
+                return _walletInfo;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to get the wallet transaction history of the current Amino account
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="size"></param>
+        /// <returns>List : Amino.Objects.CoinHistoryEntry</returns>
+        public List<Objects.CoinHistoryEntry> get_wallet_history(int start = 0, int size = 25)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/wallet/coin/history?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray historyEntry = jsonObj["coinHistoryList"];
+                List<Objects.CoinHistoryEntry> coinHistoryList = new List<Objects.CoinHistoryEntry>();
+                foreach (JObject entry in historyEntry)
+                {
+                    Objects.CoinHistoryEntry _entry = new Objects.CoinHistoryEntry(entry);
+                    coinHistoryList.Add(_entry);
+                }
+                return coinHistoryList;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to get a user ID based on a device ID
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <returns>string : the target users ID</returns>
+        public string get_from_deviceId(string deviceId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/auid?deviceId={deviceId}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                return jsonObj["auid"];
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to get information an Amino URL
+        /// </summary>
+        /// <param name="aminoUrl"></param>
+        /// <returns>Object : Amino.Objects.FromCode</returns>
         public Objects.FromCode get_from_code(string aminoUrl)
         {
             try
@@ -1664,6 +2035,13 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
         
+        /// <summary>
+        /// Allows you to get information about an Amino ID
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="type"></param>
+        /// <param name="communityId"></param>
+        /// <returns>Object : Amino.Objects.FromId</returns>
         public Objects.FromId get_from_id(string objectId, Amino.Types.Object_Types type, string communityId = null)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
@@ -1696,6 +2074,204 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to get the supported langauges of Amino
+        /// </summary>
+        /// <returns>string[] : language keys</returns>
+        public string[] get_supported_languages()
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/community-collection/supported-languages?start=0&size=100");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                Console.WriteLine(response.Content);
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray languageArray = jsonObj["supportedLanguages"];
+                List<string> langList = new List<string>();
+                foreach(JObject language in languageArray)
+                {
+                    langList.Add(language.ToString());
+                }
+                return langList.ToArray();
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to claim the new user coupon using the current Amino account
+        /// </summary>
+        /// <returns></returns>
+        public Task claim_new_user_coupon()
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/coupon/new-user-coupon/claim");
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+
+        /// <summary>
+        /// Allows you to get a list of Amino users
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="size"></param>
+        /// <returns>List : Amino.Objects.UserProfile</returns>
+        public List<Objects.UserProfile> get_all_users(int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserProfile> userList = new List<Objects.UserProfile>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile?type=recent&start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userArray = jsonObj["userProfileList"];
+                foreach (JObject user in userArray)
+                {
+                    Objects.UserProfile _user = new Objects.UserProfile(user);
+                    userList.Add(_user);
+                }
+                return userList;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to accept host / organizer of a chatroom with the current Amino account
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="requestId"></param>
+        /// <returns></returns>
+        public Task accept_host(string chatId, string requestId)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/transfer-organizer/{requestId}/accept");
+                request.AddHeaders(headers);
+                var data = new { };
+                request.AddJsonBody(data);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+
+        /// <summary>
+        /// Allows you to accept host / organizer of a chatroom with the current Amino account
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="requestId"></param>
+        /// <returns></returns>
+        public Task accept_organizer(string chatId, string requestId)
+        {
+            accept_host(chatId, requestId);
+            return Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// Allows you to get information about an Amino Invite Code
+        /// </summary>
+        /// <param name="inviteCode"></param>
+        /// <returns>Obejct : Amino.Objects.FromInvite</returns>
+        public Amino.Objects.FromInvite link_identify(string inviteCode)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/community/link-identify?q=http%3A%2F%2Faminoapps.com%2Finvite%2F{inviteCode}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                JObject json = JObject.Parse(response.Content);
+                Objects.FromInvite fromInvite = new Objects.FromInvite(json);
+                return fromInvite;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to change the wallet config of the current Amino account
+        /// </summary>
+        /// <param name="walletLevel"></param>
+        /// <returns></returns>
+        public Task wallet_config(Types.Wallet_Config_Levels walletLevel)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            int _walletLevel;
+            if(walletLevel == Types.Wallet_Config_Levels.lvl_1) { _walletLevel = 1; } else { _walletLevel = 2; }
+            try
+            {
+                var data = new
+                {
+                    adsLevel = _walletLevel,
+                    timestamp = helpers.GetTimestamp() * 1000
+                };
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest("/g/s/wallet/ads/config");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to get a list of available Avatar Frames of the current Amino account
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="size"></param>
+        /// <returns>List : Amino.Object.AvatarFrame</returns>
+        public List<Objects.AvatarFrame> get_avatar_frames(int start = 0, int size = 25)
+        {
+            if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.AvatarFrame> _avataFrameList = new List<Objects.AvatarFrame>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/avatar-frame?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray avatarFrameArrray = jsonObj["avatarFrameList"];
+                foreach(JObject avatarFrame in avatarFrameArrray)
+                {
+                    Objects.AvatarFrame _avatarFrame = new Objects.AvatarFrame(avatarFrame);
+                    _avataFrameList.Add(_avatarFrame);
+                }
+                return _avataFrameList;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Handles the Event calls, do not manually interact with this Class or its functions!
+        /// </summary> 
         public class Events
         {
             public void callMessageEvent(Amino.Client _client, object _sender, Amino.Objects.Message _message)
