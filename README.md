@@ -51,7 +51,7 @@ Amino.Client client = new Amino.Client(); // This client will be used as an Exam
 ```
 
 ## Methods / Functions
-### request_verify_code(string email, bool resetPassword)
+### request_verify_code(string email, bool resetPassword) : Task
 You can request an Amino verification code using this function.
 - Success: Task completes successfully
 - Error: Throws an exception
@@ -70,7 +70,7 @@ try
 }
 ```
 
-### login(string email, string password, string secret)
+### login(string email, string password, string secret) : Task
 You can log into an existing Amino account using this function.
 - Success: Sets all of the clients values, the Client headers and completes the Task successfully
 - Error: Throws an Exception
@@ -90,7 +90,7 @@ try
 }
 ```
 
-### logout()
+### logout() : Task
 You can log out of an Amino account using this function, make sure you are logged into an account to use this function!
 - Success: Clears the Clients headers, values and completes the Task successfully
 - Error: Throws an Exception
@@ -102,12 +102,146 @@ try
     Console.WriteLine("Logged out!");
 } catch 
 {
-    Console.WriteLine("Could not log out!")
+    Console.WriteLine("Could not log out!");
 }
 ```
 
-### register(string name, string email, string password, string verificationCode, string deviceId)
+### register(string name, string email, string password, string verificationCode, string deviceId) : Task
 This function allows you to register an Amino account
 - Success: The account will be created and the Task completes Successfully
 - Error: Throws an Exception
+### Values:
+- name : string : The name of the account
+- email : string : The email of the account
+- password : string : The password of the account
+- verificationCode : string : The verification code for the email, refer to `request_verify_code()`
+- deviceId : string (default: null) : The device ID of the account, if left empty it will generate one for you
+### Example:
+```CSharp
+try 
+{
+    client.register("epicName", "myEmail@Domain.com", "myNicePassword", "ABCDEF");
+    Console.WriteLine("Account registered!");
+} catch 
+{
+    Console.Writeline("Could not register account!");
+}
+``` 
+
+### restore_account(string email, string password, string deviceId) : Task
+This function allows you to restore a deleted Amino account
+- Success: Restores the account and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- email : string : The email of the account you want to restore
+- password : string : The password of the account you want to restore
+- deviceId : string (default: null) : The device ID you want to restore the account with, if left empty it will generate one for you
+### Example:
+```CSharp
+try 
+{
+    client.restore_account("myEmail@Domain.com", "myEpicPassword", "someDeviceId");
+    Console.WriteLine("Restored account successfully!");
+} catch 
+{
+    Console.WriteLine("Could not restore account!");
+}
+```
+
+### delete_account(string password) : Task
+This function allows you to delete the current Amino account in use.
+- Success: Deletes the current Amino account, clears all headers, stops the webSocket and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- password : string : The password of the current Amino Account
+### Example:
+```CSharp
+try 
+{
+    client.delete_account("myEpicPassword");
+    Console.WriteLine("Account has been deleted Successfully!");
+} catch 
+{
+    Console.WriteLine("Account could not be deleted!");
+}
+```
+
+### activate_account(string email, string verificationCode, string deviceId) : Task
+This function allows you to activate an Amino account using a verification Code
+- Success: Activates the Amino account and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- email : string : The email address of the account you want to activate
+- verificationCode : string : The verification Code to activate the account (refer to `request_verify_code()`)
+- deviceId : string (default: null) : The device ID  you want to activate the account from, if left empty it will generate one for you
+### Example:
+```CSharp
+try 
+{
+    client.activate_account("myEmail@Domain.com", "ABCDEF");
+    Console.WriteLine("The account has been activated!")
+} catch 
+{
+    Console.WriteLine("Could not activate the account!");
+}
+```
+
+### configure_account(Amino.Types.account_gender gender, int age) : Task
+This function allows you to configure an Amino accounts age and gender
+- Success: Configures the account and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- gender : Amino.Types.account_gender : The gender you want the account to be configured to
+- age : int : Sets the age of the account : This value cannot be lower than 13!
+### Example:
+```CSharp
+try 
+{
+    client.configure_account(Amino.Types.account_gender.Non_Binary, 18);
+    Console.WriteLine("Configured account successfully!");
+} catch 
+{
+    Console.WriteLine("Could not configure account!");
+}
+```
+
+### change_password(string email, string password, string verificationCode) : Task
+This function allows you to change the password of the current Amino account.
+- Success: Changes the account password and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- email : string : The email of your account
+- password : string : The new password you want the account to change to
+- verificationCode : string : The verification code needed to reset your Password (refer to `request_verify_code()`)
+### Example:
+```CSharp
+try 
+{
+    client.change_password("myEmail@Domain.com", "myNewPassword", "ABCDEF");
+    Console.WriteLine("Account password has been changed successfully!");
+} catch 
+{
+    Console.WriteLine("Could not reset password!");
+}
+```
+
+### get_user_info(string userId) : Amino.Objects.GlobalProfile
+This function allows you to get information about a global Amino Profile
+- Success: Gets the users information and returns it as an Object (Amino.Objects.GlobalProfile)
+- Error: Throws an Exception
+### Values:
+- userId : string : The object / user ID of the Amino user you want to get information about
+### Example:
+```CSharp
+try 
+{
+    var userProfile = client.get_user_info("anyUserId");
+    Console.WriteLine("Account username: " + userProfile.nickname);
+} catch 
+{
+    Console.WriteLine("Could not get user information");
+}
+```
+
+
 

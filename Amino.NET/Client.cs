@@ -350,6 +350,22 @@ namespace Amino
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
+                sessionID = null;
+                secret = null;
+                userID = null;
+                json = null;
+                googleID = null;
+                appleID = null;
+                facebookID = null;
+                twitterID = null;
+                iconURL = null;
+                aminoID = null;
+                email = null;
+                phoneNumber = null;
+                nickname = null;
+                is_Global = false;
+                headerBuilder();
+                _ = webSocket.disconnect_socket();
                 return Task.CompletedTask;
             }catch(Exception e)
             {
@@ -437,7 +453,7 @@ namespace Amino
         /// <param name="_password"></param>
         /// <param name="_verificationCode"></param>
         /// <returns></returns>
-        public Task Change_password(string _email, string _password, string _verificationCode)
+        public Task change_password(string _email, string _password, string _verificationCode)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             var data = new
