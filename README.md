@@ -10,6 +10,7 @@ Amino.Net has a lot of functionality that allow you to develop Amino tools and b
 - Some values / objects might change depending on if the Client is logged in or not!
 - Some functions require the Client to be logged in, they will throw an Exception if it is not.
 - If you find a bug, an issue or have a recommendation to make, please open an Issue on GitHub about it!
+- Please note that this library is built for an easy and dynamic start into making Amino bots and tools, it is **not** made for spam bots or any sort of harmful tools, so use it the way it's intended for.
 
 ## Important Notice
 By using this library you agree that you are aware of the fact that you are breaking the App services Terms of Service - as Team Amino strictly forbids the use of any sort of third party software / scripting to gain an advantage over other members, any activity by third party tools found by Team Amino may result in your account getting banned from their services!
@@ -595,11 +596,412 @@ try
     Console.WriteLine("Could not get user followers");
 }
 ``` 
-<button onClick="testFunction()">test</button>
 
 
-<script>
-    function testFunction() {
-        alert("Test");
+### get_user_visitors(string userId, int start, int size) : List<Amino.Objects.UserVisitor>
+This function allows you to get a list of users that have visited a target profile
+- Success: Gets all user visitors and returns them as an Object List (List<Amino.Objects.UserVisitor>)
+- Error: Throws an Exception
+### Values:
+- userId : string : The target users object / user ID that you want to get the visitors of
+- start : int (default: 0) : Sets the Start index for getting chat list
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example: 
+```CSharp
+try 
+{
+    List<Amino.Objects.UserVisitor> userVisitors = client.get_user_visitors("someUserId");
+    Console.WriteLine("Name list of all visitors:");
+    foreach(Amino.Objects.UserVisitor visitor in userVisitors)
+    {
+        Console.WriteLine(visitor.Profile.nickname);
     }
-</script>
+
+} catch 
+{
+    Console.WriteLine("Could not get user visitors!");
+}
+```
+
+
+### get_blocked_users(int start, int size) : List<Amino.Objects.BlockedUser>
+This function allows you to get a list of users that the current Amino account has blocked
+- Success: Gets the blocked users and returns them as an Object List (List<Amino.Objects.BlockedUser>)
+- Error: Throws an Exception
+### Values:
+- start : int (default: 0) : Sets the Start index for getting chat list
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.BlockedUser> blockedUsers = client.get_blocked_users();
+    Console.WriteLine("List of blocked users (user IDs)");
+    foreach(Amino.Obejcts.BlockedUser user in blockedUsers) 
+    {
+        Console.WriteLine(user.userId);
+    }
+} catch 
+{
+    Console.WriteLine("Could not get blocked users");
+}
+```
+
+
+### get_blocker_users(int start, int size) : List<<string>string>
+This function allows you to get a list of user IDs of the users who have currenty blocked the current Amino account
+- Success: Gets all blocker user IDs and returns them as a string list
+- Error: Throws an Exception
+### values:
+- start : int (default: 0) : Sets the Start index for getting chat list
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<string> blockerUsers = client.get_blocker_users();
+    if(blockerUsers.Count > 0) 
+    {
+        Console.WriteLine("First blocker user: " + blockerUsers[0]);
+    }
+} catch 
+{
+    Console.WriteLine("Could not get blocker users");
+}
+```
+
+
+### get_wall_comments(string userId, Amino.Types.Sorting_Types type, int start, int size) : List<Amino.Objects.Comment>
+This function allows you to get a list of comments that have been left on a users wall
+- Success: Gets a users wall comments and returns them as an Object List (List<Amino.Objects.Comment>)
+- Error: Throws an Exception
+### values:
+- userId : string : The object / user ID of the user you want to get the wall comments from
+- type : Amino.Types.Sorting_Types : The type of sorting you want to apply to the comment filter
+- start : int (default: 0) : Sets the Start index for getting chat list
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Obejcts.Comment> wallComments = client.get_wall_comments("someUserId", Types.Sorting_Types.Newest);
+    Console.WriteLine("First wall comment content: " + wallComments[0].content);
+} catch 
+{
+    Console.WriteLine("Could not get wall comments");
+}
+```
+
+
+### flag(string reason, Amino.Types.Flag_Types flagType, Amino.Types.Flag_Targets targetType, string targetId, bool asGuest) : Task
+This function allows you to flag a post / profile on Amino
+- Success: Flags the target and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- reason : string : The reason you are flagging the target
+- flagType : Amino.Types.Flag_Types : The type of flagging that is being done
+- targetType : Amino.Types.Flag_Targets : The type of the target that is being flagged
+- targetId : string : The object / user ID of the target that you want to flag
+- asGuest : bool : This value decides if you want to flag the content as a guest or as a logged in Amino user
+### Example:
+```CSharp
+try 
+{
+    client.flag("spamming posts", Amino.Types.Flag_Types.Spam, Amino.Types.Flag_Targets.User, false);
+    Console.WriteLine("Flagged content!");
+} catch 
+{
+    Console.WriteLine("Could not flag content");
+}
+```
+
+
+### delete_message(string chatId, string messageId, bool asStaff, string reason) : Task
+This function allows you to delete a specific chat message using the current Amino account
+- Success: Deletes the target message and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- chatId : string : The object / chat ID where the message has been sent in
+- messageId : string : The object / message ID of the message that you want to delete
+- asStaff : bool (default: false) : This value decides if you're deleting the message as a staff membber
+- reason : string (default: null) : The reason provided if the message is being deleted as a staff member
+### Example:
+```CSharp
+try 
+{
+    client.delete_message("someChatId", "someMessageId", true, "spam content");
+    Console.WriteLine("Message deleted!");
+} catch 
+{
+    Console.WriteLine("Could not delete message!");
+}
+```  
+
+
+### mark_as_read(string chatId, string messageId) : Task
+This function allows you to mark a message as read
+- Success: Marks the message as read and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- chatId : string : The object / chat ID of the chat where the message has been sent in
+- messageId : string : The object / message ID that you want to mark as read
+### Example:
+```CSharp
+try 
+{
+    client.mark_as_read("someChatId", "someMessageId");
+    Console.WriteLine("Marked message as read");
+} catch 
+{
+    Console.WriteLine("Could not mark message as read");
+}
+```
+
+
+### visit(string userId) : Task
+This function allows you to visit a users Amino profile
+- Success: Visits the targets profile and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- userId : string : The object / user ID of the user that you want to visit
+### Example:
+```CSharp
+try 
+{
+    client.visit("someUserId");
+    Console.WriteLine("Visited profile");
+} catch 
+{
+    Console.WriteLine("Could not visit user!");
+}
+```
+
+
+### follow_user(string userId) : Task
+This function allows you to follow a user using the current Amino account
+- Success: Follows the user and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- userId : string : The object / user ID of the user you want to follow
+### Example:
+```CSharp
+try 
+{
+    client.follow("someUserId");
+    Console.WriteLine("Followed user");
+} catch 
+{
+    Console.WriteLine("Could not follow user");
+}
+```
+
+
+### unfollow_user(string userId) : Task
+This function allows you to unfollow a user using the current Amino account
+- Success: Unfollows the user and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- userId : string : The object / user ID of the user you want to unfollow
+### Example:
+```CSharp
+try 
+{
+    client.unfollow_user("someUserId");
+    Console.WriteLine("Unfollowed user");
+} catch 
+{
+    Console.WriteLine("Could not unfollow user");
+}
+```
+
+
+### block_user(string userId) : Task
+This function allows you to block a user using the current Amino account
+- Success: Blocks the user and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- userId : string : The object / user ID of the user you want to block
+### Example:
+```CSharp
+try 
+{
+    client.block_user("someUserId");
+    Console.WriteLine("Blocked user");
+} catch 
+{
+    Console.WriteLine("Could not block user");
+}
+```
+
+
+### unblock_user(string userId) : Task
+This function allows you to unblock a user using the current Amino account
+- Success: Unblocks the user and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- userId : string : The object / user ID of the user you want to unblock
+### Example:
+```CSharp
+try 
+{
+    client.unblock_user("someUserId");
+    Console.WriteLine("Unblocked user");
+} catch 
+{
+    Console.WriteLine("Could not unblock user");
+}
+```
+
+
+### join_community(string communityId, string invitationCode) : Task
+This function allows you to join a community using the current Amino account
+- Success: Joins the community and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- communityId : string : The ID of the community that you want to join
+- invitationCode : string (default: null) : The invitation code of the community (if there is one)
+### Example:
+```CSharp
+try 
+{
+    client.join_community("123456");
+    Console.WriteLine("Joined community");
+} catch 
+{
+    Console.WriteLine("Could not join community");
+}
+```
+
+
+### join_community_request(string communityId, string message) : Task
+This function allows you to make a join request to a community
+- Success: Requests to join the community and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- communityId : string : The community ID of the community that you want to request to join in
+- message : string (default: null) : The message you want to state as reason on why you want to join
+### Example:
+```CSharp
+try 
+{
+    client.join_community_request("123456", "I like foxes.");
+    Console.WriteLine("Requested to join community");
+} catch 
+{
+    Console.WriteLine("Could not request to join the community");
+}
+```
+
+
+### leave_community(string communityId) : Task
+This function allows you to leave a comunity using the current Amino account
+- Success: Leaves the community and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- communityId : string : The community ID of the community that you want to leave
+### Example:
+```CSharp
+try 
+{
+    client.leave_community("123456");
+    Console.WriteLine("Left community");
+} catch 
+{
+    Console.WriteLine("Could not leave community");
+}
+```
+
+
+### flag_community(string communityId, string reason, Amino.Types.Flag_Types flagType, bool asGuest) : Task
+This function allows you to flag a community
+- Success: Flags the community and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- communityId : string : The community ID of the community you want to flag
+- reason : string : The reason why you want to flag the community
+- flagType : Amino.Types.Flag_Types : The Type of flagging you want to do
+- asGuest : bool (default: false) : This value decides if you want to flag the community as a guest or with an Amino account
+### Example:
+```CSharp
+try 
+{
+    client.flag_community("123456", "No foxes", Amino.Types.Flag_Types.Trolling, true);
+    Console.WriteLine("Flagged community");
+} catch 
+{
+    Console.WriteLine("Could not flag community");
+}
+```
+
+
+### upload_media(byte[] file | string filePath, Amino.Types.Upload_File_Types type) : string
+This function allows you to upload media directly to the Amino servers, it will return the resulting media URL.
+- Success: Uploads the media to the Amino servers and returns the resulting media URL
+- Error: Throws an Exception
+- This function can be used in multiple ways and have the same output, choose between byte[] for the direct file or string for filepath!
+### Values:
+- file : byte[] : The bytes of the file that you want to upload
+- filePath : string : The path to the file that you want to upload
+- type : Amino.Types.Upload_File_Types : The type of media that you want to upload
+### Example:
+```CSharp
+try 
+{
+    //Uploading media using the file bytes
+    byte[] fileBytes = File.ReadAllBytes("Path_To_File");
+    string uploaded_with_bytes = client.upload_media(fileBytes, Types.upload_File_Types.Image);
+
+    //Uploading media using file path
+    string uploaded_with_path = client.upload_media("Path_To_File", Types.upload_File_Types.Image);
+
+} catch 
+{
+    Console.WriteLine("Could not upload media");
+}
+```
+
+
+### edit_profile(string nickname, string content, byte[] icon, string backgroundColor, string backgroundMediaUrl, string defaultChatbubbleId) : Task
+This function allows you to edit your global Amino profile
+- Success: Edits the profile and completes the task successfully 
+- Error: Throws an Exception
+### Values:
+- nickname : string (default: null) : The nickname you want the account to have
+- content : string (default: null) : The content of the accounts description you want the account to have
+- icon : byte[] (default: null) : The icon you want the account to have as profile picture
+- backgroundColor : string (default: null) : The background color of the account as HEX format
+- backgroundMediaUrl : string (default: null) : The backkground media you want the account to have
+- defaultChatbubbleId : string (default: null) : The default chat bubble ID you want the account to have
+### Example:
+```CSharp
+try 
+{
+    client.edit_profile("I hated making this one.", "it sucked and probably doesn't even work.", backgroundColor: "#FFFFFF");
+    Console.WriteLine("Edited profile");
+} catch 
+{
+    Console.WriteLine("Could not edit profile");
+}
+```
+
+
+### set_privacy_status(bool isAnonymous, bool getNotifications) : Task
+This function allows you to set the privacy status of the current Amino account
+- Success: Sets the privacy status and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- isAnonymous : bool (default: false) : Decides if the account is anonymous
+- getNotifications : bool (default: true) : Decides if you get notifications or not
+### Example:
+```CSharp
+try 
+{
+    client.set_privacy_status(true, false);
+    Console.WriteLine("Set privacy status");
+} catch 
+{
+    Console.WriteLine("Could not set privacy status");
+}
+```
+
+
