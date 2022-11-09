@@ -26,6 +26,7 @@ You can get Amino.Net straight from [NuGet.org](https://nuget.org) or any NuGet 
 - Types (Coming soon)
 - Objects (Coming soon)
 - Events (Coming soon)
+- Exceptions (Coming soon)
 - Amino REST API Documentation (Coming soon)
 
 
@@ -59,7 +60,7 @@ You need to create an Object instance of the Amino.Client object to use the Clie
 ### Values:
 - _deviceId : string : if left empty, it will generate a valid Amino Device ID
 
-### Exmaple:
+### Example:
 ```CSharp
 Amino.Client client = new Amino.Client(); // This client will be used as an Example Client for the rest of the Amino.Client() docuemntations, whenever "client" is being used, its just an instance of Amino.Client()
 ```
@@ -535,4 +536,70 @@ try
 ```
 
 
-### 
+### search_community(string aminoId) : List<Amino.Objects.CommunityInfo>
+This function allows you to search for a Community by its aminoId (**not** and ObjectId) and retrive information about it
+- Success: Searches the community and returns it as an Object List (List<Amino.Objects.CommunityInfo>)
+- Error: Throws an Exception
+### Values:
+- aminoId : string : The aminoId that you want to look up
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.CommunityInfo> communityInfo = client.search_community("myLookupTerm");
+    Console.WriteLine("Name of the first community result: " + communityInfo[0].name);
+} catch 
+{
+    Console.WriteLine("Could not search for community");
+}
+```
+
+
+### get_user_following(string userId, int start, int size) : List<Amino.Objects.UserFollowings>
+This function allows you to get the users a target is following
+- Success: Gets the user followings and returns the data as an Object List (List<Amino.Objects.UserFollowings>)
+- Error: Throws an Exception
+### Values:
+- userId : string : The object / user Id of a target user
+- start : int (default: 0) : Sets the Start index for getting chat list
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.UserFollowings> userFollowings = client.get_user_followings("someUserId");
+    Console.WriteLine("Name of the first user following: " + userFollowings[0].nickname);
+} catch 
+{
+    Console.WriteLine("Could not get user followings");
+}
+```
+
+
+### get_user_followers(string userId, int start, int size) : List<Amino.Objects.UserFollowings>
+This function allows you to get a list of users that follow a user
+- Success: Gets the followers and returns them as an Object List (List<Amino.Objects.UserFollowings>)
+- Error: Throws an Exception
+### Values:
+- userId : string : The object / user ID of the user you want to get the followers of
+- start : int (default: 0) : Sets the Start index for getting chat list
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.UserFollowings> userFollowers = client.get_user_followers("someUserId");
+    Console.WriteLine("Name of the first follower: " + userFollowers[0].nickname);
+} catch 
+{
+    Console.WriteLine("Could not get user followers");
+}
+``` 
+<button onClick="testFunction()">test</button>
+
+
+<script>
+    function testFunction() {
+        alert("Test");
+    }
+</script>
