@@ -7,6 +7,9 @@ Amino.Net has a lot of functionality that allow you to develop Amino tools and b
 ## Extras and Credits
 - This C# library has been made possible using [Amino.py](https://github.com/Slimakoi/Amino.py) as it is based on [Slimakoi](https://github.com/Slimakoi/)s work
 - Some values or Objects might return `null`, this is because the library pulls its data straight from the Amino REST API, if values in the API return `null` there's nothing i can do!
+- Some values / objects might change depending on if the Client is logged in or not!
+- Some functions require the Client to be logged in, they will throw an Exception if it is not.
+- If you find a bug, an issue or have a recommendation to make, please open an Issue on GitHub about it!
 
 ## Important Notice
 By using this library you agree that you are aware of the fact that you are breaking the App services Terms of Service - as Team Amino strictly forbids the use of any sort of third party software / scripting to gain an advantage over other members, any activity by third party tools found by Team Amino may result in your account getting banned from their services!
@@ -14,8 +17,19 @@ By using this library you agree that you are aware of the fact that you are brea
 ## How to install
 You can get Amino.Net straight from [NuGet.org](https://nuget.org) or any NuGet Package manager!
 
+## Quick Links
+- Main Documentation and Extra info ([Click Here](https://github.com/FabioGaming/Amino.NET/blob/master/README.md))
+- Client Documentation (Coming soon)
+- SubClient Documentation (Coming soon)
+- ACM Documentation (Coming soon)
+- Helpers Documentation (Coming soon)
+- Types (Coming soon)
+- Objects (Coming soon)
+- Events (Coming soon)
+- Amino REST API Documentation (Coming soon)
 
-# DOCUMENTATION
+
+# GENERAL DOCUMENTATION
 ## Client
 The Amino.Client() Object is a crucial object to make Bots or tools, as there need to be an instance of it to make the library work
 ### Values
@@ -51,6 +65,7 @@ Amino.Client client = new Amino.Client(); // This client will be used as an Exam
 ```
 
 ## Methods / Functions
+
 ### request_verify_code(string email, bool resetPassword) : Task
 You can request an Amino verification code using this function.
 - Success: Task completes successfully
@@ -69,6 +84,7 @@ try
     Console.WriteLine("Could not send email");
 }
 ```
+
 
 ### login(string email, string password, string secret) : Task
 You can log into an existing Amino account using this function.
@@ -90,6 +106,7 @@ try
 }
 ```
 
+
 ### logout() : Task
 You can log out of an Amino account using this function, make sure you are logged into an account to use this function!
 - Success: Clears the Clients headers, values and completes the Task successfully
@@ -105,6 +122,7 @@ try
     Console.WriteLine("Could not log out!");
 }
 ```
+
 
 ### register(string name, string email, string password, string verificationCode, string deviceId) : Task
 This function allows you to register an Amino account
@@ -128,6 +146,7 @@ try
 }
 ``` 
 
+
 ### restore_account(string email, string password, string deviceId) : Task
 This function allows you to restore a deleted Amino account
 - Success: Restores the account and completes the Task successfully
@@ -148,6 +167,7 @@ try
 }
 ```
 
+
 ### delete_account(string password) : Task
 This function allows you to delete the current Amino account in use.
 - Success: Deletes the current Amino account, clears all headers, stops the webSocket and completes the Task successfully
@@ -165,6 +185,7 @@ try
     Console.WriteLine("Account could not be deleted!");
 }
 ```
+
 
 ### activate_account(string email, string verificationCode, string deviceId) : Task
 This function allows you to activate an Amino account using a verification Code
@@ -186,6 +207,7 @@ try
 }
 ```
 
+
 ### configure_account(Amino.Types.account_gender gender, int age) : Task
 This function allows you to configure an Amino accounts age and gender
 - Success: Configures the account and completes the Task successfully
@@ -204,6 +226,7 @@ try
     Console.WriteLine("Could not configure account!");
 }
 ```
+
 
 ### change_password(string email, string password, string verificationCode) : Task
 This function allows you to change the password of the current Amino account.
@@ -225,6 +248,7 @@ try
 }
 ```
 
+
 ### get_user_info(string userId) : Amino.Objects.GlobalProfile
 This function allows you to get information about a global Amino Profile
 - Success: Gets the users information and returns it as an Object (Amino.Objects.GlobalProfile)
@@ -244,4 +268,271 @@ try
 ```
 
 
+### check_device(string deviceId) : bool
+This function allows you to check if a device ID is valid or not
+- Success: Checks if the device ID is valid and returns either True or False
+- Error: Throws an Exception
+### Values:
+- deviceId : string : The device ID you want to check
+### Example:
+```CSharp
+try 
+{
+    if(client.check_device("someDeviceId")) 
+    {
+        Console.WriteLine("This device ID is valid!");
+    } else 
+    {
+        Console.WriteLine("This device ID is invalid!");
+    }
+} catch 
+{
+    Console.WriteLine("Could not check device ID");
+}
+```
 
+
+### get_event_log() : Amino.Objects.EventLog
+This function allows you to get information about the current accounts event log!
+- Success: Gets the accounts eventLog and returns it as an Object (Amino.Objects.EventLog)
+- Error: Throws an Exception
+### Values:
+- None
+### Example:
+```CSharp
+try 
+{
+    var eventLog = client.get_event_log();
+    Console.WriteLine("EventLog JSON: " + eventLog.json);
+} catch 
+{
+    Console.WriteLine("Could not get eventLog!");
+}
+``` 
+
+
+### get_subClient_communities(int start, int size) : List<Amino.Objects.Community>
+This function allows you to get information about all the Communities where the current Amino account is in
+- Success: Gets all communities of the main Client and returns them as an Object List (List<Amino.Objects.Community>)
+- Error: Throws an Exception
+- The range between `start` and `size` **cannot** be larger than `100`
+### Values:
+- start : int (default: 0) : The start index for getting the communities
+- size : int (default: 25) : Sets the range between `start` and whatever number this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.Community> communityList = client.get_subClient_communities();
+    Console.WriteLine("First community Name: " + communityList[0].communityName);
+} catch 
+{
+    Console.WriteLine("Could not get subClient communities.");
+}
+```
+
+
+### get_subClient_profiles(int start, int size) : List<Amino.Objects.CommunityProfile>
+This function allows you to get information about all the community profiles where the current Amino account is in
+- Success: Gets Community profiles and returns them as an Object List (List<Amino.Objects.CommunityProfile>)
+- Error: Throws an Exception
+- The range between `start` and `size` **cannot** be larger than `100`
+### Values:
+- start : int (default: 0) : The start index of the Community profiles
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.CommunityProfile> profileList = client.get_subClient_profiles();
+    Console.WriteLine("Profile name in first community: " + profileList[0].nickname);
+} catch 
+{
+    Console.WriteLine("Could not get subClient profiles");
+}
+```
+
+
+### get_account_info() : Amino.Objects.UserAccount
+This function allows you to get information about the current Amino account
+- Success: Gets user information and returns it as an Object (Amino.Objects.UserAccount)
+- Error: Throws an Exception
+### Values:
+- None
+### Example:
+```CSharp
+try 
+{
+    var accountInfo = client.get_account_info();
+    Console.WriteLine("Account was created on " + accountInfo.createdTime);
+} catch 
+{
+    Console.WriteLine("Could not get user information");
+}
+```
+
+
+### get_chat_threads(int start, int size) : List<Amino.Obejcts.Chat>
+This function allows you to get all chat threads where the current Amino account is in
+- Success: Gets all chat threads and returns them as an Object List (List<Amino.Objects.Chat>)
+- Error: Throws an Exception
+- The range between `start` and `size` **cannot** be larger than `100`
+### Values:
+- start : int (default: 0) : Sets the Start index for getting chat list
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.Chat> chatList = client.get_chat_threads();
+    Console.WriteLine("Nickname of the owner of the first chat: " + chatList[0].Author.nickname);
+} catch 
+{
+    Console.WriteLine("Could not get chats!");
+}
+```
+
+
+### get_chat_thread(string chatId) : Amino.Objects.Chat
+This function allows you to get information about a specific chat thread where the current Amino account is in
+- Success: Gets the chat threads information and returns it as an Object (Amino.Objects.Chat)
+- Error: Throws an Exception
+### Values:
+- chatId : string : The object / chat ID of the chat thread you want the information from
+### Example:
+```CSharp
+try 
+{
+    var Chat = client.get_chat_thread("myChatId");
+    Console.WriteLine("Chat Member Count: " + Chat.membersCount);
+} catch 
+{
+    Console.WriteLine("Could not get chat Thread);
+}
+```
+
+
+### get_chat_users(string chatId, int start, int size) : List<Amino.Objects.ChatMember>
+This function allows you to get chat member information about a specific chat thread
+- Success: Gets the member information and returns it as an Object List (List<Amino.Objects.ChatMember>)
+- Error: Throws an Exception
+- The range between `start` and `size` **cannot** be larger than `100`
+### Values:
+- chatId : string : The object / chat ID of the chat thread
+- start : int (default: 0) : Sets the Start index for getting chat list
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.ChatMember> chatMemberList = client.get_chat_users("myChatId");
+    Console.WriteLine("Name of the first chat member: " + chatMemberList[0].nickname);
+} catch 
+{
+    Console.WriteLine("Could not get chat users");
+}
+```
+
+
+### join_chat(string chatId) : Task
+This function allows you to join a chat thread using the current Amino account.
+- Success: Joins the chat thread and completes the Task Successfully
+- Error: Throws an Exception
+### Values:
+- chatId : string : The object / chat ID of the chat thread you want to join
+### Example:
+```CSharp
+try 
+{
+    client.join_chat("myChatId");
+    Console.WriteLine("Joined chat");
+} catch 
+{
+    Console.WriteLine("Could not join chat!");
+}
+```
+
+
+### leave_chat(string chatId) : Task
+This function allows you to leave a chat thread using the current Amino account.
+- Success: Leaves the chat and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- chatId : string : The object / chat ID of the chat thread you want to leave
+### Example:
+```CSharp
+try 
+{
+    client.leave_chat("myChatId");
+    Console.WriteLine("Left chat");
+} catch 
+{
+    Console.WriteLine("Could not leave chat!");
+}
+```
+
+
+### invite_to_chat(stiring[] userIds, string chatId) : Task
+This function allows you to invite one or more members to a chat thread with the current Amino account
+- Success: Invites the members to the chat thread and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- userIds : string[] : A string array of the user IDs that you want to invite
+- chatId : string : The object / chat ID that you want to invite the users into
+### Example:
+```CSharp
+try 
+{
+    string[] users = new string[] { "userId_1", "userId_2" };
+    client.invite_to_chat(users, "chatId");
+    Console.WriteLine("Invited users!");
+} catch 
+{
+    Console.WriteLine("Could not invite members to chat");
+}
+```
+
+
+### kick_from_chat(string userId, string chatId, bool allowRejoin) : Task 
+This function allows you to kick a user from a chat thread
+- Success: Kicks the user from the chat tread and completes the Task successfully7
+- Error: Throws an Exception
+### Values:
+- userId : string : The userId of the user you want to kick
+- chatId : string : The object / chat ID of the chat thread you want to kick the user from
+- allowRejoin : bool (default: true) : Decides if the user is allowed to rejoin the chat thread or not
+### Example:
+```CSharp
+try 
+{
+    client.kick_from_chat("userId", "chatId", false);
+    Console.WriteLine("User has been kicked from chat!");
+} catch 
+{
+    Console.WriteLine("Could not kick member from chat!");
+}
+```
+
+
+### get_chat_messages(string chatId, int size, string pageToken) : List<Amino.Objects.MessageCollection>
+This function allows you to get a collection of messages in a specific chat thread the current Amino account is in
+- Success: Gets the chat messages and returns them as an Object List (List<Amino.Objects.MessageCollection>)
+- Error: Throws an Exception
+### Values:
+- chatId : string : The object / chat ID of the chat thread that you want the messages from
+- size : int (default: 25) : The amount of messages you want to get
+- pageToken : string (default: null) : The page Token of the messages
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Obejcts.MessageCollection> messageList = client.get_chat_messages("someChatId", 50);
+    Console.WriteLine("Nickname of the author of the first message: " + messageList[0].Author.nickname);
+} catch 
+{
+    Console.WriteLine("Could not get chat messages!");
+}
+```
+
+
+### 
