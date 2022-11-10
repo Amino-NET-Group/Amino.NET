@@ -1012,6 +1012,7 @@ This function allows you to change your Amino ID, note that you can't do this an
 ### Values:
 - aminoId : string : The Amino ID that you want to assign for the account
 ### Example:
+```CSharp
 try 
 {
     client.set_amino_id("someAminoID");
