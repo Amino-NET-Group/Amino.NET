@@ -1005,3 +1005,102 @@ try
 ```
 
 
+### set_amino_id(string aminoId) : Task
+This function allows you to change your Amino ID, note that you can't do this an unlimited amount of times
+- Success: Changes the accounts Amino ID and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- aminoId : string : The Amino ID that you want to assign for the account
+### Example:
+try 
+{
+    client.set_amino_id("someAminoID");
+    Console.WriteLine("Set Amino ID");
+} catch 
+{
+    Console.WriteLine("Could not set Amino ID");
+}
+```
+
+
+### add_linked_community(int communityId) : Task
+This function allows you to add a linked community to the profile of the current Amino account
+- Success: Adds the community and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- communityId : int : The ID of the community that you want to add
+### Example:
+```CSharp
+try 
+{
+    client.add_linked_community(123456);
+    Console.WriteLine("Added linked community");
+} catch 
+{
+    Console.WriteLine("Could not add linked community");
+}
+```
+
+
+### remove_linked_community(int communityId) : Task
+This function allows you to remove a linked community from the profile of the current Amino account
+- Success: Removes the linked community and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- communityId : int : The ID of the community that you want to remove
+### Example:
+```CSharp
+try 
+{
+    client.remove_linked_community(123456);
+    Console.WriteLine("Removed linked community");
+} catch 
+{
+    Console.WriteLine("Could not remove linked community");
+}
+``` 
+
+
+### comment(string message, Amino.Types.Comment_Types type, objectId) : Task
+This function allows you to comment below a post, a wall or reply to a comment using the current Amino account
+- Success: Executes the comment and completes the Task succeessfully
+- Error: Throws an Exception
+### Values:
+- message : string : The content of the comment that you want to post
+- type : Amino.Types.Comment_Types : The type of comment you want to post
+- objectId : string : The object ID of the target you want to comment under / reply to
+### Example:
+```CSharp
+try 
+{
+    client.comment("Nice post. Sadly it's not about Foxes.", Amino.Types.Comment_Types.Blog, "somePostId");
+    Console.WriteLine("Comment posted");
+} catch 
+{
+    Console.WriteLine("Could not comment");
+}
+```
+
+
+### delete_comment(string commentId, Amino.Types.Comment_Types type, string objectId) : Task
+This function allows you to delete a comment from a post, a users wall or a reply using the current Amino account
+- Success: Deletes the target comment and completes the Task successfully
+- Error: Throws an Exception
+### Values:
+- commentId : string : The object ID of the comment that you want to delete
+- type : Amino.Types.Comment_Types : The type of comment you're targetting
+- objectId : string : The object ID where the target comment has been commented on
+### Example:
+```CSharp
+try 
+{
+    client.delete_comment("someCommentId", Amino.Types.Comment_Types.Blog, "someBlogPostId");
+    Console.WriteLine("Deleted comment");
+} catch 
+{
+    Console.WriteLine("Could not delete comment");
+}
+```
+
+
+
