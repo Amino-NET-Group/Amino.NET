@@ -1162,3 +1162,66 @@ try
 }
 ```
 
+
+### get_ta_announcements(Amino.Types.Supported_Languages language, int start, int size) : List<Amino.Objects.Post>
+This function allows you to get a list of Team Amino announcements
+- Success: Gets the Team Amino announcements and returns them as an Object List (List<Amino.Objects.Post>)
+- Error: Throws an Exception
+### Values:
+- language : Amino.Types.Supported_Languages (default: Amino.Types.Supportedd_Languages.english)
+- start : int (default: 0) : Sets the Start index for getting the announcement posts
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.Post> announcementList = client.get_ta_announcements();
+    Console.WriteLine("Title of the first post: " + announcementList[0].title);
+} catch 
+{
+    Console.WriteLine("Could not get Team Amino announcement posts!");
+}
+```
+
+
+### get_wallet_info() : Amino.Objects.WalletInfo
+This function allows you to get the wallet info of the current Amino account
+- Success: Gets the wallet info and returns it as an Object (Amino.Objects.WalletInfo)
+- Error: Throws an Exception
+### Values:
+- None
+### Example:
+```CSharp
+try 
+{
+    var walletInfo = client.get_wallet_info();
+    Console.WriteLine("This account has " + walletInfo.totalCoins + " Amino coins");
+} catch 
+{
+    Console.WriteLine("Could not get wallet info");
+}
+```
+
+
+### get_wallet_history(int start, int size) : List<Amino.Objects.CoinHistoryEntry>
+This function allows you to get the wallet history of the current Amino account
+- Success: Gets the wallet history and returns it as an Object List (List<Amino.Objects.CoinHistoryEntry>)
+- Error: Throws an Exception
+### Values:
+- start : int (default: 0) : Sets the Start index for getting the announcement posts
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.CoinHistoryEntry> coinHistory = client.get_wallet_history();
+    Console.WriteLine("Latest transaction amount: " + coinHistory[0].changedCoins + " paid by " + coinHistory[0].userId);
+} catch 
+{
+    Console.WriteLine("Could not get wallet history.");
+}
+```
+
+
+
+
