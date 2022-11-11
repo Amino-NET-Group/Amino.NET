@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Version>1.0.0-Dev-6.9.1.9</Version>
+    <Version>1.0.0-Dev-6.9.2.1</Version>
     <Authors>FabioTheFox</Authors>
     <Company>FabiDev</Company>
     <Description>An unofficial C# wrapper for Aminos REST API for making amino bots and tools</Description>
@@ -17,17 +17,29 @@
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
+    <PackageIcon>Amino.Net-Logo-V2.png</PackageIcon>
+    <PackageIconUrl />
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>C:\Users\Fabio\Documents\GitHub\Amino.NET\Amino.NET\Amino.NET.xml</DocumentationFile>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <Optimize>false</Optimize>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="RestSharp" Version="108.0.2" />
     <PackageReference Include="Websocket.Client" Version="4.4.43" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Amino.Net-Logo-V2.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
