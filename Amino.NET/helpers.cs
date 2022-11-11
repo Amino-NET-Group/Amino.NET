@@ -10,6 +10,9 @@ namespace Amino
     public class helpers
     {
 
+        /// <summary>
+        /// This value represents the baseURL to Aminos REST backend
+        /// </summary>
         public static string BaseUrl = "https://service.narvii.com/api/v1";
 
         private static T[] CombineTwoArrays<T>(T[] a1, T[] a2)
@@ -29,6 +32,11 @@ namespace Amino
                              .ToArray();
         }
 
+        /// <summary>
+        /// This function allows you to generate an Amino valid signiture based on JSON data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>string : The signiture.</returns>
         public static string generate_signiture(string data)
         {
             string prefix = "42";
@@ -40,7 +48,11 @@ namespace Amino
             return Convert.ToBase64String(CombineTwoArrays(StringToByteArray(prefix), result));
         }
 
-
+        /// <summary>
+        /// This function allows you to generate an Amino valid signiture for file uploads
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>string : The signiture.</returns>
         public static string generate_file_signiture(byte[] data)
         {
             string prefix = "42";
@@ -50,6 +62,10 @@ namespace Amino
             return Convert.ToBase64String(CombineTwoArrays(StringToByteArray(prefix), result));
         }
 
+        /// <summary>
+        /// This function allows you to generate an Amino valid device ID
+        /// </summary>
+        /// <returns>string : The Device ID</returns>
         public static string generate_device_id()
         {
             string prefix = "42";
@@ -64,7 +80,10 @@ namespace Amino
             return (prefix + BitConverter.ToString(identifier).Replace("-", "").ToLower() + result).ToUpper();
         }
 
-
+        /// <summary>
+        /// This function allows you to get the current UNIX Timestamp (NOT Amino valid)
+        /// </summary>
+        /// <returns>double : The current UNIX Timestamp</returns>
         public static double GetTimestamp()
         {
 
@@ -75,6 +94,11 @@ namespace Amino
             return unixTime;
         }
 
+        /// <summary>
+        /// This function allows you to get the Type ID based on Amino.Types.Object_Types
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>int : the object ID index thingie</returns>
         public static int get_ObjectTypeID(Types.Object_Types type)
         {
             int _type;

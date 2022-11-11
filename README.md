@@ -1104,4 +1104,61 @@ try
 ```
 
 
+### like_post(string objectId, Amino.Types.Post_Types type) : Task
+This function allows you to like a post using the current Amino account
+- Success: Likes the post and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- objectId : string : The ID of the post you want to like
+- type : Amino.Types.Post_Types : The type of post that you want to like
+### Example:
+```CSharp
+try 
+{
+    client.like_post("somePostID", Amino.Types.Post_Types.Blog);
+    Console.WriteLine("Liked post");
+} catch 
+{
+    Console.WriteLiine("Could not like post");
+}
+```
+
+
+### unlike_post(string objectId, Amino.Types.Post_Types type) : Task
+This function allows you to unlike a post using the current Amino account
+- Success: Unlikes the post and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- objectId : string : The object ID of the post that you want to unlike
+- type : Amino.Types.Post_Types : The type of post that you want to unlike
+### Example:
+```CSharp
+try 
+{
+    client.unlike_post("somePostId", Amino.Types.Post_Types.Blog);
+    Console.WriteLine("Unlikes post");
+} catch 
+{
+    Console.WriteLine("Could not unlike post");
+}
+```
+
+
+### get_membership_info() : Amino.Objects.MembershipInfo
+This function allows you to get information about the current Amino accounts Amino+ membership
+- Success: Gets the membership information and returns it as an Object (Amino.Objects.MembershipInfo)
+- Error: Throws an Exception
+### Values:
+- None
+### Example:
+```CSharp
+try 
+{
+    var membershipInfo = client.get_membership_info();
+    Console.WriteLine("The membership will expire on: " + membershipInfo.Membership.expiredTime);
+} catch 
+{
+    Console.WriteLine("Could not get membership info");
+}
+```
 
