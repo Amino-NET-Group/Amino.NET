@@ -11,6 +11,8 @@ Amino.Net has a lot of functionality that allow you to develop Amino tools and b
 - Some functions require the Client to be logged in, they will throw an Exception if it is not.
 - If you find a bug, an issue or have a recommendation to make, please open an Issue on GitHub about it!
 - Please note that this library is built for an easy and dynamic start into making Amino bots and tools, it is **not** made for spam bots or any sort of harmful tools, so use it the way it's intended for.
+- This is a non profit project, however, if you do want to support me and my **general** work, you can refer to the GitHub sponsor options linked to this repository
+- I will not take any responsibilty for harm being done using this library, as this is only a free and **open** library, therefore I can't prevent any harm!
 
 ## Important Notice
 By using this library you agree that you are aware of the fact that you are breaking the App services Terms of Service - as Team Amino strictly forbids the use of any sort of third party software / scripting to gain an advantage over other members, any activity by third party tools found by Team Amino may result in your account getting banned from their services!
@@ -421,7 +423,7 @@ This function allows you to get chat member information about a specific chat th
 - The range between `start` and `size` **cannot** be larger than `100`
 ### Values:
 - chatId : string : The object / chat ID of the chat thread
-- start : int (default: 0) : Sets the Start index for getting chat list
+- start : int (default: 0) : Sets the Start index for getting chat users
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
 ```CSharp
@@ -562,7 +564,7 @@ This function allows you to get the users a target is following
 - Error: Throws an Exception
 ### Values:
 - userId : string : The object / user Id of a target user
-- start : int (default: 0) : Sets the Start index for getting chat list
+- start : int (default: 0) : Sets the Start index for getting user followings
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
 ```CSharp
@@ -583,7 +585,7 @@ This function allows you to get a list of users that follow a user
 - Error: Throws an Exception
 ### Values:
 - userId : string : The object / user ID of the user you want to get the followers of
-- start : int (default: 0) : Sets the Start index for getting chat list
+- start : int (default: 0) : Sets the Start index for getting user followers
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
 ```CSharp
@@ -604,7 +606,7 @@ This function allows you to get a list of users that have visited a target profi
 - Error: Throws an Exception
 ### Values:
 - userId : string : The target users object / user ID that you want to get the visitors of
-- start : int (default: 0) : Sets the Start index for getting chat list
+- start : int (default: 0) : Sets the Start index for getting user visitors
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example: 
 ```CSharp
@@ -629,7 +631,7 @@ This function allows you to get a list of users that the current Amino account h
 - Success: Gets the blocked users and returns them as an Object List (List<Amino.Objects.BlockedUser>)
 - Error: Throws an Exception
 ### Values:
-- start : int (default: 0) : Sets the Start index for getting chat list
+- start : int (default: 0) : Sets the Start index for getting blocked users
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
 ```CSharp
@@ -653,7 +655,7 @@ This function allows you to get a list of user IDs of the users who have current
 - Success: Gets all blocker user IDs and returns them as a string list
 - Error: Throws an Exception
 ### values:
-- start : int (default: 0) : Sets the Start index for getting chat list
+- start : int (default: 0) : Sets the Start index for getting blocker users
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
 ```CSharp
@@ -678,7 +680,7 @@ This function allows you to get a list of comments that have been left on a user
 ### values:
 - userId : string : The object / user ID of the user you want to get the wall comments from
 - type : Amino.Types.Sorting_Types : The type of sorting you want to apply to the comment filter
-- start : int (default: 0) : Sets the Start index for getting chat list
+- start : int (default: 0) : Sets the Start index for getting wall comments
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
 ```CSharp
@@ -1223,5 +1225,345 @@ try
 ```
 
 
+### get_from_deviceId(string deviceId) : string
+This function allows you to get a user ID thats linked to a deviceId
+- Success: Returns the user ID as a string and completes the task successfully
+- Error: Throws an exception
+### Values:
+- deviceId : string : The device ID that you want to get the userId from
+### Example:
+```CSharp
+try 
+{
+    Console.WriteLine("Some stuff: " + client.get_from_deviceId("someDeviceId"));
+} catch 
+{
+    Console.WriteLine("Could not get data from userId");
+}
+```
 
 
+### get_from_code(string aminoUrl) : Amino.Objects.FromCode
+This function allows you to get information about a specific Amino URL (code)
+- Success: Gets the information and returns it as an Object (Amino.Objects.FromCode)
+- Error: Throws an Exception
+### Values:
+- aminoUrl : string : The URL of the object that you want to get information about
+### Example:
+```CSharp
+try 
+{
+    var objectInfo = client.get_from_code("someUrl");
+    Console.WriteLine("Target Code: " + objectInfo.targetCode);
+} catch 
+{
+    Console.WriteLine("Could not get object information");
+}
+```
+
+
+### get_from_id(string objectId, Amino.Types.Object_Types type, string communityId) : Amino.Objects.FromId
+This function allows you to get informations abou tan object using the object ID
+- Success: Gets the objects information and returns it as an Object (Amino.Objects.FromId)
+- Error: Throws an Exception
+### Values:
+- objectId : string : The ID of the object that you want to get information of
+- type : Amino.Objects.Object_Types : The type of the obejct that you want to get information of
+- communityId : string (default: null) : If you want to get information about an object inside of a community you can assign a CommunityId to this function
+### Example:
+```CSharp
+try 
+{
+    var objectInfo = client.get_from_id("somePostId", Amino.Types.Object_Types.Blog, "123456");
+    Console.WriteLine("Path of the object: " + objectInfo.path);
+} catch 
+{
+    Console.WriteLine("Could not get object informations");
+}
+```
+
+
+### get_supported_languages() : string[]
+This function allows you to get the language codes for each supported language as a strin array
+- Success: Gets the supported languages and returns them as a string array
+- Error: Throws an Exception
+### Values:
+- None
+### Example:
+```CSharp
+try 
+{
+    string[] supportedLanguages = client.get_supported_languages();
+    Conmsole.WriteLine("List of supported languages:");
+    foreach(string language in supportedLanguages) 
+    {
+        Console.WriteLine(language);
+    }
+} catch 
+{
+    Console.WriteLine("Could not get supported languages");
+}
+```
+
+
+### claim_new_user_coupon() : Task
+This function allows you to claim the new user coupon for the current Amino account
+- Success: Claims the new user coupon and completes the Task successfully
+- Error: Throws an Exception
+### values:
+- None
+### Example:
+```CSharp
+try 
+{
+    client.claim_new_user_coupon();
+    Console.WriteLine("Claimed new user coupon");
+} catch 
+{
+    Console.WriteLine("Could not claim new user coupon");
+}
+```
+
+
+### get_all_users(int start, int size) : List<Amino.Obejcts.UserProfile>
+This function allows you to get a list of all global Amino users
+- Success: Gets the global Amino users and returns them as an Object List (List<Amino.Objects.UserProfile>)
+- Error: Throws an Exception
+### Values:
+- start : int (default: 0) : Sets the Start index for getting user profiles
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Obejcts.UserProfile> users = client.get_all_users();
+    Console.WriteLine("List of user info:")
+    foreach(Amino.Objects.UserProfile user in users) 
+    {
+        Console.WriteLine("Name: " + user.nickname.PadRight(16) + " userId: " + user.userId);
+    }
+} catch 
+{
+    Console.WriteLine("Could not get users!");
+}
+```
+
+
+### accept_host(string chatId, string requestId) : Task
+This function allows you to accept host / organizer of a chat room using the current Amino account
+- Success: Accepts chat host role and completes the task successfully
+- Error: Throws an Exception
+### Values:
+- chatId : string : The object / chat ID of the chat where you have been requested to be host in
+- requestId : string : The object ID of the chat host request
+### Example:
+```CSharp
+try 
+{
+    client.accept_host("someChatId", "someRequestId");
+    Console.WriteLine("Chat host has been accepted");
+} catch 
+{
+    Console.WriteLine("Could not accept chat host");
+}
+```
+
+
+### accept_organizer(string chatId, string requestId) : Task
+- Refer to `accept_host`.
+
+
+### link_identify(string inviteCode) : Amino.Obejcts.FromInvite
+This function allows you to get information about an Amino invite code and its community
+- Success: Gets the invite codes information and returns it as an Object (Amino.Obejcts.FromInvite)
+- Error: Throws an Exception
+### Values:
+- inviteCode : string : The Amino invite code you want to get information from (The inviteCode is **not** the full invite URL)
+### Example:
+```CSharp
+try 
+{
+    var inviteInformation = client.link_identify("ABCDEF")M;
+    Console.WriteLine("InviteId: " + inviteInformation.invitationId + " for community: " + inviteInformation.Community.name);
+} catch 
+{
+    Console.WriteLine("Could not get invite information!");
+}
+```
+
+
+### wallet_config(Amino.Types.Wallet_Config_Levels walletLevel) : Task
+This function allows you to set the coin wallet configuration using the current Amino account
+- Success: Changed the coin wallet configuration and returns the task successfully
+- Error: Throws an Exception
+### Values:
+- walletLevel : Amino.Types.Wallet_Config_Levels : The wallet Level that you want to set
+### Example:
+```CSharp
+try 
+{
+    client.wallet_config(Amino.Types.Wallet_Config_Levels.lvl_2);
+    Console.WriteLine("Set wallet level successfully");
+} catch 
+{
+    Console.WriteLine("Could not set wallet level");
+}
+```
+
+
+### get_avatar_frames(int start, int size) : List<Amino.Objects.AvatarFrame>
+This function allows you to get a list of Avatar Frames that the current Amino account has unlocked
+- Success: Gets the Avatar frames and returns them as an Object List (List<Amino.Obejcts.AvatarFrame>)
+- Error: Throws an Exception
+### Values:
+- start : int (default: 0) : Sets the Start index for getting the Avatar Frames
+- size : int (default: 25) : Sets the range between `start` and whatever this is set to
+### Example:
+```CSharp
+try 
+{
+    List<Amino.Objects.AvatarFrame> frames = client.get_avatar_frames();
+    if(frames.Count > 0) 
+    {
+        Console.WriteLine("All Frame IDs and Names in current list:");
+        foreach(Amino.Obejcts.AvatarFrame frame in frames) 
+        {
+            Console.WriteLine("FrameID: " + frame.frameId + " FrameName: " + frame.name);
+        }
+    } else 
+    {
+        Console.WriteLine("This account does not have any Avatar Frames!");
+    }
+} catch 
+{
+    Console.WriteLine("Could not get Avatar Frames");
+}
+```
+
+## events
+- This library has features a number of events that you can subscribe to!
+- All events run on an Amino.Client() instance!
+- All events will return either a value or an Object.
+
+
+### onMessage : Amino.Objects.Message
+This event fires each time the Client receives a Text message
+### Event:
+- This event returns an Amino.Objects.Message object
+### Example:
+```CSharp
+static void onMessageEvent(Amino.Objects.Message message) 
+{
+    Console.WriteLine($"User {message.Author.userName} has sent a message: {message.content} in chat: {message.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onMessage += onMessageEvent;
+}
+```
+
+
+### onImageMessage : Amino.Objects.ImageMessage
+This event fires each time the Client receives an Image message
+### Event:
+- This event returns an Amino.Objects.ImageMessage Object
+### Example: 
+```CSharp
+static void onImageMessageEvent(Amino.Objects.ImageMessage imageMessage) 
+{
+    Console.WriteLine($"User {imageMessage.Author.nickname} has sent an image: {imageMessage.mediaUrl}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onImageMessage += onImageMessageEvent;
+}
+```
+
+
+### onWebSocketMessage : string
+This event fires each time a websocket message has been recevied by the Client
+### Event:
+- This event returns a string, that being the raw (probably JSON) websocket message
+### Example: 
+```CSharp
+static void onWebSocketMessageEvent(string socketMessage) 
+{
+    Console.WriteLine("Recevied websocket message: " + socketMessage);
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onWebSocketMessage += onWebSocketMessageEvent;
+}
+```
+
+
+
+## helpers
+- The helpers class is an important part of Amino.Net and any other Amino library, as it allows you to get around the Amino API more easily
+### Values:
+- BaseURL : string : This string represents the base URL to Aminos REST API
+## Methods / Functions
+### generate_device_id() : string
+This function allows you to generate an Amino ready device ID 
+### Values:
+- None
+### Example:
+```CSharp
+Console.WriteLine("Amino device ID: " + Amino.helpers.generate_device_id());
+```
+
+
+### generate_signiture(sring data) : string
+This function allows you to generate an Amino valid request signiture
+### Values:
+- data : string : The data you want to turn into a signiture hash
+### Example:
+```CSharp
+Console.WriteLine("Amino Signiture: " + Amino.helpers.generate_signiture("{ some JSON data }"));
+```
+
+
+### generate_file_signiture(byte[] data) : string
+This function allows you to generate an Amino valid request signiture out of file data
+### Values:
+- data : byte[] : The file bytes that you want to turn into data
+### Example:
+```CSharp
+Console.WriteLine("Some file signiture: " + Amino.helpers.generate_file_signiture(File.ReadAllBytes("Some_File_Path")));
+```
+
+
+### GetTimestamp : double
+This function allows you to get the current UNIX timestamp, it is **not** Amino ready!
+### Values:
+- None
+### Example:
+```CSharp
+Console.WriteLine("Current UNIX Timestamp: " + Amino.helpers.GetTimestamp());
+Console.WriteLine("Current UNIX Timestamp (Amino ready): " + Amino.helpers.GetTimestamp() * 1000);
+```
+
+
+### get_ObjectTypeID(Amino.Types.Object_Types type) : int
+This function allows you to convert a Type into the fitting Amino object ID
+### Values:
+- type : Amino.Types.Object_Types : The Type enum that you want to convert into a number
+### Example:
+```CSharp
+Console.WriteLine("The Amino ID for Blog posts is: " + Amino.helpers.get_ObjectTypeID(Types.Object_Types.Blog));
+```
