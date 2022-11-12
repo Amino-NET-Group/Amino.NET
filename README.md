@@ -13,6 +13,7 @@ Amino.Net has a lot of functionality that allow you to develop Amino tools and b
 - Please note that this library is built for an easy and dynamic start into making Amino bots and tools, it is **not** made for spam bots or any sort of harmful tools, so use it the way it's intended for.
 - This is a non profit project, however, if you do want to support me and my **general** work, you can refer to the GitHub sponsor options linked to this repository
 - I will not take any responsibilty for harm being done using this library, as this is only a free and **open** library, therefore I can't prevent any harm!
+- If you run into issues or want to talk to other Amino.Net developers, you can check out the official Amino.Net discord server [HERE](https://discord.gg/gNnBnADQkz)
 
 ## Important Notice
 By using this library you agree that you are aware of the fact that you are breaking the App services Terms of Service - as Team Amino strictly forbids the use of any sort of third party software / scripting to gain an advantage over other members, any activity by third party tools found by Team Amino may result in your account getting banned from their services!
@@ -31,7 +32,7 @@ You can get Amino.Net straight from [NuGet.org](https://nuget.org) or any NuGet 
 - Events ([Click Here](https://github.com/FabioGaming/Amino.NET/blob/master/Events.md))
 - Exceptions & Troubleshooting (Coming soon)
 - Amino REST API Documentation (Coming soon)
-
+- Official Amino.Net Discord Server ([Click Here](https://discord.gg/gNnBnADQkz))
 
 # GENERAL DOCUMENTATION
 ## Client
