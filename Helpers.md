@@ -106,6 +106,7 @@ Console.WriteLine("The Amino ID for Blog posts is: " + Amino.helpers.get_ObjectT
 </details>
 --->
 
+<!---
 
 <style>
 #functionName {
@@ -122,3 +123,5 @@ summary {
 }
 
 </style> 
+
+--->
