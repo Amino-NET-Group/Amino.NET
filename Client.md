@@ -1,42 +1,16 @@
-# Amino.Net
-An unofficial C# wrapper for Aminos REST API to make Amino Bots and Tools
-
-# What can this wrapper do?
-Amino.Net has a lot of functionality that allow you to develop Amino tools and bots for multiple types of C# / dotNet projects
-
-## Extras and Credits
-- This C# library has been made possible using [Amino.py](https://github.com/Slimakoi/Amino.py) as it is based on [Slimakoi](https://github.com/Slimakoi/)s work
-- Some values or Objects might return `null`, this is because the library pulls its data straight from the Amino REST API, if values in the API return `null` there's nothing i can do!
-- Some values / objects might change depending on if the Client is logged in or not!
-- Some functions require the Client to be logged in, they will throw an Exception if it is not.
-- If you find a bug, an issue or have a recommendation to make, please open an Issue on GitHub about it!
-- Please note that this library is built for an easy and dynamic start into making Amino bots and tools, it is **not** made for spam bots or any sort of harmful tools, so use it the way it's intended for.
-- This is a non profit project, however, if you do want to support me and my **general** work, you can refer to the GitHub sponsor options linked to this repository
-- I will not take any responsibilty for harm being done using this library, as this is only a free and **open** library, therefore I can't prevent any harm!
-
-## Important Notice
-By using this library you agree that you are aware of the fact that you are breaking the App services Terms of Service - as Team Amino strictly forbids the use of any sort of third party software / scripting to gain an advantage over other members, any activity by third party tools found by Team Amino may result in your account getting banned from their services!
-
-## How to install
-You can get Amino.Net straight from [NuGet.org](https://nuget.org) or any NuGet Package manager!
-
-## Quick Links
-- Main Documentation and Extra info ([Click Here](https://github.com/FabioGaming/Amino.NET/blob/master/README.md))
-- Client Documentation ([Click Here](https://github.com/FabioGaming/Amino.NET/blob/master/Client.md))
-- SubClient Documentation (Coming soon)
-- ACM Documentation (Coming soon)
-- Helpers Documentation ([Click Here](https://github.com/FabioGaming/Amino.NET/blob/master/Helpers.md))
-- Types (Coming soon)
-- Objects (Coming soon)
-- Events ([Click Here](https://github.com/FabioGaming/Amino.NET/blob/master/Events.md))
-- Exceptions & Troubleshooting (Coming soon)
-- Amino REST API Documentation (Coming soon)
+# Amino.Client()
+## This is a seperated documentation file written for the Amino.Client()
+- This file might not always be up to date right away
+- This file contains every Amino.Client() function / method nicely wrapped up
+- To see the full general documentation consider reading Readme.md ([Click here](https://github.com/FabioGaming/Amino.NET))
 
 
-# GENERAL DOCUMENTATION
-## Client
-The Amino.Client() Object is a crucial object to make Bots or tools, as there need to be an instance of it to make the library work
-### Values
+
+<details>
+<summary id="functionName">Client(string deviceId)</summary>
+<p id="functionDescription">The Amino.Client() Object is a crucial object to make Bots or tools, as there need to be an instance of it to make the library work</p>
+
+### Object Values:
 Note that some values might be `null` if you don't `login` into an Amino account
 - deviceID : string
 - sessionID : string
@@ -55,46 +29,26 @@ Note that some values might be `null` if you don't `login` into an Amino account
 - is_Global : bool
 - debug : bool (default: false) : If turned to true, all API responses will be printed into the Trace log
 
-
-### Client(string _deviceId)
-You need to create an Object instance of the Amino.Client object to use the Clients functions, it accepts 1 value
 ### Extras
 - Consider using try catch statements, if a function fails while executing the request, the response code doesn't indicate success or if a custom condition is triggered, it will throw an Exception!
-### Values:
-- _deviceId : string : if left empty, it will generate a valid Amino Device ID
+
+### Required Values:
+- deviceId : string : if left empty, it will generate a valid Amino Device ID
 
 ### Example:
 ```CSharp
 Amino.Client client = new Amino.Client(); // This client will be used as an Example Client for the rest of the Amino.Client() docuemntations, whenever "client" is being used, its just an instance of Amino.Client()
 ```
 
-## Methods / Functions
+### Returns:
+- Nothing
+</details>
 
-### request_verify_code(string email, bool resetPassword) : Task
-You can request an Amino verification code using this function.
-- Success: Task completes successfully
-- Error: Throws an exception
-### Values:
-- email : string : The email address for the Amino account
-- resetPassword : bool (default: false) : This decides if the verification code is supposed to reset the accounts password
-### Example:
-```CSharp
-try
-{
-    client.request_verify_code("myEmail@domain.com", true);
-    Console.WriteLine("Requested Verification code!");
-} catch
-{
-    Console.WriteLine("Could not send email");
-}
-```
+<details>
+<summary id="functionName">login(string email, string password, string secret)</summary>
+<p id="functionDescription">You can log into an existing Amino account using this function.</p>
 
-
-### login(string email, string password, string secret) : Task
-You can log into an existing Amino account using this function.
-- Success: Sets all of the clients values, the Client headers and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+### Required Values:
 - email : string : The email of the account
 - password : string : The password of the account
 - secret : string (default: null) : The login secret of the account
@@ -110,11 +64,16 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### logout() : Task
-You can log out of an Amino account using this function, make sure you are logged into an account to use this function!
-- Success: Clears the Clients headers, values and completes the Task successfully
-- Error: Throws an Exception
+<details>
+<summary id="functionName">logout()</summary>
+<p id="functionDescription">You can log out of an Amino account using this function, make sure you are logged into an account to use this function!</p>
+
+### Required Values:
+- None
 ### Example:
 ```CSharp
 try 
@@ -127,12 +86,40 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### register(string name, string email, string password, string verificationCode, string deviceId) : Task
-This function allows you to register an Amino account
-- Success: The account will be created and the Task completes Successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">request_verify_code(string email, bool resetPassword)</summary>
+<p id="functionDescription">You can request an Amino verification code using this function.</p>
+
+### Required Values:
+- email : string : The email address for the Amino account
+- resetPassword : bool (default: false) : This decides if the verification code is supposed to reset the accounts password
+
+### Example:
+```CSharp
+try
+{
+    client.request_verify_code("myEmail@domain.com", true);
+    Console.WriteLine("Requested Verification code!");
+} catch
+{
+    Console.WriteLine("Could not send email");
+}
+```
+
+### Returns:
+- Nothing
+</details>
+
+
+<details>
+<summary id="functionName">register(string name, string email, string password, string verificationCode, string deviceId)</summary>
+<p id="functionDescription">This function allows you to register an Amino account</p>
+
+### Required Values:
 - name : string : The name of the account
 - email : string : The email of the account
 - password : string : The password of the account
@@ -148,17 +135,21 @@ try
 {
     Console.Writeline("Could not register account!");
 }
-``` 
+```
 
+### Returns:
+- Nothing
+</details>
 
-### restore_account(string email, string password, string deviceId) : Task
-This function allows you to restore a deleted Amino account
-- Success: Restores the account and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">restore_account(string email, string password, string deviceId)</summary>
+<p id="functionDescription">This function allows you to restore a deleted Amino account</p>
+
+### Required Values:
 - email : string : The email of the account you want to restore
 - password : string : The password of the account you want to restore
 - deviceId : string (default: null) : The device ID you want to restore the account with, if left empty it will generate one for you
+
 ### Example:
 ```CSharp
 try 
@@ -171,12 +162,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### delete_account(string password) : Task
-This function allows you to delete the current Amino account in use.
-- Success: Deletes the current Amino account, clears all headers, stops the webSocket and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">delete_account(string password)</summary>
+<p id="functionDescription">This function allows you to delete the current Amino account in use.</p>
+
+### Required Values:
 - password : string : The password of the current Amino Account
 ### Example:
 ```CSharp
@@ -190,12 +184,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### activate_account(string email, string verificationCode, string deviceId) : Task
-This function allows you to activate an Amino account using a verification Code
-- Success: Activates the Amino account and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">activate_account(string email, string verificationCode, string deviceId)</summary>
+<p id="functionDescription">This function allows you to activate an Amino account using a verification Code</p>
+
+### Required Values:
 - email : string : The email address of the account you want to activate
 - verificationCode : string : The verification Code to activate the account (refer to `request_verify_code()`)
 - deviceId : string (default: null) : The device ID  you want to activate the account from, if left empty it will generate one for you
@@ -211,12 +208,16 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### configure_account(Amino.Types.account_gender gender, int age) : Task
-This function allows you to configure an Amino accounts age and gender
-- Success: Configures the account and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">configure_account(Amino.Types.account_gender gender, int age)</summary>
+<p id="functionDescription">
+This function allows you to configure an Amino accounts age and gender</p>
+
+### Required Values:
 - gender : Amino.Types.account_gender : The gender you want the account to be configured to
 - age : int : Sets the age of the account : This value cannot be lower than 13!
 ### Example:
@@ -231,12 +232,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### change_password(string email, string password, string verificationCode) : Task
-This function allows you to change the password of the current Amino account.
-- Success: Changes the account password and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">change_password(string email, string password, string verificationCode)</summary>
+<p id="functionDescription">This function allows you to change the password of the current Amino account.</p>
+
+### Required Values:
 - email : string : The email of your account
 - password : string : The new password you want the account to change to
 - verificationCode : string : The verification code needed to reset your Password (refer to `request_verify_code()`)
@@ -252,12 +256,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### get_user_info(string userId) : Amino.Objects.GlobalProfile
-This function allows you to get information about a global Amino Profile
-- Success: Gets the users information and returns it as an Object (Amino.Objects.GlobalProfile)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_user_info(string userId)</summary>
+<p id="functionDescription">This function allows you to get information about a global Amino Profile</p>
+
+### Required Values:
 - userId : string : The object / user ID of the Amino user you want to get information about
 ### Example:
 ```CSharp
@@ -271,12 +278,15 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.GlobalProfile
+</details>
 
-### check_device(string deviceId) : bool
-This function allows you to check if a device ID is valid or not
-- Success: Checks if the device ID is valid and returns either True or False
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">check_device(string deviceId)</summary>
+<p id="functionDescription">This function allows you to check if a device ID is valid or not</p>
+
+### Required Values:
 - deviceId : string : The device ID you want to check
 ### Example:
 ```CSharp
@@ -295,12 +305,15 @@ try
 }
 ```
 
+### Returns:
+- bool
+</details>
 
-### get_event_log() : Amino.Objects.EventLog
-This function allows you to get information about the current accounts event log!
-- Success: Gets the accounts eventLog and returns it as an Object (Amino.Objects.EventLog)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_event_log()</summary>
+<p id="functionDescription">This function allows you to get information about the current accounts event log!</p>
+
+### Required Values:
 - None
 ### Example:
 ```CSharp
@@ -312,15 +325,17 @@ try
 {
     Console.WriteLine("Could not get eventLog!");
 }
-``` 
+```
 
+### Returns:
+- Amino.Objects.EventLog
+</details>
 
-### get_subClient_communities(int start, int size) : List<Amino.Objects.Community>
-This function allows you to get information about all the Communities where the current Amino account is in
-- Success: Gets all communities of the main Client and returns them as an Object List (List<Amino.Objects.Community>)
-- Error: Throws an Exception
-- The range between `start` and `size` **cannot** be larger than `100`
-### Values:
+<details>
+<summary id="functionName">get_subClient_communities(int start, int size)</summary>
+<p id="functionDescription">This function allows you to get information about all the Communities where the current Amino account is in</p>
+
+### Required Values:
 - start : int (default: 0) : The start index for getting the communities
 - size : int (default: 25) : Sets the range between `start` and whatever number this is set to
 ### Example:
@@ -335,13 +350,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.Community>
+</details>
 
-### get_subClient_profiles(int start, int size) : List<Amino.Objects.CommunityProfile>
-This function allows you to get information about all the community profiles where the current Amino account is in
-- Success: Gets Community profiles and returns them as an Object List (List<Amino.Objects.CommunityProfile>)
-- Error: Throws an Exception
-- The range between `start` and `size` **cannot** be larger than `100`
-### Values:
+<details>
+<summary id="functionName">get_subClient_profiles(int start, int size)</summary>
+<p id="functionDescription">This function allows you to get information about all the community profiles where the current Amino account is in</p>
+
+### Required Values:
 - start : int (default: 0) : The start index of the Community profiles
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
@@ -356,12 +373,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.CommunityProfile>
+</details>
 
-### get_account_info() : Amino.Objects.UserAccount
-This function allows you to get information about the current Amino account
-- Success: Gets user information and returns it as an Object (Amino.Objects.UserAccount)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_account_info()</summary>
+<p id="functionDescription">This function allows you to get information about the current Amino account</p>
+
+### Required Values:
 - None
 ### Example:
 ```CSharp
@@ -375,18 +395,19 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.UserAccount
+</details>
 
-### get_chat_threads(int start, int size) : List<Amino.Obejcts.Chat>
-This function allows you to get all chat threads where the current Amino account is in
-- Success: Gets all chat threads and returns them as an Object List (List<Amino.Objects.Chat>)
-- Error: Throws an Exception
-- The range between `start` and `size` **cannot** be larger than `100`
-### Values:
+<details>
+<summary id="functionName">get_chat_threads(int start, int size)</summary>
+<p id="functionDescription">This function allows you to get all chat threads where the current Amino account is in</p>
+
+### Required Values:
 - start : int (default: 0) : Sets the Start index for getting chat list
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
 ```CSharp
-try 
 {
     List<Amino.Objects.Chat> chatList = client.get_chat_threads();
     Console.WriteLine("Nickname of the owner of the first chat: " + chatList[0].Author.nickname);
@@ -396,12 +417,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.Chat>
+</details>
 
-### get_chat_thread(string chatId) : Amino.Objects.Chat
-This function allows you to get information about a specific chat thread where the current Amino account is in
-- Success: Gets the chat threads information and returns it as an Object (Amino.Objects.Chat)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_chat_thread(string chatId)</summary>
+<p id="functionDescription">This function allows you to get information about a specific chat thread where the current Amino account is in</p>
+
+### Required Values:
 - chatId : string : The object / chat ID of the chat thread you want the information from
 ### Example:
 ```CSharp
@@ -415,16 +439,19 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.Chat
+</details>
 
-### get_chat_users(string chatId, int start, int size) : List<Amino.Objects.ChatMember>
-This function allows you to get chat member information about a specific chat thread
-- Success: Gets the member information and returns it as an Object List (List<Amino.Objects.ChatMember>)
-- Error: Throws an Exception
-- The range between `start` and `size` **cannot** be larger than `100`
-### Values:
+<details>
+<summary id="functionName">get_chat_users(string chatId, int start, int size)</summary>
+<p id="functionDescription">This function allows you to get chat member information about a specific chat thread</p>
+
+### Required Values:
 - chatId : string : The object / chat ID of the chat thread
 - start : int (default: 0) : Sets the Start index for getting chat users
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
+
 ### Example:
 ```CSharp
 try 
@@ -437,12 +464,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.ChatMember>
+</details>
 
-### join_chat(string chatId) : Task
-This function allows you to join a chat thread using the current Amino account.
-- Success: Joins the chat thread and completes the Task Successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">join_chat(string chatId)</summary>
+<p id="functionDescription">This function allows you to join a chat thread using the current Amino account.</p>
+
+### Required Values:
 - chatId : string : The object / chat ID of the chat thread you want to join
 ### Example:
 ```CSharp
@@ -456,12 +486,15 @@ try
 }
 ```
 
+### Returns:
+- None
+</details>
 
-### leave_chat(string chatId) : Task
-This function allows you to leave a chat thread using the current Amino account.
-- Success: Leaves the chat and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">leave_chat(string chatId)</summary>
+<p id="functionDescription">This function allows you to leave a chat thread using the current Amino account.</p>
+
+### Required Values:
 - chatId : string : The object / chat ID of the chat thread you want to leave
 ### Example:
 ```CSharp
@@ -475,14 +508,16 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### invite_to_chat(stiring[] userIds, string chatId) : Task
-This function allows you to invite one or more members to a chat thread with the current Amino account
-- Success: Invites the members to the chat thread and completes the Task successfully
-- Error: Throws an Exception
-### Values:
-- userIds : string[] : A string array of the user IDs that you want to invite
-- chatId : string : The object / chat ID that you want to invite the users into
+<details>
+<summary id="functionName">invite_to_chat(stiring[] userIds, string chatId)</summary>
+<p id="functionDescription">This function allows you to invite one or more members to a chat thread with the current Amino account</p>
+
+### Required Values:
+
 ### Example:
 ```CSharp
 try 
@@ -496,12 +531,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### kick_from_chat(string userId, string chatId, bool allowRejoin) : Task 
-This function allows you to kick a user from a chat thread
-- Success: Kicks the user from the chat tread and completes the Task successfully7
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">kick_from_chat(string userId, string chatId, bool allowRejoin)</summary>
+<p id="functionDescription">This function allows you to kick a user from a chat thread</p>
+
+### Required Values:
 - userId : string : The userId of the user you want to kick
 - chatId : string : The object / chat ID of the chat thread you want to kick the user from
 - allowRejoin : bool (default: true) : Decides if the user is allowed to rejoin the chat thread or not
@@ -517,12 +555,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### get_chat_messages(string chatId, int size, string pageToken) : List<Amino.Objects.MessageCollection>
-This function allows you to get a collection of messages in a specific chat thread the current Amino account is in
-- Success: Gets the chat messages and returns them as an Object List (List<Amino.Objects.MessageCollection>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_chat_messages(string chatId, int size, string pageToken)</summary>
+<p id="functionDescription">This function allows you to get a collection of messages in a specific chat thread the current Amino account is in</p>
+
+### Required Values:
 - chatId : string : The object / chat ID of the chat thread that you want the messages from
 - size : int (default: 25) : The amount of messages you want to get
 - pageToken : string (default: null) : The page Token of the messages
@@ -538,12 +579,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.MessageCollection>
+</details>
 
-### search_community(string aminoId) : List<Amino.Objects.CommunityInfo>
-This function allows you to search for a Community by its aminoId (**not** and ObjectId) and retrieve information about it
-- Success: Searches the community and returns it as an Object List (List<Amino.Objects.CommunityInfo>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">search_community(string aminoId)</summary>
+<p id="functionDescription">This function allows you to search for a Community by its aminoId (**not** and ObjectId) and retrieve information about it</p>
+
+### Required Values:
 - aminoId : string : The aminoId that you want to look up
 ### Example:
 ```CSharp
@@ -557,12 +601,15 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.CommunityInfo
+</details>
 
-### get_user_following(string userId, int start, int size) : List<Amino.Objects.UserFollowings>
-This function allows you to get the users a target is following
-- Success: Gets the user followings and returns the data as an Object List (List<Amino.Objects.UserFollowings>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_user_following(string userId, int start, int size)</summary>
+<p id="functionDescription"></p>
+
+### Required Values:
 - userId : string : The object / user Id of a target user
 - start : int (default: 0) : Sets the Start index for getting user followings
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
@@ -578,12 +625,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.UserFollowings>
+</details>
 
-### get_user_followers(string userId, int start, int size) : List<Amino.Objects.UserFollowings>
-This function allows you to get a list of users that follow a user
-- Success: Gets the followers and returns them as an Object List (List<Amino.Objects.UserFollowings>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_user_followers(string userId, int start, int size)</summary>
+<p id="functionDescription">This function allows you to get a list of users that follow a user</p>
+
+### Required Values:
 - userId : string : The object / user ID of the user you want to get the followers of
 - start : int (default: 0) : Sets the Start index for getting user followers
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
@@ -597,18 +647,21 @@ try
 {
     Console.WriteLine("Could not get user followers");
 }
-``` 
+```
 
+### Returns:
+- List<Amino.Objects.UserFollowings>
+</details>
 
-### get_user_visitors(string userId, int start, int size) : List<Amino.Objects.UserVisitor>
-This function allows you to get a list of users that have visited a target profile
-- Success: Gets all user visitors and returns them as an Object List (List<Amino.Objects.UserVisitor>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_user_visitors(string userId, int start, int size)</summary>
+<p id="functionDescription">This function allows you to get a list of users that have visited a target profile</p>
+
+### Required Values:
 - userId : string : The target users object / user ID that you want to get the visitors of
 - start : int (default: 0) : Sets the Start index for getting user visitors
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
-### Example: 
+### Example:
 ```CSharp
 try 
 {
@@ -625,12 +678,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.UserVisitor>
+</details>
 
-### get_blocked_users(int start, int size) : List<Amino.Objects.BlockedUser>
-This function allows you to get a list of users that the current Amino account has blocked
-- Success: Gets the blocked users and returns them as an Object List (List<Amino.Objects.BlockedUser>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_blocked_users(int start, int size)</summary>
+<p id="functionDescription">This function allows you to get a list of users that the current Amino account has blocked</p>
+
+### Required Values:
 - start : int (default: 0) : Sets the Start index for getting blocked users
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
@@ -649,12 +705,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.BlockedUser>
+</details>
 
-### get_blocker_users(int start, int size) : List<<string>string>
-This function allows you to get a list of user IDs of the users who have currenty blocked the current Amino account
-- Success: Gets all blocker user IDs and returns them as a string list
-- Error: Throws an Exception
-### values:
+<details>
+<summary id="functionName">get_blocker_users(int start, int size)</summary>
+<p id="functionDescription">This function allows you to get a list of user IDs of the users who have currenty blocked the current Amino account</p>
+
+### Required Values:
 - start : int (default: 0) : Sets the Start index for getting blocker users
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
@@ -672,12 +731,15 @@ try
 }
 ```
 
+### Returns:
+- List<<string>string>
+</details>
 
-### get_wall_comments(string userId, Amino.Types.Sorting_Types type, int start, int size) : List<Amino.Objects.Comment>
-This function allows you to get a list of comments that have been left on a users wall
-- Success: Gets a users wall comments and returns them as an Object List (List<Amino.Objects.Comment>)
-- Error: Throws an Exception
-### values:
+<details>
+<summary id="functionName">get_wall_comments(string userId, Amino.Types.Sorting_Types type, int start, int size)</summary>
+<p id="functionDescription">This function allows you to get a list of comments that have been left on a users wall</p>
+
+### Required Values:
 - userId : string : The object / user ID of the user you want to get the wall comments from
 - type : Amino.Types.Sorting_Types : The type of sorting you want to apply to the comment filter
 - start : int (default: 0) : Sets the Start index for getting wall comments
@@ -694,12 +756,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.Comment>
+</details>
 
-### flag(string reason, Amino.Types.Flag_Types flagType, Amino.Types.Flag_Targets targetType, string targetId, bool asGuest) : Task
-This function allows you to flag a post / profile on Amino
-- Success: Flags the target and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">flag(string reason, Amino.Types.Flag_Types flagType, Amino.Types.Flag_Targets targetType, string targetId, bool asGuest)</summary>
+<p id="functionDescription">This function allows you to flag a post / profile on Amino</p>
+
+### Required Values:
 - reason : string : The reason you are flagging the target
 - flagType : Amino.Types.Flag_Types : The type of flagging that is being done
 - targetType : Amino.Types.Flag_Targets : The type of the target that is being flagged
@@ -717,12 +782,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### delete_message(string chatId, string messageId, bool asStaff, string reason) : Task
-This function allows you to delete a specific chat message using the current Amino account
-- Success: Deletes the target message and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">delete_message(string chatId, string messageId, bool asStaff, string reason) </summary>
+<p id="functionDescription">This function allows you to delete a specific chat message using the current Amino account</p>
+
+### Required Values:
 - chatId : string : The object / chat ID where the message has been sent in
 - messageId : string : The object / message ID of the message that you want to delete
 - asStaff : bool (default: false) : This value decides if you're deleting the message as a staff membber
@@ -737,14 +805,17 @@ try
 {
     Console.WriteLine("Could not delete message!");
 }
-```  
+```
 
+### Returns:
+- Nothing
+</details>
 
-### mark_as_read(string chatId, string messageId) : Task
-This function allows you to mark a message as read
-- Success: Marks the message as read and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">mark_as_read(string chatId, string messageId)</summary>
+<p id="functionDescription">This function allows you to mark a message as read</p>
+
+### Required Values:
 - chatId : string : The object / chat ID of the chat where the message has been sent in
 - messageId : string : The object / message ID that you want to mark as read
 ### Example:
@@ -759,12 +830,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### visit(string userId) : Task
-This function allows you to visit a users Amino profile
-- Success: Visits the targets profile and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">visit(string userId)</summary>
+<p id="functionDescription">This function allows you to visit a users Amino profile</p>
+
+### Required Values:
 - userId : string : The object / user ID of the user that you want to visit
 ### Example:
 ```CSharp
@@ -778,12 +852,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### follow_user(string userId) : Task
-This function allows you to follow a user using the current Amino account
-- Success: Follows the user and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">follow_user(string userId)</summary>
+<p id="functionDescription">This function allows you to follow a user using the current Amino account</p>
+
+### Required Values:
 - userId : string : The object / user ID of the user you want to follow
 ### Example:
 ```CSharp
@@ -797,12 +874,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### unfollow_user(string userId) : Task
-This function allows you to unfollow a user using the current Amino account
-- Success: Unfollows the user and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">unfollow_user(string userId)</summary>
+<p id="functionDescription">This function allows you to unfollow a user using the current Amino account</p>
+
+### Required Values:
 - userId : string : The object / user ID of the user you want to unfollow
 ### Example:
 ```CSharp
@@ -816,12 +896,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### block_user(string userId) : Task
-This function allows you to block a user using the current Amino account
-- Success: Blocks the user and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">block_user(string userId)</summary>
+<p id="functionDescription">This function allows you to block a user using the current Amino account</p>
+
+### Required Values:
 - userId : string : The object / user ID of the user you want to block
 ### Example:
 ```CSharp
@@ -835,12 +918,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### unblock_user(string userId) : Task
-This function allows you to unblock a user using the current Amino account
-- Success: Unblocks the user and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">unblock_user(string userId)</summary>
+<p id="functionDescription">This function allows you to unblock a user using the current Amino account</p>
+
+### Required Values:
 - userId : string : The object / user ID of the user you want to unblock
 ### Example:
 ```CSharp
@@ -854,12 +940,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### join_community(string communityId, string invitationCode) : Task
-This function allows you to join a community using the current Amino account
-- Success: Joins the community and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">join_community(string communityId, string invitationCode)</summary>
+<p id="functionDescription">This function allows you to join a community using the current Amino account</p>
+
+### Required Values:
 - communityId : string : The ID of the community that you want to join
 - invitationCode : string (default: null) : The invitation code of the community (if there is one)
 ### Example:
@@ -874,12 +963,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### join_community_request(string communityId, string message) : Task
-This function allows you to make a join request to a community
-- Success: Requests to join the community and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">join_community_request(string communityId, string message)</summary>
+<p id="functionDescription">This function allows you to make a join request to a community</p>
+
+### Required Values:
 - communityId : string : The community ID of the community that you want to request to join in
 - message : string (default: null) : The message you want to state as reason on why you want to join
 ### Example:
@@ -894,12 +986,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### leave_community(string communityId) : Task
-This function allows you to leave a comunity using the current Amino account
-- Success: Leaves the community and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">leave_community(string communityId)</summary>
+<p id="functionDescription">This function allows you to leave a comunity using the current Amino account</p>
+
+### Required Values:
 - communityId : string : The community ID of the community that you want to leave
 ### Example:
 ```CSharp
@@ -913,12 +1008,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### flag_community(string communityId, string reason, Amino.Types.Flag_Types flagType, bool asGuest) : Task
-This function allows you to flag a community
-- Success: Flags the community and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">flag_community(string communityId, string reason, Amino.Types.Flag_Types flagType, bool asGuest)</summary>
+<p id="functionDescription">This function allows you to flag a community</p>
+
+### Required Values:
 - communityId : string : The community ID of the community you want to flag
 - reason : string : The reason why you want to flag the community
 - flagType : Amino.Types.Flag_Types : The Type of flagging you want to do
@@ -935,13 +1033,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### upload_media(byte[] file | string filePath, Amino.Types.Upload_File_Types type) : string
-This function allows you to upload media directly to the Amino servers, it will return the resulting media URL.
-- Success: Uploads the media to the Amino servers and returns the resulting media URL
-- Error: Throws an Exception
-- This function can be used in multiple ways and have the same output, choose between byte[] for the direct file or string for filepath!
-### Values:
+<details>
+<summary id="functionName">upload_media(byte[] file | string filePath, Amino.Types.Upload_File_Types type)</summary>
+<p id="functionDescription">This function allows you to upload media directly to the Amino servers, it will return the resulting media URL.</p>
+
+### Required Values:
 - file : byte[] : The bytes of the file that you want to upload
 - filePath : string : The path to the file that you want to upload
 - type : Amino.Types.Upload_File_Types : The type of media that you want to upload
@@ -962,12 +1062,15 @@ try
 }
 ```
 
+### Returns:
+- string
+</details>
 
-### edit_profile(string nickname, string content, byte[] icon, string backgroundColor, string backgroundMediaUrl, string defaultChatbubbleId) : Task
-This function allows you to edit your global Amino profile
-- Success: Edits the profile and completes the task successfully 
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">edit_profile(string nickname, string content, byte[] icon, string backgroundColor, string backgroundMediaUrl, string defaultChatbubbleId)</summary>
+<p id="functionDescription">This function allows you to edit your global Amino profile</p>
+
+### Required Values:
 - nickname : string (default: null) : The nickname you want the account to have
 - content : string (default: null) : The content of the accounts description you want the account to have
 - icon : byte[] (default: null) : The icon you want the account to have as profile picture
@@ -986,12 +1089,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### set_privacy_status(bool isAnonymous, bool getNotifications) : Task
-This function allows you to set the privacy status of the current Amino account
-- Success: Sets the privacy status and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">set_privacy_status(bool isAnonymous, bool getNotifications)</summary>
+<p id="functionDescription">This function allows you to set the privacy status of the current Amino account</p>
+
+### Required Values:
 - isAnonymous : bool (default: false) : Decides if the account is anonymous
 - getNotifications : bool (default: true) : Decides if you get notifications or not
 ### Example:
@@ -1006,12 +1112,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### set_amino_id(string aminoId) : Task
-This function allows you to change your Amino ID, note that you can't do this an unlimited amount of times
-- Success: Changes the accounts Amino ID and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">set_amino_id(string aminoId)</summary>
+<p id="functionDescription">This function allows you to change your Amino ID, note that you can't do this an unlimited amount of times</p>
+
+### Required Values:
 - aminoId : string : The Amino ID that you want to assign for the account
 ### Example:
 ```CSharp
@@ -1025,12 +1134,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### add_linked_community(int communityId) : Task
-This function allows you to add a linked community to the profile of the current Amino account
-- Success: Adds the community and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">add_linked_community(int communityId)</summary>
+<p id="functionDescription">This function allows you to add a linked community to the profile of the current Amino account</p>
+
+### Required Values:
 - communityId : int : The ID of the community that you want to add
 ### Example:
 ```CSharp
@@ -1044,12 +1156,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### remove_linked_community(int communityId) : Task
-This function allows you to remove a linked community from the profile of the current Amino account
-- Success: Removes the linked community and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">remove_linked_community(int communityId)</summary>
+<p id="functionDescription">This function allows you to remove a linked community from the profile of the current Amino account</p>
+
+### Required Values:
 - communityId : int : The ID of the community that you want to remove
 ### Example:
 ```CSharp
@@ -1061,14 +1176,17 @@ try
 {
     Console.WriteLine("Could not remove linked community");
 }
-``` 
+```
 
+### Returns:
+- Nothing
+</details>
 
-### comment(string message, Amino.Types.Comment_Types type, objectId) : Task
-This function allows you to comment below a post, a wall or reply to a comment using the current Amino account
-- Success: Executes the comment and completes the Task succeessfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">comment(string message, Amino.Types.Comment_Types type, objectId)</summary>
+<p id="functionDescription">This function allows you to comment below a post, a wall or reply to a comment using the current Amino account</p>
+
+### Required Values:
 - message : string : The content of the comment that you want to post
 - type : Amino.Types.Comment_Types : The type of comment you want to post
 - objectId : string : The object ID of the target you want to comment under / reply to
@@ -1084,12 +1202,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### delete_comment(string commentId, Amino.Types.Comment_Types type, string objectId) : Task
-This function allows you to delete a comment from a post, a users wall or a reply using the current Amino account
-- Success: Deletes the target comment and completes the Task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">delete_comment(string commentId, Amino.Types.Comment_Types type, string objectId)</summary>
+<p id="functionDescription">This function allows you to delete a comment from a post, a users wall or a reply using the current Amino account</p>
+
+### Required Values:
 - commentId : string : The object ID of the comment that you want to delete
 - type : Amino.Types.Comment_Types : The type of comment you're targetting
 - objectId : string : The object ID where the target comment has been commented on
@@ -1105,12 +1226,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### like_post(string objectId, Amino.Types.Post_Types type) : Task
-This function allows you to like a post using the current Amino account
-- Success: Likes the post and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">like_post(string objectId, Amino.Types.Post_Types type)</summary>
+<p id="functionDescription">This function allows you to like a post using the current Amino account</p>
+
+### Required Values:
 - objectId : string : The ID of the post you want to like
 - type : Amino.Types.Post_Types : The type of post that you want to like
 ### Example:
@@ -1125,12 +1249,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### unlike_post(string objectId, Amino.Types.Post_Types type) : Task
-This function allows you to unlike a post using the current Amino account
-- Success: Unlikes the post and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">unlike_post(string objectId, Amino.Types.Post_Types type)</summary>
+<p id="functionDescription">This function allows you to unlike a post using the current Amino account</p>
+
+### Required Values:
 - objectId : string : The object ID of the post that you want to unlike
 - type : Amino.Types.Post_Types : The type of post that you want to unlike
 ### Example:
@@ -1145,12 +1272,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### get_membership_info() : Amino.Objects.MembershipInfo
-This function allows you to get information about the current Amino accounts Amino+ membership
-- Success: Gets the membership information and returns it as an Object (Amino.Objects.MembershipInfo)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_membership_info()</summary>
+<p id="functionDescription">This function allows you to get information about the current Amino accounts Amino+ membership</p>
+
+### Required Values:
 - None
 ### Example:
 ```CSharp
@@ -1164,12 +1294,15 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.MembershipInfo
+</details>
 
-### get_ta_announcements(Amino.Types.Supported_Languages language, int start, int size) : List<Amino.Objects.Post>
-This function allows you to get a list of Team Amino announcements
-- Success: Gets the Team Amino announcements and returns them as an Object List (List<Amino.Objects.Post>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_ta_announcements(Amino.Types.Supported_Languages language, int start, int size)</summary>
+<p id="functionDescription">This function allows you to get a list of Team Amino announcements</p>
+
+### Required Values:
 - language : Amino.Types.Supported_Languages (default: Amino.Types.Supportedd_Languages.english)
 - start : int (default: 0) : Sets the Start index for getting the announcement posts
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
@@ -1185,12 +1318,15 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.Post
+</details>
 
-### get_wallet_info() : Amino.Objects.WalletInfo
-This function allows you to get the wallet info of the current Amino account
-- Success: Gets the wallet info and returns it as an Object (Amino.Objects.WalletInfo)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_wallet_info()</summary>
+<p id="functionDescription">This function allows you to get the wallet info of the current Amino account</p>
+
+### Required Values:
 - None
 ### Example:
 ```CSharp
@@ -1204,12 +1340,15 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.WalletInfo
+</details>
 
-### get_wallet_history(int start, int size) : List<Amino.Objects.CoinHistoryEntry>
-This function allows you to get the wallet history of the current Amino account
-- Success: Gets the wallet history and returns it as an Object List (List<Amino.Objects.CoinHistoryEntry>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_wallet_history(int start, int size)</summary>
+<p id="functionDescription">This function allows you to get the wallet history of the current Amino account</p>
+
+### Required Values:
 - start : int (default: 0) : Sets the Start index for getting the wallet history
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
@@ -1224,12 +1363,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Objects.CoinHistoryEntry>
+</details>
 
-### get_from_deviceId(string deviceId) : string
-This function allows you to get a user ID thats linked to a deviceId
-- Success: Returns the user ID as a string and completes the task successfully
-- Error: Throws an exception
-### Values:
+<details>
+<summary id="functionName">get_from_deviceId(string deviceId)</summary>
+<p id="functionDescription">This function allows you to get a user ID thats linked to a deviceId</p>
+
+### Required Values:
 - deviceId : string : The device ID that you want to get the userId from
 ### Example:
 ```CSharp
@@ -1242,12 +1384,15 @@ try
 }
 ```
 
+### Returns:
+- string
+</details>
 
-### get_from_code(string aminoUrl) : Amino.Objects.FromCode
-This function allows you to get information about a specific Amino URL (code)
-- Success: Gets the information and returns it as an Object (Amino.Objects.FromCode)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_from_code(string aminoUrl)</summary>
+<p id="functionDescription">This function allows you to get information about a specific Amino URL (code)</p>
+
+### Required Values:
 - aminoUrl : string : The URL of the object that you want to get information about
 ### Example:
 ```CSharp
@@ -1261,12 +1406,15 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.FromCode
+</details>
 
-### get_from_id(string objectId, Amino.Types.Object_Types type, string communityId) : Amino.Objects.FromId
-This function allows you to get informations abou tan object using the object ID
-- Success: Gets the objects information and returns it as an Object (Amino.Objects.FromId)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_from_id(string objectId, Amino.Types.Object_Types type, string communityId)</summary>
+<p id="functionDescription">This function allows you to get informations abou tan object using the object ID</p>
+
+### Required Values:
 - objectId : string : The ID of the object that you want to get information of
 - type : Amino.Objects.Object_Types : The type of the obejct that you want to get information of
 - communityId : string (default: null) : If you want to get information about an object inside of a community you can assign a CommunityId to this function
@@ -1282,12 +1430,15 @@ try
 }
 ```
 
+### Returns:
+- Amino.Objects.FromId
+</details>
 
-### get_supported_languages() : string[]
-This function allows you to get the language codes for each supported language as a strin array
-- Success: Gets the supported languages and returns them as a string array
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_supported_languages() </summary>
+<p id="functionDescription">This function allows you to get the language codes for each supported language as a strin array</p>
+
+### Required Values:
 - None
 ### Example:
 ```CSharp
@@ -1305,12 +1456,15 @@ try
 }
 ```
 
+### Returns:
+- string[]
+</details>
 
-### claim_new_user_coupon() : Task
-This function allows you to claim the new user coupon for the current Amino account
-- Success: Claims the new user coupon and completes the Task successfully
-- Error: Throws an Exception
-### values:
+<details>
+<summary id="functionName">claim_new_user_coupon()</summary>
+<p id="functionDescription">This function allows you to claim the new user coupon for the current Amino account</p>
+
+### Required Values:
 - None
 ### Example:
 ```CSharp
@@ -1324,12 +1478,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### get_all_users(int start, int size) : List<Amino.Obejcts.UserProfile>
-This function allows you to get a list of all global Amino users
-- Success: Gets the global Amino users and returns them as an Object List (List<Amino.Objects.UserProfile>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_all_users(int start, int size)</summary>
+<p id="functionDescription">This function allows you to get a list of all global Amino users</p>
+
+### Required Values:
 - start : int (default: 0) : Sets the Start index for getting user profiles
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
@@ -1348,12 +1505,15 @@ try
 }
 ```
 
+### Returns:
+- List<Amino.Obejcts.UserProfile>
+</details>
 
-### accept_host(string chatId, string requestId) : Task
-This function allows you to accept host / organizer of a chat room using the current Amino account
-- Success: Accepts chat host role and completes the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">accept_host(string chatId, string requestId)</summary>
+<p id="functionDescription">This function allows you to accept host / organizer of a chat room using the current Amino account</p>
+
+### Required Values:
 - chatId : string : The object / chat ID of the chat where you have been requested to be host in
 - requestId : string : The object ID of the chat host request
 ### Example:
@@ -1368,16 +1528,20 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### accept_organizer(string chatId, string requestId) : Task
-- Refer to `accept_host`.
+<details>
+<summary id="functionName">accept_organizer(string chatId, string requestId)</summary>
+<p id="functionDescription">Refer to `accept_host`.</p>
+</details>
 
+<details>
+<summary id="functionName">link_identify(string inviteCode)</summary>
+<p id="functionDescription">This function allows you to get information about an Amino invite code and its community</p>
 
-### link_identify(string inviteCode) : Amino.Obejcts.FromInvite
-This function allows you to get information about an Amino invite code and its community
-- Success: Gets the invite codes information and returns it as an Object (Amino.Obejcts.FromInvite)
-- Error: Throws an Exception
-### Values:
+### Required Values:
 - inviteCode : string : The Amino invite code you want to get information from (The inviteCode is **not** the full invite URL)
 ### Example:
 ```CSharp
@@ -1391,12 +1555,15 @@ try
 }
 ```
 
+### Returns:
+- Amino.Obejcts.FromInvite
+</details>
 
-### wallet_config(Amino.Types.Wallet_Config_Levels walletLevel) : Task
-This function allows you to set the coin wallet configuration using the current Amino account
-- Success: Changed the coin wallet configuration and returns the task successfully
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">wallet_config(Amino.Types.Wallet_Config_Levels walletLevel)</summary>
+<p id="functionDescription">This function allows you to set the coin wallet configuration using the current Amino account</p>
+
+### Required Values:
 - walletLevel : Amino.Types.Wallet_Config_Levels : The wallet Level that you want to set
 ### Example:
 ```CSharp
@@ -1410,12 +1577,15 @@ try
 }
 ```
 
+### Returns:
+- Nothing
+</details>
 
-### get_avatar_frames(int start, int size) : List<Amino.Objects.AvatarFrame>
-This function allows you to get a list of Avatar Frames that the current Amino account has unlocked
-- Success: Gets the Avatar frames and returns them as an Object List (List<Amino.Obejcts.AvatarFrame>)
-- Error: Throws an Exception
-### Values:
+<details>
+<summary id="functionName">get_avatar_frames(int start, int size)</summary>
+<p id="functionDescription">This function allows you to get a list of Avatar Frames that the current Amino account has unlocked</p>
+
+### Required Values:
 - start : int (default: 0) : Sets the Start index for getting the Avatar Frames
 - size : int (default: 25) : Sets the range between `start` and whatever this is set to
 ### Example:
@@ -1440,130 +1610,35 @@ try
 }
 ```
 
-## Events
-- This library features a number of events that you can subscribe to!
-- All events run on an Amino.Client() instance!
-- All events will return either a value or an Object.
+<!--- JUST A TEMPLATE
 
+<details>
+<summary id="functionName"></summary>
+<p id="functionDescription"></p>
 
-### onMessage : Amino.Objects.Message
-This event fires each time the Client receives a Text message
-### Event:
-- This event returns an Amino.Objects.Message object
+### Required Values:
+
 ### Example:
 ```CSharp
-static void onMessageEvent(Amino.Objects.Message message) 
-{
-    Console.WriteLine($"User {message.Author.userName} has sent a message: {message.content} in chat: {message.chatId}");
+```
+
+### Returns:
+</details>
+--->
+
+
+<style>
+#functionName {
+    font-size:15px;
+    font-weight: bold;
+}
+#functionDescription {
+    font-style: italic
 }
 
-
-[...]
-
-static void main(string[] args) 
-{
-    [...]
-    client.onMessage += onMessageEvent;
-}
-```
-
-
-### onImageMessage : Amino.Objects.ImageMessage
-This event fires each time the Client receives an Image message
-### Event:
-- This event returns an Amino.Objects.ImageMessage Object
-### Example: 
-```CSharp
-static void onImageMessageEvent(Amino.Objects.ImageMessage imageMessage) 
-{
-    Console.WriteLine($"User {imageMessage.Author.nickname} has sent an image: {imageMessage.mediaUrl}");
+summary {
+    padding: 8px;
+    cursor: pointer;
 }
 
-
-[...]
-
-static void main(string[] args) 
-{
-    [...]
-    client.onImageMessage += onImageMessageEvent;
-}
-```
-
-
-### onWebSocketMessage : string
-This event fires each time a websocket message has been recevied by the Client
-### Event:
-- This event returns a string, that being the raw (probably JSON) websocket message
-### Example: 
-```CSharp
-static void onWebSocketMessageEvent(string socketMessage) 
-{
-    Console.WriteLine("Recevied websocket message: " + socketMessage);
-}
-
-
-[...]
-
-static void main(string[] args) 
-{
-    [...]
-    client.onWebSocketMessage += onWebSocketMessageEvent;
-}
-```
-
-
-
-## helpers
-- The helpers class is an important part of Amino.Net and any other Amino library, as it allows you to get around the Amino API more easily
-### Values:
-- BaseURL : string : This string represents the base URL to Aminos REST API
-## Methods / Functions
-### generate_device_id() : string
-This function allows you to generate an Amino ready device ID 
-### Values:
-- None
-### Example:
-```CSharp
-Console.WriteLine("Amino device ID: " + Amino.helpers.generate_device_id());
-```
-
-
-### generate_signiture(sring data) : string
-This function allows you to generate an Amino valid request signiture
-### Values:
-- data : string : The data you want to turn into a signiture hash
-### Example:
-```CSharp
-Console.WriteLine("Amino Signiture: " + Amino.helpers.generate_signiture("{ some JSON data }"));
-```
-
-
-### generate_file_signiture(byte[] data) : string
-This function allows you to generate an Amino valid request signiture out of file data
-### Values:
-- data : byte[] : The file bytes that you want to turn into data
-### Example:
-```CSharp
-Console.WriteLine("Some file signiture: " + Amino.helpers.generate_file_signiture(File.ReadAllBytes("Some_File_Path")));
-```
-
-
-### GetTimestamp() : double
-This function allows you to get the current UNIX timestamp, it is **not** Amino ready!
-### Values:
-- None
-### Example:
-```CSharp
-Console.WriteLine("Current UNIX Timestamp: " + Amino.helpers.GetTimestamp());
-Console.WriteLine("Current UNIX Timestamp (Amino ready): " + Amino.helpers.GetTimestamp() * 1000);
-```
-
-
-### get_ObjectTypeID(Amino.Types.Object_Types type) : int
-This function allows you to convert a Type into the fitting Amino object ID
-### Values:
-- type : Amino.Types.Object_Types : The Type enum that you want to convert into a number
-### Example:
-```CSharp
-Console.WriteLine("The Amino ID for Blog posts is: " + Amino.helpers.get_ObjectTypeID(Types.Object_Types.Blog));
-```
+</style> 
