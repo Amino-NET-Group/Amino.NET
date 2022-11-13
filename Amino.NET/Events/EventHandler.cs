@@ -29,6 +29,14 @@ namespace Amino.Events
                             Amino.Objects.ImageMessage _imageMessage = new Amino.Objects.ImageMessage(webSocketMessage);
                             eventCall.callImageMessageEvent(client, _imageMessage);
                             break;
+                        case 103: //YouTubeMessage
+                            Amino.Objects.YouTubeMessage _youtubeMessage = new Objects.YouTubeMessage(webSocketMessage);
+                            eventCall.callYouTubeMessageEvent(client, _youtubeMessage);
+                            break;
+                        case 110: //VoiceMessage
+                            Amino.Objects.VoiceMessage _voiceMessage = new Objects.VoiceMessage(webSocketMessage);
+
+                            break;
                     }
                 }
             }

@@ -100,6 +100,8 @@ namespace Amino
         /// Fires each time an Amino WebSocket Message has been receveived by the current Amino Client
         /// </summary>
         public event Action<string> onWebSocketMessage;
+        public event Action<Objects.YouTubeMessage> onYouTubeMessage;
+        public event Action<Objects.VoiceMessage> onVoiceMessage;
 
         //headers.
         private IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -2310,6 +2312,22 @@ namespace Amino
                 if(_client.onImageMessage != null)
                 {
                     _client.onImageMessage.Invoke(_image);
+                }
+            }
+
+            public void callYouTubeMessageEvent(Amino.Client _client, Amino.Objects.YouTubeMessage _youtubeMessage)
+            {
+                if(_client.onYouTubeMessage != null)
+                {
+                    _client.onYouTubeMessage.Invoke(_youtubeMessage);
+                }
+            }
+
+            public void callVoiceMessageEvent(Amino.Client _client, Amino.Objects.VoiceMessage _voiceMessage)
+            {
+                if(_client.onVoiceMessage != null)
+                {
+                    _client.onVoiceMessage.Invoke(_voiceMessage);
                 }
             }
         }
