@@ -102,6 +102,7 @@ namespace Amino
         public event Action<string> onWebSocketMessage;
         public event Action<Objects.YouTubeMessage> onYouTubeMessage;
         public event Action<Objects.VoiceMessage> onVoiceMessage;
+        public event Action<Objects.StickerMessage> onStickerMessage;
 
         //headers.
         private IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -2328,6 +2329,14 @@ namespace Amino
                 if(_client.onVoiceMessage != null)
                 {
                     _client.onVoiceMessage.Invoke(_voiceMessage);
+                }
+            }
+
+            public void callStickerMessageEvent(Amino.Client _client, Amino.Objects.StickerMessage _stickerMessage)
+            {
+                if(_client.onStickerMessage != null)
+                {
+                    _client.onStickerMessage.Invoke(_stickerMessage);
                 }
             }
         }

@@ -35,7 +35,11 @@ namespace Amino.Events
                             break;
                         case 110: //VoiceMessage
                             Amino.Objects.VoiceMessage _voiceMessage = new Objects.VoiceMessage(webSocketMessage);
-
+                            eventCall.callVoiceMessageEvent(client, _voiceMessage);
+                            break;
+                        case 113: //StickerMessage
+                            Amino.Objects.StickerMessage _stickerMessage = new Objects.StickerMessage(webSocketMessage);
+                            eventCall.callStickerMessageEvent(client, _stickerMessage);
                             break;
                     }
                 }
