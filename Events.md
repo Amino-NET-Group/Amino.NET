@@ -94,6 +94,87 @@ static void main(string[] args)
 - string
 </details>
 
+<details>
+<summary id="functionName">onYouTubeMessage</summary>
+<p id="functionDescription">This event fires each time a YouTube message has been received by the Client</p>
+
+### Event:
+- This event returns an Amino.Objects.YouTubeMessage Object
+### Example:
+```CSharp
+static void onYouTubeMessageEvent(Amino.Objects.YouTubeMessage youtubeMessage) 
+{
+    Console.WriteLine("Video title of the received Video: " + youtubeMessage.videoTitle);
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onYouTubeMessage += onYouTubeMessageEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.YouTubeMessage
+</details>
+
+<details>
+<summary id="functionName">onVoiceMessage</summary>
+<p id="functionDescription">This event fires each time a Voice message / note is received by the Client</p>
+
+### Event:
+- This event returns an Amino.Objects.VoiceMessage Object
+### Example:
+```CSharp
+static void onVoiceMessageEvent(Amino.Objects.VoiceMessage voiceMessage) 
+{
+    Console.WriteLine("URL to the audio file: " + voiceMessage.mediaValue);
+    Console.WriteLine("Duration of the voice message: " + voiceMessage.Extensions.duration);
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onVoiceMessage += onVoiceMessageEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.VoiceMessage
+</details>
+
+<details>
+<summary id="functionName">onStickerMessage</summary>
+<p id="functionDescription">This event fires each time an Amino sticker message has been received by the Client</p>
+
+### Event:
+- This event returns an Amino.Objects.StickerMessage Object
+### Example:
+```CSharp
+static void onStickerMessageEvent(Amino.Objects.StickerMessage stickerMessage) 
+{
+    Console.WriteLine("Sticker ID: " + stickerMessage.Sticker.stickerId);
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onStickerMessage += onStickerMessageEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.StickerMessage
+</details>
 
 <!--- JUST A TEMPLATE
 
