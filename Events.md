@@ -157,7 +157,7 @@ static void main(string[] args)
 - This event returns an Amino.Objects.StickerMessage Object
 ### Example:
 ```CSharp
-static void onStickerMessageEvent(Amino.Objects.StickerMessage stickerMessage) 
+static void onStickerMessageEvent(Amino.Objects.StickerMessage stickerMessage)
 {
     Console.WriteLine("Sticker ID: " + stickerMessage.Sticker.stickerId);
 }
