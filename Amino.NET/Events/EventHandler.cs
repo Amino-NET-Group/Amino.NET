@@ -8,8 +8,17 @@ using Newtonsoft.Json.Linq;
 
 namespace Amino.Events
 {
+    /// <summary>
+    /// This class is responsible for all Events of Amino.Net
+    /// </summary>
     public class EventHandler
     {
+        /// <summary>
+        /// This function handles the websocket responses and converts them into objects to call events with
+        /// </summary>
+        /// <param name="webSocketMessage"></param>
+        /// <param name="client"></param>
+        /// <returns></returns>
         public Task ReceiveEvent(JObject webSocketMessage, Client client)
         {
             Client.Events eventCall = new Client.Events();

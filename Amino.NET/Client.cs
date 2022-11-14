@@ -87,7 +87,6 @@ namespace Amino
         //The value to access the websocket manager
         private Amino.WebSocketHandler webSocket;
         //Events
-        //public event EventHandler<Objects.Message> onMessage;
         /// <summary>
         /// Fires each time an Amino Text Message has been received by the current Amino account
         /// </summary>
@@ -100,8 +99,17 @@ namespace Amino
         /// Fires each time an Amino WebSocket Message has been receveived by the current Amino Client
         /// </summary>
         public event Action<string> onWebSocketMessage;
+        /// <summary>
+        /// Fires each time an Amino YouTube message has been received by the current Amino account
+        /// </summary>
         public event Action<Objects.YouTubeMessage> onYouTubeMessage;
+        /// <summary>
+        /// Fires each time an Amino Voice message / note has been received by the current Amino account
+        /// </summary>
         public event Action<Objects.VoiceMessage> onVoiceMessage;
+        /// <summary>
+        /// Fires each time an Amino Sticker message has been received by the current Amino account
+        /// </summary>
         public event Action<Objects.StickerMessage> onStickerMessage;
 
         //headers.
