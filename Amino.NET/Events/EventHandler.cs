@@ -30,9 +30,19 @@ namespace Amino.Events
                 {
                     switch((int)jsonObj["o"]["chatMessage"]["mediaType"])
                     {
-                        case 0: //TextMessage
-                            Amino.Objects.Message _message = new Amino.Objects.Message(webSocketMessage);
-                            eventCall.callMessageEvent(client, this, _message);
+                        case 0: //TextMessage / MessageDeleted
+                            switch((int)jsonObj["o"]["chatMessage"]["type"])
+                            {
+                                case 0: //Textmessage recevied
+                                    Amino.Objects.Message _message = new Amino.Objects.Message(webSocketMessage);
+                                    eventCall.callMessageEvent(client, this, _message);
+                                    break;
+                                case 100: // Textmessage deleted
+                                    Amino.Objects.DeletedMessage _deletedMessage = new Objects.DeletedMessage(webSocketMessage);
+                                    eventCall.callMessageDeletedEvent(client, _deletedMessage);
+                                    break;
+                            }
+
                             break;
                         case 100: //ImageMessage
                             Amino.Objects.ImageMessage _imageMessage = new Amino.Objects.ImageMessage(webSocketMessage);

@@ -111,6 +111,10 @@ namespace Amino
         /// Fires each time an Amino Sticker message has been received by the current Amino account
         /// </summary>
         public event Action<Objects.StickerMessage> onStickerMessage;
+        /// <summary>
+        /// Fires each time an Amino message has been deleted (in a chat where the current Amino account is in)
+        /// </summary>
+        public event Action<Objects.DeletedMessage> onMessageDeleted;
 
         //headers.
         private IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -2345,6 +2349,14 @@ namespace Amino
                 if(_client.onStickerMessage != null)
                 {
                     _client.onStickerMessage.Invoke(_stickerMessage);
+                }
+            }
+
+            public void callMessageDeletedEvent(Amino.Client _client, Amino.Objects.DeletedMessage _deletedMessage)
+            {
+                if(_client.onMessageDeleted != null)
+                {
+                    _client.onMessageDeleted.Invoke(_deletedMessage);
                 }
             }
         }
