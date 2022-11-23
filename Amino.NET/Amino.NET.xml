@@ -99,6 +99,26 @@
             Fires each time an Amino WebSocket Message has been receveived by the current Amino Client
             </summary>
         </member>
+        <member name="E:Amino.Client.onYouTubeMessage">
+            <summary>
+            Fires each time an Amino YouTube message has been received by the current Amino account
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onVoiceMessage">
+            <summary>
+            Fires each time an Amino Voice message / note has been received by the current Amino account
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onStickerMessage">
+            <summary>
+            Fires each time an Amino Sticker message has been received by the current Amino account
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onMessageDeleted">
+            <summary>
+            Fires each time an Amino message has been deleted (in a chat where the current Amino account is in)
+            </summary>
+        </member>
         <member name="M:Amino.Client.#ctor(System.String)">
             <summary>
             Creates an instance of the Amino.Client object and builds headers
@@ -116,7 +136,7 @@
             <param name="resetPassword"></param>
             <returns></returns>
         </member>
-        <member name="M:Amino.Client.Login(System.String,System.String,System.String)">
+        <member name="M:Amino.Client.login(System.String,System.String,System.String)">
             <summary>
             Allows you to log into your account
             <para>This function will set all client values and wíll enable the webSocket to activate</para>
@@ -127,14 +147,14 @@
             <param name="_secret"></param>
             <returns></returns>
         </member>
-        <member name="M:Amino.Client.Logout">
+        <member name="M:Amino.Client.logout">
             <summary>
             Allows you to log out of the current account
             <para>A successful function call will clear the Client values and close the webSocket connection</para>
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Amino.Client.Register(System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:Amino.Client.register(System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Allows you to register an Amino account
             <para>This function requires a verification code, refer to <b>request_verify_code()</b></para>
@@ -146,7 +166,7 @@
             <param name="_deviceID"></param>
             <returns></returns>
         </member>
-        <member name="M:Amino.Client.Restore_account(System.String,System.String,System.String)">
+        <member name="M:Amino.Client.restore_account(System.String,System.String,System.String)">
             <summary>
             Allows you to restore an Amino account
             </summary>
@@ -155,7 +175,7 @@
             <param name="_deviceID"></param>
             <returns></returns>
         </member>
-        <member name="M:Amino.Client.Delete_account(System.String)">
+        <member name="M:Amino.Client.delete_account(System.String)">
             <summary>
             Allows you to delete the current Amino account
             <para>This function requires a verification code, refer to <b>request_verify_code()</b></para>
@@ -181,7 +201,7 @@
             <param name="_age"></param>
             <returns></returns>
         </member>
-        <member name="M:Amino.Client.Change_password(System.String,System.String,System.String)">
+        <member name="M:Amino.Client.change_password(System.String,System.String,System.String)">
             <summary>
             Allows you to change the password of the current Amino account
             </summary>
@@ -632,10 +652,83 @@
             <param name="requestId"></param>
             <returns></returns>
         </member>
+        <member name="M:Amino.Client.link_identify(System.String)">
+            <summary>
+            Allows you to get information about an Amino Invite Code
+            </summary>
+            <param name="inviteCode"></param>
+            <returns>Obejct : Amino.Objects.FromInvite</returns>
+        </member>
+        <member name="M:Amino.Client.wallet_config(Amino.Types.Wallet_Config_Levels)">
+            <summary>
+            Allows you to change the wallet config of the current Amino account
+            </summary>
+            <param name="walletLevel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amino.Client.get_avatar_frames(System.Int32,System.Int32)">
+            <summary>
+            Allows you to get a list of available Avatar Frames of the current Amino account
+            </summary>
+            <param name="start"></param>
+            <param name="size"></param>
+            <returns>List : Amino.Object.AvatarFrame</returns>
+        </member>
         <member name="T:Amino.Client.Events">
             <summary>
             Handles the Event calls, do not manually interact with this Class or its functions!
             </summary> 
+        </member>
+        <member name="T:Amino.Events.EventHandler">
+            <summary>
+            This class is responsible for all Events of Amino.Net
+            </summary>
+        </member>
+        <member name="M:Amino.Events.EventHandler.ReceiveEvent(Newtonsoft.Json.Linq.JObject,Amino.Client)">
+            <summary>
+            This function handles the websocket responses and converts them into objects to call events with
+            </summary>
+            <param name="webSocketMessage"></param>
+            <param name="client"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Amino.helpers.BaseUrl">
+            <summary>
+            This value represents the baseURL to Aminos REST backend
+            </summary>
+        </member>
+        <member name="M:Amino.helpers.generate_signiture(System.String)">
+            <summary>
+            This function allows you to generate an Amino valid signiture based on JSON data
+            </summary>
+            <param name="data"></param>
+            <returns>string : The signiture.</returns>
+        </member>
+        <member name="M:Amino.helpers.generate_file_signiture(System.Byte[])">
+            <summary>
+            This function allows you to generate an Amino valid signiture for file uploads
+            </summary>
+            <param name="data"></param>
+            <returns>string : The signiture.</returns>
+        </member>
+        <member name="M:Amino.helpers.generate_device_id">
+            <summary>
+            This function allows you to generate an Amino valid device ID
+            </summary>
+            <returns>string : The Device ID</returns>
+        </member>
+        <member name="M:Amino.helpers.GetTimestamp">
+            <summary>
+            This function allows you to get the current UNIX Timestamp (NOT Amino valid)
+            </summary>
+            <returns>double : The current UNIX Timestamp</returns>
+        </member>
+        <member name="M:Amino.helpers.get_ObjectTypeID(Amino.Types.Object_Types)">
+            <summary>
+            This function allows you to get the Type ID based on Amino.Types.Object_Types
+            </summary>
+            <param name="type"></param>
+            <returns>int : the object ID index thingie</returns>
         </member>
         <member name="T:Amino.Types.account_gender">
             <summary>
