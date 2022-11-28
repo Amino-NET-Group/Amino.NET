@@ -94,6 +94,229 @@ static void main(string[] args)
 - string
 </details>
 
+<details>
+<summary id="functionName">onYouTubeMessage</summary>
+<p id="functionDescription">This event fires each time a YouTube message has been received by the Client</p>
+
+### Event:
+- This event returns an Amino.Objects.YouTubeMessage Object
+### Example:
+```CSharp
+static void onYouTubeMessageEvent(Amino.Objects.YouTubeMessage youtubeMessage) 
+{
+    Console.WriteLine("Video title of the received Video: " + youtubeMessage.videoTitle);
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onYouTubeMessage += onYouTubeMessageEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.YouTubeMessage
+</details>
+
+<details>
+<summary id="functionName">onVoiceMessage</summary>
+<p id="functionDescription">This event fires each time a Voice message / note is received by the Client</p>
+
+### Event:
+- This event returns an Amino.Objects.VoiceMessage Object
+### Example:
+```CSharp
+static void onVoiceMessageEvent(Amino.Objects.VoiceMessage voiceMessage) 
+{
+    Console.WriteLine("URL to the audio file: " + voiceMessage.mediaValue);
+    Console.WriteLine("Duration of the voice message: " + voiceMessage.Extensions.duration);
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onVoiceMessage += onVoiceMessageEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.VoiceMessage
+</details>
+
+<details>
+<summary id="functionName">onStickerMessage</summary>
+<p id="functionDescription">This event fires each time an Amino sticker message has been received by the Client</p>
+
+### Event:
+- This event returns an Amino.Objects.StickerMessage Object
+### Example:
+```CSharp
+static void onStickerMessageEvent(Amino.Objects.StickerMessage stickerMessage)
+{
+    Console.WriteLine("Sticker ID: " + stickerMessage.Sticker.stickerId);
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onStickerMessage += onStickerMessageEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.StickerMessage
+</details>
+
+
+<details>
+<summary id="functionName">onMessageDeleted</summary>
+<p id="functionDescription">This event fires each time an Amino message has been deleted in any chat where the current Amino account is in</p>
+
+### Event:
+- This even returns an Amino.Objects.DeletedMessage Object
+### Example:
+```CSharp
+static void onDeletedMessageEvent(Amino.Objects.DeletedMessage deletedMessage)
+{
+    Console.WriteLine($"User: {deletedMessage.Author.username}({deletedMessage.Author.userId}) has deleted a message in chat: {deletedMessage.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onMessageDeleted += onStickerMessageEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.DeletedMessage
+</details>
+
+
+<details>
+<summary id="functionName">onChatMemberJoin</summary>
+<p id="functionDescription">This event fires each time an Amino user has joined a chat thread where the current Amino account is in</p>
+
+### Event:
+- This event returns an Amino.Obejcts.JoinedChatMember Object
+
+### Example:
+```CSharp
+static void onUserChatJoinEvent(Amino.Objects.JoinedChatMember joinedMember)
+{
+    Console.WriteLine($"User: {joinedMember.Author.nickname} joined chat {joinedMember.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatMemberJoin += onUserChatJoinEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.JoinedChatMember
+</details>
+
+
+<details>
+<summary id="functionName">onChatMemberLeave</summary>
+<p id="functionDescription">This even fires each time an Amino user has left a chat where the current Amino account is in</p>
+
+### Event:
+- This event returns an Amino.Objects.LeftChatMember Object
+### Example:
+```CSharp
+static void onUserChatLeaveEvent(Amino.Objects.LeftChatMember leftMember)
+{
+    Console.WriteLine($"User: {leftMember.userId} left chat {leftMember.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatMemberLeave += onUserChatLeaveEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.LeftChatMember
+</details>
+
+
+<details>
+<summary id="functionName">onChatBackgroundChanged</summary>
+<p id="functionDescription">This event fires each time an Amino chat thread background has been changed (only chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatEvent Object
+
+### Example:
+```CSharp
+static void onChatBackgroundChangedEvent(Amino.Objects.ChatEvent chatEvent)
+{
+    Console.WriteLine($"Background in Chat thread {chatEvent.chatId} has changed.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatBackgroundChanged += onChatBackgroundChangedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatEvent
+</details>
+
+
+<details>
+<summary id="functionName">onChatTitleChanged</summary>
+<p id="functionDescription">This event fires each time an Amino chat thread Title has been changed (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatEvent Object
+### Example:
+```CSharp
+static void onChatTitleChangedEvent(Amino.Objects.ChatEvent chatEvent)
+{
+    Console.WriteLine($"Title of Chat thread {chatEvent.chatId} has changed.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatTitleChanged += onChatTitleChangedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatEvent
+</details>
 
 <!--- JUST A TEMPLATE
 

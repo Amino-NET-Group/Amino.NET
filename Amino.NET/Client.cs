@@ -87,7 +87,6 @@ namespace Amino
         //The value to access the websocket manager
         private Amino.WebSocketHandler webSocket;
         //Events
-        //public event EventHandler<Objects.Message> onMessage;
         /// <summary>
         /// Fires each time an Amino Text Message has been received by the current Amino account
         /// </summary>
@@ -100,6 +99,38 @@ namespace Amino
         /// Fires each time an Amino WebSocket Message has been receveived by the current Amino Client
         /// </summary>
         public event Action<string> onWebSocketMessage;
+        /// <summary>
+        /// Fires each time an Amino YouTube message has been received by the current Amino account
+        /// </summary>
+        public event Action<Objects.YouTubeMessage> onYouTubeMessage;
+        /// <summary>
+        /// Fires each time an Amino Voice message / note has been received by the current Amino account
+        /// </summary>
+        public event Action<Objects.VoiceMessage> onVoiceMessage;
+        /// <summary>
+        /// Fires each time an Amino Sticker message has been received by the current Amino account
+        /// </summary>
+        public event Action<Objects.StickerMessage> onStickerMessage;
+        /// <summary>
+        /// Fires each time an Amino message has been deleted (in a chat where the current Amino account is in)
+        /// </summary>
+        public event Action<Objects.DeletedMessage> onMessageDeleted;
+        /// <summary>
+        /// Fires each time an Amino member joined a chat where the current Amino account is in
+        /// </summary>
+        public event Action<Objects.JoinedChatMember> onChatMemberJoin;
+        /// <summary>
+        /// Fires each time an Amino member left a chat where the current Amino account is in
+        /// </summary>
+        public event Action<Objects.LeftChatMember> onChatMemberLeave;
+        /// <summary>
+        /// Fires each time an Amino chat background has changed (only chats where the current Amino account is in)
+        /// </summary>
+        public event Action<Objects.ChatEvent> onChatBackgroundChanged;
+        /// <summary>
+        /// Fires each time an Amino chat title has been changed (only chats where the current Amino account is in)
+        /// </summary>
+        public event Action<Objects.ChatEvent> onChatTitleChanged;
 
         //headers.
         private IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -111,9 +142,10 @@ namespace Amino
             headers.Add("NDCDEVICEID", deviceID);
             headers.Add("Accept-Language", "en-US");
             headers.Add("Content-Type", "application/json; charset=utf-8");
-            headers.Add("Host", "service.narvii.com");
+            headers.Add("Host", "service.aminoapps.com");
             headers.Add("Accept-Encoding", "gzip");
             headers.Add("Connection", "Keep-Alive");
+            headers.Add("User-Agent", "Dalvik/2.1.0 (Linux; U; Android 7.1.2; SM-G965N Build/star2ltexx-user 7.1.; com.narvii.amino.master/3.4.33602)");
             if(sessionID != null) { headers.Add("NDCAUTH", $"sid={sessionID}"); }
             return Task.CompletedTask;
         }
@@ -2310,6 +2342,69 @@ namespace Amino
                 if(_client.onImageMessage != null)
                 {
                     _client.onImageMessage.Invoke(_image);
+                }
+            }
+
+            public void callYouTubeMessageEvent(Amino.Client _client, Amino.Objects.YouTubeMessage _youtubeMessage)
+            {
+                if(_client.onYouTubeMessage != null)
+                {
+                    _client.onYouTubeMessage.Invoke(_youtubeMessage);
+                }
+            }
+
+            public void callVoiceMessageEvent(Amino.Client _client, Amino.Objects.VoiceMessage _voiceMessage)
+            {
+                if(_client.onVoiceMessage != null)
+                {
+                    _client.onVoiceMessage.Invoke(_voiceMessage);
+                }
+            }
+
+            public void callStickerMessageEvent(Amino.Client _client, Amino.Objects.StickerMessage _stickerMessage)
+            {
+                if(_client.onStickerMessage != null)
+                {
+                    _client.onStickerMessage.Invoke(_stickerMessage);
+                }
+            }
+
+            public void callMessageDeletedEvent(Amino.Client _client, Amino.Objects.DeletedMessage _deletedMessage)
+            {
+                if(_client.onMessageDeleted != null)
+                {
+                    _client.onMessageDeleted.Invoke(_deletedMessage);
+                }
+            }
+
+            public void callChatMemberJoinEvent(Amino.Client _client, Amino.Objects.JoinedChatMember _joinedMember)
+            {
+                if(_client.onChatMemberJoin != null)
+                {
+                    _client.onChatMemberJoin.Invoke(_joinedMember);
+                }
+            }
+
+            public void callChatMemberLeaveEvent(Amino.Client _client, Amino.Objects.LeftChatMember _leftMember)
+            {
+                if(_client.onChatMemberLeave != null)
+                {
+                    _client.onChatMemberLeave.Invoke(_leftMember);
+                }
+            }
+
+            public void callChatBackgroundChangedEvent(Amino.Client _client, Amino.Objects.ChatEvent _chatEvent)
+            {
+                if(_client.onChatBackgroundChanged != null)
+                {
+                    _client.onChatBackgroundChanged.Invoke(_chatEvent);
+                }
+            }
+            public void callChatTitleChangedEvent(Amino.Client _client, Amino.Objects.ChatEvent _chatEvent)
+            {
+                if(_client.onChatTitleChanged != null)
+                {
+                    _client.onChatTitleChanged.Invoke(_chatEvent);
                 }
             }
         }
