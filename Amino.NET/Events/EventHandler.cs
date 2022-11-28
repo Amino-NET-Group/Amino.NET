@@ -30,7 +30,7 @@ namespace Amino.Events
                 {
                     switch((int)jsonObj["o"]["chatMessage"]["mediaType"])
                     {
-                        case 0: //TextMessage / MessageDeleted / ChatMember Left, ChatMember Joined
+                        case 0: //TextMessage / MessageDeleted / ChatMember Left, ChatMember Joined / ChatBackground changed / ChatTitle changed
                             switch((int)jsonObj["o"]["chatMessage"]["type"])
                             {
                                 case 0: //Textmessage recevied
@@ -48,6 +48,14 @@ namespace Amino.Events
                                 case 102: // ChatMember Left
                                     Amino.Objects.LeftChatMember _leftMember = new Objects.LeftChatMember(webSocketMessage);
                                     eventCall.callChatMemberLeaveEvent(client, _leftMember);
+                                    break;
+                                case 104: // ChatBackground changed
+                                    Amino.Objects.ChatEvent _chatBackgroundChanged = new Objects.ChatEvent(webSocketMessage);
+                                    eventCall.callChatBackgroundChangedEvent(client, _chatBackgroundChanged);
+                                    break;
+                                case 105: // ChatTitle changed
+                                    Amino.Objects.ChatEvent _chatTitleChanged = new Objects.ChatEvent(webSocketMessage);
+                                    eventCall.callChatTitleChangedEvent(client, _chatTitleChanged);  
                                     break;
                             }
 

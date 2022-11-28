@@ -123,6 +123,14 @@ namespace Amino
         /// Fires each time an Amino member left a chat where the current Amino account is in
         /// </summary>
         public event Action<Objects.LeftChatMember> onChatMemberLeave;
+        /// <summary>
+        /// Fires each time an Amino chat background has changed (only chats where the current Amino account is in)
+        /// </summary>
+        public event Action<Objects.ChatEvent> onChatBackgroundChanged;
+        /// <summary>
+        /// Fires each time an Amino chat title has been changed (only chats where the current Amino account is in)
+        /// </summary>
+        public event Action<Objects.ChatEvent> onChatTitleChanged;
 
         //headers.
         private IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -2381,6 +2389,21 @@ namespace Amino
                 if(_client.onChatMemberLeave != null)
                 {
                     _client.onChatMemberLeave.Invoke(_leftMember);
+                }
+            }
+
+            public void callChatBackgroundChangedEvent(Amino.Client _client, Amino.Objects.ChatEvent _chatEvent)
+            {
+                if(_client.onChatBackgroundChanged != null)
+                {
+                    _client.onChatBackgroundChanged.Invoke(_chatEvent);
+                }
+            }
+            public void callChatTitleChangedEvent(Amino.Client _client, Amino.Objects.ChatEvent _chatEvent)
+            {
+                if(_client.onChatTitleChanged != null)
+                {
+                    _client.onChatTitleChanged.Invoke(_chatEvent);
                 }
             }
         }
