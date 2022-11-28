@@ -176,6 +176,148 @@ static void main(string[] args)
 - Amino.Objects.StickerMessage
 </details>
 
+
+<details>
+<summary id="functionName">onMessageDeleted</summary>
+<p id="functionDescription">This event fires each time an Amino message has been deleted in any chat where the current Amino account is in</p>
+
+### Event:
+- This even returns an Amino.Objects.DeletedMessage Object
+### Example:
+```CSharp
+static void onDeletedMessageEvent(Amino.Objects.DeletedMessage deletedMessage)
+{
+    Console.WriteLine($"User: {deletedMessage.Author.username}({deletedMessage.Author.userId}) has deleted a message in chat: {deletedMessage.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onMessageDeleted += onStickerMessageEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.DeletedMessage
+</details>
+
+
+<details>
+<summary id="functionName">onChatMemberJoin</summary>
+<p id="functionDescription">This event fires each time an Amino user has joined a chat thread where the current Amino account is in</p>
+
+### Event:
+- This event returns an Amino.Obejcts.JoinedChatMember Object
+
+### Example:
+```CSharp
+static void onUserChatJoinEvent(Amino.Objects.JoinedChatMember joinedMember)
+{
+    Console.WriteLine($"User: {joinedMember.Author.nickname} joined chat {joinedMember.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatMemberJoin += onUserChatJoinEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.JoinedChatMember
+</details>
+
+
+<details>
+<summary id="functionName">onChatMemberLeave</summary>
+<p id="functionDescription">This even fires each time an Amino user has left a chat where the current Amino account is in</p>
+
+### Event:
+- This event returns an Amino.Objects.LeftChatMember Object
+### Example:
+```CSharp
+static void onUserChatLeaveEvent(Amino.Objects.LeftChatMember leftMember)
+{
+    Console.WriteLine($"User: {leftMember.userId} left chat {leftMember.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatMemberLeave += onUserChatLeaveEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.LeftChatMember
+</details>
+
+
+<details>
+<summary id="functionName">onChatBackgroundChanged</summary>
+<p id="functionDescription">This event fires each time an Amino chat thread background has been changed (only chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatEvent Object
+
+### Example:
+```CSharp
+static void onChatBackgroundChangedEvent(Amino.Objects.ChatEvent chatEvent)
+{
+    Console.WriteLine($"Background in Chat thread {chatEvent.chatId} has changed.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatBackgroundChanged += onChatBackgroundChangedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatEvent
+</details>
+
+
+<details>
+<summary id="functionName">onChatTitleChanged</summary>
+<p id="functionDescription">This event fires each time an Amino chat thread Title has been changed (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatEvent Object
+### Example:
+```CSharp
+static void onChatTitleChangedEvent(Amino.Objects.ChatEvent chatEvent)
+{
+    Console.WriteLine($"Title of Chat thread {chatEvent.chatId} has changed.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatTitleChanged += onChatTitleChangedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatEvent
+</details>
+
 <!--- JUST A TEMPLATE
 
 <details>
