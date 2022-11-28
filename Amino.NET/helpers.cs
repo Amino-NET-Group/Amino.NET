@@ -39,8 +39,8 @@ namespace Amino
         /// <returns>string : The signiture.</returns>
         public static string generate_signiture(string data)
         {
-            string prefix = "42";
-            string key = "f8e7a61ac3f725941e3ac7cae2d688be97f30b93";
+            string prefix = "52";
+            string key = "EAB4F1B9E3340CD1631EDE3B587CC3EBEDF1AFA9".ToLower();
              
             HMACSHA1 hmac = new HMACSHA1(StringToByteArray(key));
             byte[] buffer = Encoding.Default.GetBytes(data);
@@ -55,8 +55,8 @@ namespace Amino
         /// <returns>string : The signiture.</returns>
         public static string generate_file_signiture(byte[] data)
         {
-            string prefix = "42";
-            string key = "f8e7a61ac3f725941e3ac7cae2d688be97f30b93";
+            string prefix = "52";
+            string key = "EAB4F1B9E3340CD1631EDE3B587CC3EBEDF1AFA9".ToLower();
             HMACSHA1 hmac = new HMACSHA1(StringToByteArray(key));
             byte[] result = hmac.ComputeHash(data);
             return Convert.ToBase64String(CombineTwoArrays(StringToByteArray(prefix), result));
@@ -68,8 +68,8 @@ namespace Amino
         /// <returns>string : The Device ID</returns>
         public static string generate_device_id()
         {
-            string prefix = "42";
-            string key = "02b258c63559d8804321c5d5065af320358d366f";
+            string prefix = "52";
+            string key = "AE49550458D8E7C51D566916B04888BFB8B3CA7D".ToLower();
 
             Random rnd = new Random();
             byte[] identifier = new byte[20];

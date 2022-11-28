@@ -119,6 +119,26 @@
             Fires each time an Amino message has been deleted (in a chat where the current Amino account is in)
             </summary>
         </member>
+        <member name="E:Amino.Client.onChatMemberJoin">
+            <summary>
+            Fires each time an Amino member joined a chat where the current Amino account is in
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onChatMemberLeave">
+            <summary>
+            Fires each time an Amino member left a chat where the current Amino account is in
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onChatBackgroundChanged">
+            <summary>
+            Fires each time an Amino chat background has changed (only chats where the current Amino account is in)
+            </summary>
+        </member>
+        <member name="E:Amino.Client.onChatTitleChanged">
+            <summary>
+            Fires each time an Amino chat title has been changed (only chats where the current Amino account is in)
+            </summary>
+        </member>
         <member name="M:Amino.Client.#ctor(System.String)">
             <summary>
             Creates an instance of the Amino.Client object and builds headers
