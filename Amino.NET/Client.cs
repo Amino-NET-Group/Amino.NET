@@ -115,6 +115,14 @@ namespace Amino
         /// Fires each time an Amino message has been deleted (in a chat where the current Amino account is in)
         /// </summary>
         public event Action<Objects.DeletedMessage> onMessageDeleted;
+        /// <summary>
+        /// Fires each time an Amino member joined a chat where the current Amino account is in
+        /// </summary>
+        public event Action<Objects.JoinedChatMember> onChatMemberJoin;
+        /// <summary>
+        /// Fires each time an Amino member left a chat where the current Amino account is in
+        /// </summary>
+        public event Action<Objects.LeftChatMember> onChatMemberLeave;
 
         //headers.
         private IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -2357,6 +2365,22 @@ namespace Amino
                 if(_client.onMessageDeleted != null)
                 {
                     _client.onMessageDeleted.Invoke(_deletedMessage);
+                }
+            }
+
+            public void callChatMemberJoinEvent(Amino.Client _client, Amino.Objects.JoinedChatMember _joinedMember)
+            {
+                if(_client.onChatMemberJoin != null)
+                {
+                    _client.onChatMemberJoin.Invoke(_joinedMember);
+                }
+            }
+
+            public void callChatMemberLeaveEvent(Amino.Client _client, Amino.Objects.LeftChatMember _leftMember)
+            {
+                if(_client.onChatMemberLeave != null)
+                {
+                    _client.onChatMemberLeave.Invoke(_leftMember);
                 }
             }
         }

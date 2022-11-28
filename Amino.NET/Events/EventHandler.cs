@@ -30,7 +30,7 @@ namespace Amino.Events
                 {
                     switch((int)jsonObj["o"]["chatMessage"]["mediaType"])
                     {
-                        case 0: //TextMessage / MessageDeleted
+                        case 0: //TextMessage / MessageDeleted / ChatMember Left, ChatMember Joined
                             switch((int)jsonObj["o"]["chatMessage"]["type"])
                             {
                                 case 0: //Textmessage recevied
@@ -40,6 +40,14 @@ namespace Amino.Events
                                 case 100: // Textmessage deleted
                                     Amino.Objects.DeletedMessage _deletedMessage = new Objects.DeletedMessage(webSocketMessage);
                                     eventCall.callMessageDeletedEvent(client, _deletedMessage);
+                                    break;
+                                case 101: // ChatMember Joined
+                                    Amino.Objects.JoinedChatMember _joinedMember = new Objects.JoinedChatMember(webSocketMessage);
+                                    eventCall.callChatMemberJoinEvent(client, _joinedMember);
+                                    break;
+                                case 102: // ChatMember Left
+                                    Amino.Objects.LeftChatMember _leftMember = new Objects.LeftChatMember(webSocketMessage);
+                                    eventCall.callChatMemberLeaveEvent(client, _leftMember);
                                     break;
                             }
 
