@@ -30,7 +30,7 @@ namespace Amino.Events
                 {
                     switch((int)jsonObj["o"]["chatMessage"]["mediaType"])
                     {
-                        case 0: //TextMessage / MessageDeleted / ChatMember Left, ChatMember Joined / ChatBackground changed / ChatTitle changed
+                        case 0: //TextMessage / MessageDeleted / ChatMember Left, ChatMember Joined / ChatBackground changed / ChatTitle changed / ChatContent chaaged / ChatAnnouncementPin / ChatAnnouncementUnpin / ChatViewOnlyOn / ChatViewOnlyOff / ChatTipEnabled / ChatTipDisabled / MessageForceRemoved / ChatTip
                             switch((int)jsonObj["o"]["chatMessage"]["type"])
                             {
                                 case 0: //Textmessage recevied
@@ -57,6 +57,43 @@ namespace Amino.Events
                                     Amino.Objects.ChatEvent _chatTitleChanged = new Objects.ChatEvent(webSocketMessage);
                                     eventCall.callChatTitleChangedEvent(client, _chatTitleChanged);  
                                     break;
+                                case 113: // ChatContent Changed
+                                    Amino.Objects.ChatEvent _chatContentChanged = new Objects.ChatEvent(webSocketMessage);
+                                    eventCall.callChatContentChangedEvent(client, _chatContentChanged);
+                                    break;
+                                case 119: // MessageForceRemovedByAdmin
+                                    Amino.Objects.SpecialChatEvent _messageForceRemovedByAdmin = new Objects.SpecialChatEvent(webSocketMessage);
+                                    eventCall.callMessageForceRemovedByAdminEvent(client, _messageForceRemovedByAdmin);
+                                    break;
+                                case 120: // ChatTip
+                                    Amino.Objects.ChatTip _chatTip = new Objects.ChatTip(webSocketMessage);
+                                    eventCall.callChatTipEvent(client, _chatTip);
+                                    break;
+                                case 121: // ChatAnnouncementPin
+                                    Amino.Objects.ChatAnnouncement _chatAnnouncementPinEvent = new Objects.ChatAnnouncement(webSocketMessage);
+                                    eventCall.callChatPinAnnouncementEvent(client, _chatAnnouncementPinEvent);
+                                    break;
+                                case 125: // ChatViewModeOn
+                                    Amino.Objects.ViewMode _viewModeOn = new Objects.ViewMode(webSocketMessage);
+                                    eventCall.callChatViewModeOnEvent(client, _viewModeOn);
+                                    break;
+                                case 126: // ChatViewModeOff
+                                    Amino.Objects.ViewMode _viewModeOff = new Objects.ViewMode(webSocketMessage);
+                                    eventCall.callChatViewModeOffEvent(client, _viewModeOff);
+                                    break;
+                                case 127: // ChatAnnouncementUnPin
+                                    Amino.Objects.ChatEvent _chatAnnouncementUnPin = new Objects.ChatEvent(webSocketMessage);
+                                    eventCall.callChatUnpinAnnouncementEvent(client, _chatAnnouncementUnPin);
+                                    break;
+                                case 128: // ChatTipEnabled
+                                    Amino.Objects.ChatTipToggle _chatTipEnabled = new Objects.ChatTipToggle(webSocketMessage);
+                                    eventCall.callChatTipEnabledEvent(client, _chatTipEnabled);
+                                    break;
+                                case 129: // ChatTipDisabled
+                                    Amino.Objects.ChatTipToggle _chatTipDisabled = new Objects.ChatTipToggle(webSocketMessage);
+                                    eventCall.callChatTipDisabledEvent(client, _chatTipDisabled);
+                                    break;
+                                
                             }
 
                             break;
