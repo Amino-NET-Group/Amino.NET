@@ -55,7 +55,7 @@ namespace Amino
         /// <returns>string : The signiture.</returns>
         public static string generate_file_signiture(byte[] data)
         {
-            string prefix = "52";
+            string prefix = "19";
             string key = "DFA5ED192DDA6E88A12FE12130DC6206B1251E44".ToLower();
             HMACSHA1 hmac = new HMACSHA1(StringToByteArray(key));
             byte[] result = hmac.ComputeHash(data);
