@@ -4,6 +4,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,35 +39,46 @@ namespace Amino
         }
 
 
-        public SubClient(Amino.Client _client, string communityId)
+        public SubClient(Amino.Client _client, string _communityId)
         {
             if (_client.sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             client = _client;
             debug = client.debug;
+            communityId = _communityId;
             headerBuilder();
         }
 
-        public SubClient(Amino.Client _client, int communityId)
+        public SubClient(Amino.Client _client, int _communityId)
         {
             if (_client.sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             client = _client;
             debug = client.debug;
+            communityId = _communityId.ToString();
             headerBuilder();
         }
 
 
         
-        public Task get_invite_codes(string status = "normal", int start = 0, int size = 25)
+        public List<Amino.Objects.InviteCode> get_invite_codes(string status = "normal", int start = 0, int size = 25)
         {
             try
             {
+                List<Amino.Objects.InviteCode> inviteCodeList = new List<Objects.InviteCode>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s-x{communityId}/community/invitation?status={status}&start={start}&size={size}");
                 request.AddHeaders(headers);
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray inviteCodesJson = jsonObj["communityInvitationList"];
+                foreach(JObject code in inviteCodesJson)
+                {
+                    Amino.Objects.InviteCode invCode = new Objects.InviteCode(code);
+                    inviteCodeList.Add(invCode);
+                }
+                Console.WriteLine(response.Content);
+                return inviteCodeList;
 
             } catch(Exception e) { throw new Exception(e.Message); }
 
@@ -128,7 +140,6 @@ namespace Amino
                 data.Add("timestamp", helpers.GetTimestamp() * 1000);
                 request.AddJsonBody(JsonConvert.SerializeObject(data));
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                Console.WriteLine(data);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
@@ -139,6 +150,32 @@ namespace Amino
                 throw new Exception(e.Message);
             }
         }
+
+        public Task post_wiki(string title, string content, byte[] icon = null)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/item");
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("label", title);
+                data.Add("content", content);
+                data.Add("eventSource", "GlobalComposeMenu");
+                data.Add("mediaList", new JArray());
+                data.Add("extensions", new JObject());
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                if(icon != null) { data.Add("icon", this.client.upload_media(icon, Types.upload_File_Types.Image)); }
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            } catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        //public Task edit_blog(string blogId, string title, )
 
 
     }
