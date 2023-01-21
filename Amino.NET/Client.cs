@@ -131,6 +131,18 @@ namespace Amino
         /// Fires each time an Amino chat title has been changed (only chats where the current Amino account is in)
         /// </summary>
         public event Action<Objects.ChatEvent> onChatTitleChanged;
+        /// <summary>
+        /// Fires each time an Amino chat content has been changed (only in chats where the currnt Amino account is in)
+        /// </summary>
+        public event Action<Objects.ChatEvent> onChatContentChanged;
+        public event Action<Objects.ChatAnnouncement> onChatAnnouncementPin;
+        public event Action<Objects.ChatEvent> onChatAnnouncementUnpin;
+        public event Action<Objects.ViewMode> onChatViewModeOn;
+        public event Action<Objects.ViewMode> onChatViewModeOff;
+        public event Action<Objects.ChatTipToggle> onChatTipEnabled;
+        public event Action<Objects.ChatTipToggle> onChatTipDisabled;
+        public event Action<Objects.SpecialChatEvent> onMessageForceRemovedByAdmin;
+        public event Action<Objects.ChatTip> onChatTip;
 
         //headers.
         private IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -2405,6 +2417,78 @@ namespace Amino
                 if(_client.onChatTitleChanged != null)
                 {
                     _client.onChatTitleChanged.Invoke(_chatEvent);
+                }
+            }
+
+            public void callChatContentChangedEvent(Amino.Client _client, Amino.Objects.ChatEvent _chatEvent)
+            {
+                if(_client.onChatContentChanged != null)
+                {
+                    _client.onChatContentChanged.Invoke(_chatEvent);
+                }
+            }
+
+            public void callChatPinAnnouncementEvent(Amino.Client _client, Amino.Objects.ChatAnnouncement _chatAnnouncement)
+            {
+                if(_client.onChatAnnouncementPin != null)
+                {
+                    _client.onChatAnnouncementPin.Invoke(_chatAnnouncement);
+                }
+            }
+
+            public void callChatUnpinAnnouncementEvent(Amino.Client _client, Amino.Objects.ChatEvent _chatEvent)
+            {
+                if(_client.onChatAnnouncementUnpin != null)
+                {
+                    _client.onChatAnnouncementUnpin.Invoke(_chatEvent);
+                }
+            }
+
+            public void callChatViewModeOnEvent(Amino.Client _client, Amino.Objects.ViewMode _viewMode)
+            {
+                if(_client.onChatViewModeOn != null)
+                {
+                    _client.onChatViewModeOn.Invoke(_viewMode);
+                }
+            }
+
+            public void callChatViewModeOffEvent(Amino.Client _client, Amino.Objects.ViewMode _viewMode)
+            {
+                if(_client.onChatViewModeOff != null)
+                {
+                    _client.onChatViewModeOff.Invoke(_viewMode);
+                }
+            }
+
+            public void callChatTipEnabledEvent(Amino.Client _client, Amino.Objects.ChatTipToggle _chatTip)
+            {
+                if(_client.onChatTipEnabled != null)
+                {
+                    _client.onChatTipEnabled.Invoke(_chatTip);
+                }
+            }
+
+            public void callChatTipDisabledEvent(Amino.Client _client, Amino.Objects.ChatTipToggle _chatTip)
+            {
+                if(_client.onChatTipDisabled != null)
+                {
+                    _client.onChatTipDisabled.Invoke(_chatTip);
+                }
+            }
+
+            public void callMessageForceRemovedByAdminEvent(Amino.Client _client, Amino.Objects.SpecialChatEvent _chatEvent)
+            {
+                if(_client.onMessageForceRemovedByAdmin != null)
+                {
+                    _client.onMessageForceRemovedByAdmin.Invoke(_chatEvent);
+                }
+            }
+
+            public void callChatTipEvent(Amino.Client _client, Amino.Objects.ChatTip _chatTip)
+            {
+                if(_client.onChatTip != null)
+                {
+                    _client.onChatTip.Invoke(_chatTip);
                 }
             }
         }
