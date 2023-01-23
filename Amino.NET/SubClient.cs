@@ -377,6 +377,79 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
+        public Task edit_profile(string nickname = null, string content = null, byte[] icon = null, List<byte[]> imageList = null, List<string> captionList = null, string backgroundColor = null, byte[] backgroundImage = null, string defaultChatBubbleId = null)
+        {
+            try
+            {
+                JObject data = new JObject();
+
+                JArray mediaList = new JArray();
+                JObject extensionData = new JObject();
+
+                if (imageList != null)
+                {
+                    JArray tempMedia = new JArray();
+                    for(int i = 0; i != imageList.Count; i++)
+                    {
+                        tempMedia = new JArray();
+                        tempMedia.Add(100);
+                        tempMedia.Add(this.client.upload_media(imageList[i], Types.upload_File_Types.Image));
+                        tempMedia.Add(captionList[i]);
+                        mediaList.Add(tempMedia);
+                    }
+                }
+                if (backgroundColor != null) { JObject color = new JObject(); color.Add("backgroundColor", backgroundColor); extensionData.Add(new JProperty("style", color)); }
+                if(backgroundImage != null) { JObject bgImg = new JObject(); JArray bgArr = new JArray(); bgArr.Add(100);bgArr.Add(this.client.upload_media(backgroundImage, Types.upload_File_Types.Image));bgArr.Add(null); bgArr.Add(null); bgArr.Add(null); bgImg.Add("backgroundMediaList", new JArray(bgArr)); extensionData.Add(new JProperty("style", bgImg)); }
+                if(defaultChatBubbleId != null) { JObject dchtbl = new JObject(); dchtbl.Add("defaultBubbleId", defaultChatBubbleId); extensionData.Add(dchtbl); }
+
+
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                data.Add(new JProperty("extensions", extensionData));
+                if(nickname != null) { data.Add("nickname", nickname); }
+                if(content != null) { data.Add("content", content); }
+                if(icon != null) { data.Add("icon", this.client.upload_media(icon, Types.upload_File_Types.Image)); }
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{this.client.userID}");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) throw new Exception(response.Content);
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task vote_poll(string postId, string optionId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/blog/{postId}/poll/option/{optionId}/vote");
+                JObject data = new JObject();
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                data.Add("eventSource", "PostDetailView");
+                data.Add("value", 1);
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+
+        public void Dispose()
+        {
+            this.communityId = null;
+            this.client = null;
+            this.headers = null;
+        }
+
 
     }
 

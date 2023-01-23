@@ -83,6 +83,8 @@ namespace Amino
         public bool debug { get; set; } = false;
 
 
+        private SubClient subClient = null;
+
 
         //The value to access the websocket manager
         private Amino.WebSocketHandler webSocket;
@@ -293,6 +295,8 @@ namespace Amino
                 is_Global = false;
                 headerBuilder();
                 _ = webSocket.disconnect_socket();
+                subClient.Dispose();
+                subClient = null;
                 return Task.CompletedTask;
 
             }catch(Exception e) { throw new Exception(e.Message); }
@@ -2326,6 +2330,12 @@ namespace Amino
                 }
                 return _avataFrameList;
             }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public void SetSubClient(Amino.SubClient subClient)
+        {
+            if(subClient == null) { throw new Exception("No SubClient provided!"); }
+            this.subClient = subClient;
         }
 
         /// <summary>
