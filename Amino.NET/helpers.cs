@@ -49,6 +49,15 @@ namespace Amino
         }
 
         /// <summary>
+        /// Returns the current Amino compatible Timezone
+        /// </summary>
+        /// <returns></returns>
+        public static int getTimezone()
+        {
+            return TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).Divide(1000).Seconds;
+        }
+
+        /// <summary>
         /// This function allows you to generate an Amino valid signiture for file uploads
         /// </summary>
         /// <param name="data"></param>

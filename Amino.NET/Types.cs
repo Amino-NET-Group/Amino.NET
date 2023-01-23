@@ -81,8 +81,8 @@
         /// </summary>
         public enum Repair_Types
         {
-            Coins,
-            Membeership
+            Coins = 1,
+            Membeership = 2
         }
 
         /// <summary>
@@ -253,6 +253,12 @@
         {
             lvl_1,
             lvl_2
+        }
+
+        public enum Repost_Types
+        {
+            Blog = 1,
+            Wiki = 2
         }
     }
 }

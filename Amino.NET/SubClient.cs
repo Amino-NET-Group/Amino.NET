@@ -4,9 +4,6 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Amino
@@ -121,10 +118,30 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task post_blog(string title, string content)
+        public Task post_blog(string title, string content, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
             try
             {
+                JArray mediaList = new JArray();
+                JObject extensionData = new JObject();
+
+                if(imageList != null)
+                {
+                    JArray tempMedia = new JArray();
+                    foreach(byte[] bytes in imageList)
+                    {
+                        tempMedia = new JArray();
+                        tempMedia.Add(100);
+                        tempMedia.Add(this.client.upload_media(bytes, Types.upload_File_Types.Image));
+                        tempMedia.Add(null);
+                        mediaList.Add(tempMedia);
+                    }
+                }
+                if(fansOnly) { extensionData.Add("fansOnly", fansOnly); }
+                if(backgroundColor != null) { JObject color = new JObject(); color.Add("backgroundColor", backgroundColor); extensionData.Add(new JProperty("style", color)); }
+
+                
+
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/blog");
                 request.AddHeaders(headers);
@@ -132,8 +149,8 @@ namespace Amino
                 data.Add("address", null);
                 data.Add("title", title);
                 data.Add("content", content);
-                data.Add("mediaList", new JArray());
-                data.Add("extensions", new JObject());
+                data.Add("mediaList", new JArray(mediaList));
+                data.Add(new JProperty("extensions", extensionData));
                 data.Add("latitude", 0);
                 data.Add("longitude", 0);
                 data.Add("eventSource", "GlobalComposeMenu");
@@ -151,10 +168,29 @@ namespace Amino
             }
         }
 
-        public Task post_wiki(string title, string content, byte[] icon = null)
+        public Task post_wiki(string title, string content, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
             try
             {
+                JArray mediaList = new JArray();
+                JObject extensionData = new JObject();
+
+                if (imageList != null)
+                {
+                    JArray tempMedia = new JArray();
+                    foreach (byte[] bytes in imageList)
+                    {
+                        tempMedia = new JArray();
+                        tempMedia.Add(100);
+                        tempMedia.Add(this.client.upload_media(bytes, Types.upload_File_Types.Image));
+                        tempMedia.Add(null);
+                        mediaList.Add(tempMedia);
+                    }
+                }
+                if (fansOnly) { extensionData.Add("fansOnly", fansOnly); }
+                if (backgroundColor != null) { JObject color = new JObject(); color.Add("backgroundColor", backgroundColor); extensionData.Add(new JProperty("style", color)); }
+
+
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/item");
                 request.AddHeaders(headers);
@@ -162,11 +198,11 @@ namespace Amino
                 data.Add("label", title);
                 data.Add("content", content);
                 data.Add("eventSource", "GlobalComposeMenu");
-                data.Add("mediaList", new JArray());
-                data.Add("extensions", new JObject());
+                data.Add("mediaList", new JArray(mediaList));
+                data.Add(new JProperty("extensions", extensionData));
                 data.Add("timestamp", helpers.GetTimestamp() * 1000);
-                if(icon != null) { data.Add("icon", this.client.upload_media(icon, Types.upload_File_Types.Image)); }
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
@@ -175,8 +211,174 @@ namespace Amino
             } catch(Exception e) { throw new Exception(e.Message); }
         }
 
-        //public Task edit_blog(string blogId, string title, )
+        public Task edit_blog(string blogId, string title = null, string content = null, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
+        {
+            try
+            {
+                JArray mediaList = new JArray();
+                JObject extensionData = new JObject();
+
+                if (imageList != null)
+                {
+                    JArray tempMedia = new JArray();
+                    foreach (byte[] bytes in imageList)
+                    {
+                        tempMedia = new JArray();
+                        tempMedia.Add(100);
+                        tempMedia.Add(this.client.upload_media(bytes, Types.upload_File_Types.Image));
+                        tempMedia.Add(null);
+                        mediaList.Add(tempMedia);
+                    }
+                }
+                if (fansOnly) { extensionData.Add("fansOnly", fansOnly); }
+                if (backgroundColor != null) { JObject color = new JObject(); color.Add("backgroundColor", backgroundColor); extensionData.Add(new JProperty("style", color)); }
+
+
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/blog");
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("address", null);
+                data.Add("title", title);
+                data.Add("content", content);
+                data.Add("mediaList", new JArray(mediaList));
+                data.Add(new JProperty("extensions", extensionData));
+                data.Add("latitude", 0);
+                data.Add("longitude", 0);
+                data.Add("eventSource", "PostDetailView");
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+
+                return Task.CompletedTask;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+
+        public Task delete_blog(string blogId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/blog/{blogId}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            } catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task delete_wiki(string wikiId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/item/{wikiId}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            } catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task repost_blog(string postId, Types.Repost_Types type, string content = null)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/blog");
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("content", content);
+                data.Add("refObjectId", postId);
+                data.Add("refObjectType", (int)type);
+                data.Add("type", 2);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+
+        public Task check_in(int? timezone = null)
+        {
+            try
+            {
+                int? tz;
+                if (timezone != null) { tz = timezone; } else { tz = helpers.getTimezone(); }
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/check-in");
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                data.Add("timezone", tz);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task repair_check_in(Types.Repair_Types repairType)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/check-in/repair");
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                data.Add("repairMethod", Convert.ToString((int)repairType));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task lottery(int? timezone = null)
+        {
+            try
+            {
+                int? tz;
+                if (timezone != null) { tz = timezone; } else { tz = helpers.getTimezone(); }
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/check-in");
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                data.Add("timezone", tz);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
 
 
     }
+
+
 }
