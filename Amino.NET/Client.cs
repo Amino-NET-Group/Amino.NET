@@ -217,13 +217,19 @@ namespace Amino
             {
                 string secret;
                 if (_secret == null) { secret = $"0 {_password}"; } else { secret = _secret; }
-                var data = new { email = _email, v = 2, secret = secret, deviceID = deviceID, clientType = 100, action = "normal", timestamp = helpers.GetTimestamp() * 1000};
-
+                JObject data = new JObject();
+                data.Add("email", _email);
+                data.Add("v", 2);
+                data.Add("secret", secret);
+                data.Add("deviceID", deviceID);
+                data.Add("clientType", 100);
+                data.Add("action", "normal");
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/login", Method.Post);
                 request.AddHeaders(headers);
-                request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 json = response.Content;
@@ -562,22 +568,23 @@ namespace Amino
         public bool check_device(string _deviceId)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var data = new
-            {
-                deviceID = _deviceId,
-                bundleID = "com.narvii.amino.master",
-                clientType = 100,
-                systemPushEnabled = true,
-                timezone = 0,
-                locale = currentCulture.Name,
-                timestamp = (Math.Round(helpers.GetTimestamp())) * 1000
-            };
+
+            JObject data = new JObject();
+            data.Add("deviceID", _deviceId);
+            data.Add("bundleID", "com.narvii.amino.master");
+            data.Add("clientType", 100);
+            data.Add("systemPushEnabled", true);
+            data.Add("timezone", 0);
+            data.Add("locale", currentCulture.Name);
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+            
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/device");
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { return false; }
                 if (debug) { Trace.WriteLine(response.Content); }
