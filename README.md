@@ -32,7 +32,7 @@ You can get Amino.Net straight from [NuGet.org](https://nuget.org) or any NuGet 
 - Events ([Click Here](https://github.com/FabioGaming/Amino.NET/blob/master/Events.md))
 - Exceptions & Troubleshooting ([Click Here](https://github.com/FabioGaming/Amino.NET/blob/master/Exceptions.md))
 - Amino REST API Documentation (Coming soon)
-- Official Amino.Net Discord Server ([Click Here](https://discord.gg/gNnBnADQkz))
+- Official Amino.Net Discord Server ([Click Here](https://discord.gg/qyv8P2gegK))
 
 # GENERAL DOCUMENTATION
 ### To see a better view on the Documentation consider viewing the seperated documentation files linked in `Quick Links`

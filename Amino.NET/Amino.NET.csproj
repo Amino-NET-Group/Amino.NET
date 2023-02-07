@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\source\repos\Amino.NET\Amino.NET\Amino.Net-Logo-V2.png">
+    <None Include="Amino.Net-Logo-V2.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
