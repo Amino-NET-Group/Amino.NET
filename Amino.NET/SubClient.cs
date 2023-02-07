@@ -442,6 +442,83 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        public Task comment(string message, Amino.Types.Comment_Types type, string targetId, bool isGuest = false)
+        {
+            try
+            {
+                string endPoint = null;
+                JObject data = new JObject();
+                data.Add("content", message);
+                data.Add("strickerId", null);
+                data.Add("type", 0);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                string comType;
+                if (isGuest) { comType = "g-comment"; } else { comType = "comment"; }
+                switch(type)
+                {
+                    case Types.Comment_Types.Blog:
+                        data.Add("eventSource", "PostDetailView");
+                        endPoint = $"/x{communityId}/s/blog/{targetId}/{comType}";
+                        break;
+                    case Types.Comment_Types.Wiki:
+                        data.Add("eventSource", "PostDetailView");
+                        break;
+                    case Types.Comment_Types.Reply:
+                        data.Add("respondTo", targetId);
+                        endPoint = $"/x{communityId}/s/item/{targetId}/{comType}";
+                        break;
+                    case Types.Comment_Types.User:
+                        data.Add("eventSource", "UserProfileView");
+                        endPoint = $"/x{communityId}/s/user-profile/{targetId}/{comType}";
+                        break;
+                }
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest(endPoint);
+                request.AddHeaders(headers);
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task delete_comment(string commentId, Amino.Types.Comment_Types type, string targetId)
+        {
+            try
+            {
+                string endPoint = null;
+                switch(type)
+                {
+                    case Types.Comment_Types.Blog:
+                        endPoint = $"/x{communityId}/s/blog/{targetId}/comment/{commentId}";
+                        break;
+                    case Types.Comment_Types.Wiki:
+                        endPoint = $"/x{communityId}/s/item/{targetId}/comment/{commentId}";
+                        break;
+                    case Types.Comment_Types.Reply:
+                        break;
+                    case Types.Comment_Types.User:
+                        endPoint = $"/x{communityId}/s/user-profile/{targetId}/comment/{commentId}";
+                        break;
+                }
+
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest(endPoint);
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+        
+
+
 
         public void Dispose()
         {
