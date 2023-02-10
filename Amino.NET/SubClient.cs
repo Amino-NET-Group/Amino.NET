@@ -517,8 +517,91 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
         
+        public Task like_post(string postId, bool isWiki = false)
+        {
+            try
+            {
+                string endPoint = null;
+
+                JObject data = new JObject();
+                data.Add("value", 4);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                if(!isWiki) { data.Add("eventSource", "UserProfileView"); endPoint = $"/x{communityId}/s/blog/{postId}/vote?cv=1.2"; } else { data.Add("eventSource", "PostDetailView"); endPoint = $"/x{communityId}/s/item/{postId}/vote?cv=1.2"; }
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest(endPoint);
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task unlike_post(string postId, bool isWiki = false)
+        {
+            try
+            {
+                string endPoint = null;
+                if(!isWiki) { endPoint = $"/x{communityId}/s/blog/{postId}/vote?eventSource=UserProfileView"; } else { endPoint = $"/x{communityId}/s/item/{postId}/vote?eventSource=PostDetailView"; }
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest(endPoint);
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); } 
+        }
+
+        public Task like_comment(string commentId, string targetId,Types.Comment_Types targetType)
+        {
+            try
+            {
+                string _targetType = null;
+                string voteType = null;
+                string targetValue = null;
+                if(targetType == Types.Comment_Types.User) { _targetType = "UserProfileView"; targetValue = "user-profile"; } else { _targetType = "PostDetailView"; targetValue = "blog"; }
+                if(targetType == Types.Comment_Types.Wiki) { voteType = "g-vote"; targetValue = "item"; } else { voteType = "vote";  }
+                JObject data = new JObject();
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                data.Add("value", 1);
+                data.Add("EventSource", _targetType);
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/{targetValue}/{targetId}/comment/{commentId}/{voteType}?cv=1.2&value=1");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
 
 
+        public Task unlike_comment(string commentId, string targetId, Amino.Types.Comment_Types targetType)
+        {
+            try
+            {
+                string _targetType = null;
+                string _eventSource = "PostDetailView";
+                if (targetType == Types.Comment_Types.User) { _targetType = "user-profile"; _eventSource = "UserProfileView"; } else if (targetType == Types.Comment_Types.Wiki) { _targetType = "item"; } else { _targetType = "blog"; }
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/{_targetType}/{targetId}/comment/{commentId}/g-vote?eventSource={_eventSource}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        } 
 
         public void Dispose()
         {

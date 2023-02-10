@@ -2219,6 +2219,9 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+  
+
+
         /// <summary>
         /// Allows you to accept host / organizer of a chatroom with the current Amino account
         /// </summary>
