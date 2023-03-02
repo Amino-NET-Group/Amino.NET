@@ -2219,7 +2219,22 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
-  
+
+        public Objects.AdvancedCommunityInfo get_community_info(string communityId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s-x{communityId}/community/info?withInfluencerList=1&withTopicList=true&influencerListOrderStrategy=fansCount");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                Objects.AdvancedCommunityInfo community = new Objects.AdvancedCommunityInfo(jsonObj);
+                return community;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
 
 
         /// <summary>
