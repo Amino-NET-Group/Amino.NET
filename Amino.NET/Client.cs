@@ -134,20 +134,44 @@ namespace Amino
         /// </summary>
         public event Action<Objects.ChatEvent> onChatTitleChanged;
         /// <summary>
-        /// Fires each time an Amino chat content has been changed (only in chats where the currnt Amino account is in)
+        /// Fires each time an Amino chat ddescription has been changed (only in chats where the currnt Amino account is in)
         /// </summary>
         public event Action<Objects.ChatEvent> onChatContentChanged;
+        /// <summary>
+        /// Fires each time an Amino chat Announcement has been pinned (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatAnnouncement> onChatAnnouncementPin;
+        /// <summary>
+        /// Fires each time an Amino Chat Announcement has been removed from pin (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatEvent> onChatAnnouncementUnpin;
+        /// <summary>
+        /// Fires each time an Amino Chat has been put on View Mode (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ViewMode> onChatViewModeOn;
+        /// <summary>
+        /// Fires each time an Amino Chat has been put out of View Mode (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ViewMode> onChatViewModeOff;
+        /// <summary>
+        /// Fires each time an Amino Chat has enabled chat tipping (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatTipToggle> onChatTipEnabled;
+        /// <summary>
+        /// Fires each time an Amino Chat has disabled chat tipping (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatTipToggle> onChatTipDisabled;
+        /// <summary>
+        /// Fires each time an Amino Chat Message has been removed by a moderator of the current Community (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.SpecialChatEvent> onMessageForceRemovedByAdmin;
+        /// <summary>
+        /// Fires each time someone has tipped coins in an Amino Chat (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatTip> onChatTip;
 
         //headers.
-        private IDictionary<string, string> headers = new Dictionary<string, string>();
+        public Dictionary<string, string> headers = new Dictionary<string, string>();
 
         //Handles the header stuff
         private Task headerBuilder()
