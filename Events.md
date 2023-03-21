@@ -376,6 +376,144 @@ static void main(string[] args)
 </details>
 
 
+<details>
+<summary id="functionName">onChatAnnouncementUnPin</summary>
+<p id="functionDescription">This event fires each time an Amino chat Announcement has been unpinned /    removed (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatEvent Object
+### Example:
+```CSharp
+static void onChatAnnouncementRemovedEvent(Amino.Objects.ChatEvent chatEvent)
+{
+    Console.WriteLine($"Chat Announcement of Chat thread {chatEvent.chatId} has been removed.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatAnnouncementUnPin += onChatAnnouncementRemovedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatEvent
+</details>
+
+
+<details>
+<summary id="functionName">onChatViewModeOn</summary>
+<p id="functionDescription">This event fires each time an Amino chat has been put on ViewMode (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ViewMode Object
+### Example:
+```CSharp
+static void onChatViewModeToggle(Amino.Objects.ViewMode viewMode)
+{
+    Console.WriteLine($"Chat {viewMode.chatId} got put into ViewMode by {viewMode.Author.nickname}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatViewModeOn += onChatViewModeToggle;
+}
+```
+
+### Returns:
+- Amino.Objects.ViewMode
+</details>
+
+
+<details>
+<summary id="functionName">onChatViewModeOff</summary>
+<p id="functionDescription">This event fires each time an Amino chat has been put out of ViewMode (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ViewMode Object
+### Example:
+```CSharp
+static void onChatViewModeToggle(Amino.Objects.ViewMode viewMode)
+{
+    Console.WriteLine($"Chat {viewMode.chatId} got put out of ViewMode by {viewMode.Author.nickname}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatViewModeOff += onChatViewModeToggle;
+}
+```
+### Returns:
+- Amino.Objects.ViewMode
+</details>
+
+
+<details>
+<summary id="functionName">onChatTipEnabled</summary>
+<p id="functionDescription">This event fires each time an Amino chat has enabled Chat Tipping (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.chatTipToggle Object
+### Example:
+```CSharp
+static void onChatTipToggle(Amino.Objects.ChatTipToggle chatTipToggle)
+{
+    Console.WriteLine($"Chat {chatTipToggle.chatId} has enabled tipping");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatTipEnabled += onChatTipToggle;
+}
+```
+### Returns:
+- Amino.Objects.ChatTipToggle
+</details>
+
+
+<details>
+<summary id="functionName">onChatTipDisabled</summary>
+<p id="functionDescription">This event fires each time an Amino chat has disabled Chat Tipping (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.chatTipToggle Object
+### Example:
+```CSharp
+static void onChatTipToggle(Amino.Objects.ChatTipToggle chatTipToggle)
+{
+    Console.WriteLine($"Chat {chatTipToggle.chatId} has disabled tipping");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatTipDisabled += onChatTipToggle;
+}
+```
+### Returns:
+- Amino.Objects.ChatTipToggle
+</details>
+
+
+
 <!--- JUST A TEMPLATE
 
 <details>
