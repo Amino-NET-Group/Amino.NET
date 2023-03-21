@@ -787,10 +787,81 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task start_chat(string userId, string message, string title = null, bool isGlobal = false, bool publishToGlobal = false)
+        public Task start_chat(List<string> userIds, string message, string title = null, string content = null, bool isGlobal = false, bool publishToGlobal = false)
         {
+            try
+            {
+                JObject data = new JObject();
+                data.Add("title", title);
+                data.Add("inviteeUids", new JArray(userIds));
+                data.Add("initialMessageContent", message);
+                data.Add("content", content);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                if(isGlobal) { data.Add("type", 2); data.Add("eventSource", "GlobalComposeMenu"); } else { data.Add("type", 0); }
+                if(publishToGlobal) { data.Add("publishToGlobal", 1); } else { data.Add("publishToGlobal", 0); }
 
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
         }
+        public Task start_chat(string userId, string message, string title = null, string content = null, bool isGlobal = false, bool publishToGlobal = false)
+        {
+            start_chat(new List<string>() { userId }, message, title, content, isGlobal, publishToGlobal);
+            return Task.CompletedTask;
+        }
+
+        public Task invite_to_chat(List<string> userIds, string chatId)
+        {
+            try
+            {
+                JObject data = new JObject();
+                data.Add("uids", new JArray(userIds));
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/invite");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task invite_to_chat(string userId, string chatId)
+        {
+            invite_to_chat(new List<string>() { userId }, chatId);
+            return Task.CompletedTask;
+        }
+
+        public Task add_to_favorites(string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-group/quick-access/{userId}");
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
 
         public void Dispose()
         {

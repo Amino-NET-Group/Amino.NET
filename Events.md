@@ -318,6 +318,64 @@ static void main(string[] args)
 - Amino.Objects.ChatEvent
 </details>
 
+
+<details>
+<summary id="functionName">onChatContentChanged</summary>
+<p id="functionDescription">This event fires each time an Amino chat thread Content (Description) has been changed (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatEvent Object
+### Example:
+```CSharp
+static void onChatContentChangedEvent(Amino.Objects.ChatEvent chatEvent)
+{
+    Console.WriteLine($"Content of Chat thread {chatEvent.chatId} has changed.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatContentChanged += onChatContentChangedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatEvent
+</details>
+
+
+
+<details>
+<summary id="functionName">onChatAnnouncementPin</summary>
+<p id="functionDescription">This event fires each time an Amino chat Announcement has been pinned /    changed (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatAnnouncement Object
+### Example:
+```CSharp
+static void onChatAnnouncementChangedEvent(Amino.Objects.ChatAnnouncement chatAnnouncement)
+{
+    Console.WriteLine($"Chat Announcement of Chat thread {chatAnnouncement.chatId} has changed to {chatAnnouncement.content}.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatAnnouncementPin += onChatAnnouncementChangedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatAnnouncement
+</details>
+
+
 <!--- JUST A TEMPLATE
 
 <details>
