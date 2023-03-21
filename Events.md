@@ -513,6 +513,62 @@ static void main(string[] args)
 </details>
 
 
+<details>
+<summary id="functionName">onMessageForceRemovedByAdmin</summary>
+<p id="functionDescription">This event fires each time an Amino chat message has been removed by an admin (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.SpecialChatEvent Object
+### Example:
+```CSharp
+static void onMesssageRemoved(Amino.Objects.SpecialChatEvent specialChatEvent)
+{
+    Console.WriteLine($"Message {specialChatEvent.messageId} has been removed on chat {specialChatEvent.chatId} by {specialChatEvent.Author.nickname}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onMessageForceRemovedByAdmins += onChatMessageRemoved;
+}
+```
+### Returns:
+- Amino.Objects.SpecialChatEvent
+</details>
+
+
+<details>
+<summary id="functionName">onChatTip</summary>
+<p id="functionDescription">This event fires each time an Amino user has given a chat tip(only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatTip Object
+### Example:
+```CSharp
+static void chatTip(Amino.Objects.ChatTip tip)
+{
+    Console.WriteLine($"User {tip.Author.nickname} has tipped {tip.Extensions.tippedCoins} Coins in chat {tip.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatTip += chatTip;
+}
+```
+### Returns:
+- Amino.Objects.ChatTip
+</details>
+
+
+
+
 
 <!--- JUST A TEMPLATE
 
