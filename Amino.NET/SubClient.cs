@@ -18,7 +18,7 @@ namespace Amino
 
 
         //headers.
-        private IDictionary<string, string> headers = new Dictionary<string, string>();
+        public Dictionary<string, string> headers = new Dictionary<string, string>();
 
         //Handles the header stuff
         private Task headerBuilder()
@@ -35,7 +35,11 @@ namespace Amino
             return Task.CompletedTask;
         }
 
-
+        /// <summary>
+        /// Creates an instance of the Amino.SubClient object and builds headers
+        /// </summary>
+        /// <param name="_client"></param>
+        /// <param name="_communityId"></param>
         public SubClient(Amino.Client _client, string _communityId)
         {
             if (_client.sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
@@ -45,6 +49,11 @@ namespace Amino
             headerBuilder();
         }
 
+        /// <summary>
+        /// Creates an instance of the Amino.SubClient object and builds headers
+        /// </summary>
+        /// <param name="_client"></param>
+        /// <param name="_communityId"></param>
         public SubClient(Amino.Client _client, int _communityId)
         {
             if (_client.sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
@@ -55,7 +64,13 @@ namespace Amino
         }
 
 
-        
+        /// <summary>
+        /// Allows you to get inviite codes of the current community (might require staff permissions)
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="start"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public List<Amino.Objects.InviteCode> get_invite_codes(string status = "normal", int start = 0, int size = 25)
         {
             try
@@ -81,6 +96,12 @@ namespace Amino
 
         } 
 
+        /// <summary>
+        /// Allows you to generate a Community invite code (might require staff permissions)
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="force"></param>
+        /// <returns></returns>
         public Task generate_invite_code(int duration = 0, bool force = true)
         {
             try
@@ -104,6 +125,11 @@ namespace Amino
             }
         }
 
+        /// <summary>
+        /// Allows you to delete an invite code using its ID
+        /// </summary>
+        /// <param name="inviteId"></param>
+        /// <returns></returns>
         public Task delete_invite_code(string inviteId)
         {
             try
@@ -118,6 +144,15 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to post a Blog post in the current Community
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="imageList"></param>
+        /// <param name="fansOnly"></param>
+        /// <param name="backgroundColor"></param>
+        /// <returns></returns>
         public Task post_blog(string title, string content, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
             try
@@ -168,6 +203,15 @@ namespace Amino
             }
         }
 
+        /// <summary>
+        /// Allows you to post a Wiki post on the current Community
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="imageList"></param>
+        /// <param name="fansOnly"></param>
+        /// <param name="backgroundColor"></param>
+        /// <returns></returns>
         public Task post_wiki(string title, string content, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
             try
@@ -211,6 +255,16 @@ namespace Amino
             } catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to edit an existing Blog on the current Community
+        /// </summary>
+        /// <param name="blogId"></param>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="imageList"></param>
+        /// <param name="fansOnly"></param>
+        /// <param name="backgroundColor"></param>
+        /// <returns></returns>
         public Task edit_blog(string blogId, string title = null, string content = null, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
             try
@@ -262,7 +316,11 @@ namespace Amino
             }
         }
 
-
+        /// <summary>
+        /// Allows you to delete a Blog post
+        /// </summary>
+        /// <param name="blogId"></param>
+        /// <returns></returns>
         public Task delete_blog(string blogId)
         {
             try
@@ -277,6 +335,11 @@ namespace Amino
             } catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to delete a Wiki post
+        /// </summary>
+        /// <param name="wikiId"></param>
+        /// <returns></returns>
         public Task delete_wiki(string wikiId)
         {
             try
@@ -291,6 +354,13 @@ namespace Amino
             } catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to repost a post
+        /// </summary>
+        /// <param name="postId"></param>
+        /// <param name="type"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
         public Task repost_blog(string postId, Types.Repost_Types type, string content = null)
         {
             try
@@ -314,7 +384,11 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
-
+        /// <summary>
+        /// Allows you to check in on the current Community
+        /// </summary>
+        /// <param name="timezone"></param>
+        /// <returns></returns>
         public Task check_in(int? timezone = null)
         {
             try
@@ -336,6 +410,11 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to repair your check in streak using either Amino Coins or Amino+
+        /// </summary>
+        /// <param name="repairType"></param>
+        /// <returns></returns>
         public Task repair_check_in(Types.Repair_Types repairType)
         {
             try
@@ -355,6 +434,11 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to claim the check in lottery
+        /// </summary>
+        /// <param name="timezone"></param>
+        /// <returns></returns>
         public Task lottery(int? timezone = null)
         {
             try
@@ -377,6 +461,18 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you edit your community profile
+        /// </summary>
+        /// <param name="nickname"></param>
+        /// <param name="content"></param>
+        /// <param name="icon"></param>
+        /// <param name="imageList"></param>
+        /// <param name="captionList"></param>
+        /// <param name="backgroundColor"></param>
+        /// <param name="backgroundImage"></param>
+        /// <param name="defaultChatBubbleId"></param>
+        /// <returns></returns>
         public Task edit_profile(string nickname = null, string content = null, byte[] icon = null, List<byte[]> imageList = null, List<string> captionList = null, string backgroundColor = null, byte[] backgroundImage = null, string defaultChatBubbleId = null)
         {
             try
@@ -422,6 +518,12 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to vote on a poll
+        /// </summary>
+        /// <param name="postId"></param>
+        /// <param name="optionId"></param>
+        /// <returns></returns>
         public Task vote_poll(string postId, string optionId)
         {
             try
@@ -442,6 +544,14 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to comment on a Blog, Wiki, Reply, Wall
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="type"></param>
+        /// <param name="targetId"></param>
+        /// <param name="isGuest"></param>
+        /// <returns></returns>
         public Task comment(string message, Amino.Types.Comment_Types type, string targetId, bool isGuest = false)
         {
             try
@@ -486,6 +596,13 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to delete a comment
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <param name="type"></param>
+        /// <param name="targetId"></param>
+        /// <returns></returns>
         public Task delete_comment(string commentId, Amino.Types.Comment_Types type, string targetId)
         {
             try
@@ -517,6 +634,12 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
         
+        /// <summary>
+        /// Allows you to like a Post
+        /// </summary>
+        /// <param name="postId"></param>
+        /// <param name="isWiki"></param>
+        /// <returns></returns>
         public Task like_post(string postId, bool isWiki = false)
         {
             try
@@ -541,6 +664,12 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to unlike a Post
+        /// </summary>
+        /// <param name="postId"></param>
+        /// <param name="isWiki"></param>
+        /// <returns></returns>
         public Task unlike_post(string postId, bool isWiki = false)
         {
             try
@@ -557,6 +686,13 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); } 
         }
 
+        /// <summary>
+        /// Allows you to like a comment
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <param name="targetId"></param>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
         public Task like_comment(string commentId, string targetId,Types.Comment_Types targetType)
         {
             try
@@ -585,6 +721,13 @@ namespace Amino
         }
 
 
+        /// <summary>
+        /// Allows you to unlike a comment
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <param name="targetId"></param>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
         public Task unlike_comment(string commentId, string targetId, Amino.Types.Comment_Types targetType)
         {
             try
@@ -605,6 +748,12 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         } 
 
+        /// <summary>
+        /// Allows you to upvote a comment
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <param name="postId"></param>
+        /// <returns></returns>
         public Task upvote_comment(string commentId, string postId)
         {
             try
@@ -626,6 +775,12 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to downvote a comment
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <param name="postId"></param>
+        /// <returns></returns>
         public Task downvote_comment(string commentId, string postId)
         {
             try
@@ -648,6 +803,12 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to remove your vote from a comment
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <param name="postId"></param>
+        /// <returns></returns>
         public Task unvote_comment(string commentId, string postId)
         {
             try
@@ -661,6 +822,13 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to reply to a wall comment
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="commentId"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public Task reply_wall(string userId, string commentId, string message)
         {
             try
@@ -686,6 +854,11 @@ namespace Amino
 
         }
 
+        /// <summary>
+        /// Allows you to set if youre online or offline on the community 
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
         public Task set_activity_status(Types.Activity_Status_Types status)
         {
             try
@@ -708,6 +881,10 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to check your notifications on the current Community
+        /// </summary>
+        /// <returns></returns>
         public Task check_notification()
         {
             try
@@ -722,6 +899,11 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to delete a specific notification on the current Community
+        /// </summary>
+        /// <param name="notificationId"></param>
+        /// <returns></returns>
         public Task delete_notification(string notificationId)
         {
             try
@@ -736,6 +918,10 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to clear all notifications on the current Community
+        /// </summary>
+        /// <returns></returns>
         public Task clear_notifications()
         {
             try
@@ -750,6 +936,10 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to send activity time (farm coins) on the current community (NO ARGUMENTS REQUIRED)
+        /// </summary>
+        /// <returns></returns>
         public Task send_activity_time()
         {
             try
@@ -787,6 +977,17 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+
+        /// <summary>
+        /// Allows you to start a chat with multiple people on the current Community
+        /// </summary>
+        /// <param name="userIds"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="isGlobal"></param>
+        /// <param name="publishToGlobal"></param>
+        /// <returns></returns>
         public Task start_chat(List<string> userIds, string message, string title = null, string content = null, bool isGlobal = false, bool publishToGlobal = false)
         {
             try
@@ -812,12 +1013,29 @@ namespace Amino
             }
             catch(Exception e) { throw new Exception(e.Message); }
         }
+
+        /// <summary>
+        /// Allows you to start a chat with a single person on the current Community
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="isGlobal"></param>
+        /// <param name="publishToGlobal"></param>
+        /// <returns></returns>
         public Task start_chat(string userId, string message, string title = null, string content = null, bool isGlobal = false, bool publishToGlobal = false)
         {
             start_chat(new List<string>() { userId }, message, title, content, isGlobal, publishToGlobal);
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Allows you to invite multiple people to a chat in the current Community
+        /// </summary>
+        /// <param name="userIds"></param>
+        /// <param name="chatId"></param>
+        /// <returns></returns>
         public Task invite_to_chat(List<string> userIds, string chatId)
         {
             try
@@ -840,12 +1058,23 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to invite a single person to a chat in the current Community
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="chatId"></param>
+        /// <returns></returns>
         public Task invite_to_chat(string userId, string chatId)
         {
             invite_to_chat(new List<string>() { userId }, chatId);
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Allows you to add a user to your favorites
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public Task add_to_favorites(string userId)
         {
             try
@@ -862,7 +1091,9 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
-
+        /// <summary>
+        /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
+        /// </summary>
         public void Dispose()
         {
             this.communityId = null;
