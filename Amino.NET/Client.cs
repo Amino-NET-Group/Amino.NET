@@ -83,6 +83,8 @@ namespace Amino
         public bool debug { get; set; } = false;
 
 
+        private SubClient subClient = null;
+
 
         //The value to access the websocket manager
         private Amino.WebSocketHandler webSocket;
@@ -132,20 +134,44 @@ namespace Amino
         /// </summary>
         public event Action<Objects.ChatEvent> onChatTitleChanged;
         /// <summary>
-        /// Fires each time an Amino chat content has been changed (only in chats where the currnt Amino account is in)
+        /// Fires each time an Amino chat ddescription has been changed (only in chats where the currnt Amino account is in)
         /// </summary>
         public event Action<Objects.ChatEvent> onChatContentChanged;
+        /// <summary>
+        /// Fires each time an Amino chat Announcement has been pinned (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatAnnouncement> onChatAnnouncementPin;
+        /// <summary>
+        /// Fires each time an Amino Chat Announcement has been removed from pin (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatEvent> onChatAnnouncementUnpin;
+        /// <summary>
+        /// Fires each time an Amino Chat has been put on View Mode (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ViewMode> onChatViewModeOn;
+        /// <summary>
+        /// Fires each time an Amino Chat has been put out of View Mode (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ViewMode> onChatViewModeOff;
+        /// <summary>
+        /// Fires each time an Amino Chat has enabled chat tipping (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatTipToggle> onChatTipEnabled;
+        /// <summary>
+        /// Fires each time an Amino Chat has disabled chat tipping (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatTipToggle> onChatTipDisabled;
+        /// <summary>
+        /// Fires each time an Amino Chat Message has been removed by a moderator of the current Community (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.SpecialChatEvent> onMessageForceRemovedByAdmin;
+        /// <summary>
+        /// Fires each time someone has tipped coins in an Amino Chat (only in chats where the currnt Amino account is in)
+        /// </summary>
         public event Action<Objects.ChatTip> onChatTip;
 
         //headers.
-        private IDictionary<string, string> headers = new Dictionary<string, string>();
+        public Dictionary<string, string> headers = new Dictionary<string, string>();
 
         //Handles the header stuff
         private Task headerBuilder()
@@ -157,7 +183,7 @@ namespace Amino
             headers.Add("Host", "service.aminoapps.com");
             headers.Add("Accept-Encoding", "gzip");
             headers.Add("Connection", "Keep-Alive");
-            headers.Add("User-Agent", "Dalvik/2.1.0 (Linux; U; Android 7.1.2; SM-G965N Build/star2ltexx-user 7.1.; com.narvii.amino.master/3.4.33602)");
+            headers.Add("User-Agent", "Apple iPhone13,4 iOS v15.6.1 Main/3.12.9");
             if(sessionID != null) { headers.Add("NDCAUTH", $"sid={sessionID}"); }
             return Task.CompletedTask;
         }
@@ -215,13 +241,19 @@ namespace Amino
             {
                 string secret;
                 if (_secret == null) { secret = $"0 {_password}"; } else { secret = _secret; }
-                var data = new { email = _email, v = 2, secret = secret, deviceID = deviceID, clientType = 100, action = "normal", timestamp = helpers.GetTimestamp() * 1000};
-
+                JObject data = new JObject();
+                data.Add("email", _email);
+                data.Add("v", 2);
+                data.Add("secret", secret);
+                data.Add("deviceID", deviceID);
+                data.Add("clientType", 100);
+                data.Add("action", "normal");
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/login", Method.Post);
                 request.AddHeaders(headers);
-                request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 json = response.Content;
@@ -293,6 +325,8 @@ namespace Amino
                 is_Global = false;
                 headerBuilder();
                 _ = webSocket.disconnect_socket();
+                subClient.Dispose();
+                subClient = null;
                 return Task.CompletedTask;
 
             }catch(Exception e) { throw new Exception(e.Message); }
@@ -558,22 +592,23 @@ namespace Amino
         public bool check_device(string _deviceId)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var data = new
-            {
-                deviceID = _deviceId,
-                bundleID = "com.narvii.amino.master",
-                clientType = 100,
-                systemPushEnabled = true,
-                timezone = 0,
-                locale = currentCulture.Name,
-                timestamp = (Math.Round(helpers.GetTimestamp())) * 1000
-            };
+
+            JObject data = new JObject();
+            data.Add("deviceID", _deviceId);
+            data.Add("bundleID", "com.narvii.amino.master");
+            data.Add("clientType", 100);
+            data.Add("systemPushEnabled", true);
+            data.Add("timezone", 0);
+            data.Add("locale", currentCulture.Name);
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+            
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/device");
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { return false; }
                 if (debug) { Trace.WriteLine(response.Content); }
@@ -2208,6 +2243,24 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+
+        public Objects.AdvancedCommunityInfo get_community_info(string communityId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s-x{communityId}/community/info?withInfluencerList=1&withTopicList=true&influencerListOrderStrategy=fansCount");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                Objects.AdvancedCommunityInfo community = new Objects.AdvancedCommunityInfo(jsonObj);
+                return community;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+
         /// <summary>
         /// Allows you to accept host / organizer of a chatroom with the current Amino account
         /// </summary>
@@ -2326,6 +2379,12 @@ namespace Amino
                 }
                 return _avataFrameList;
             }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public void SetSubClient(Amino.SubClient subClient)
+        {
+            if(subClient == null) { throw new Exception("No SubClient provided!"); }
+            this.subClient = subClient;
         }
 
         /// <summary>

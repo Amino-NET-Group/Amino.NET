@@ -318,6 +318,258 @@ static void main(string[] args)
 - Amino.Objects.ChatEvent
 </details>
 
+
+<details>
+<summary id="functionName">onChatContentChanged</summary>
+<p id="functionDescription">This event fires each time an Amino chat thread Content (Description) has been changed (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatEvent Object
+### Example:
+```CSharp
+static void onChatContentChangedEvent(Amino.Objects.ChatEvent chatEvent)
+{
+    Console.WriteLine($"Content of Chat thread {chatEvent.chatId} has changed.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatContentChanged += onChatContentChangedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatEvent
+</details>
+
+
+
+<details>
+<summary id="functionName">onChatAnnouncementPin</summary>
+<p id="functionDescription">This event fires each time an Amino chat Announcement has been pinned /    changed (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatAnnouncement Object
+### Example:
+```CSharp
+static void onChatAnnouncementChangedEvent(Amino.Objects.ChatAnnouncement chatAnnouncement)
+{
+    Console.WriteLine($"Chat Announcement of Chat thread {chatAnnouncement.chatId} has changed to {chatAnnouncement.content}.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatAnnouncementPin += onChatAnnouncementChangedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatAnnouncement
+</details>
+
+
+<details>
+<summary id="functionName">onChatAnnouncementUnPin</summary>
+<p id="functionDescription">This event fires each time an Amino chat Announcement has been unpinned /    removed (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatEvent Object
+### Example:
+```CSharp
+static void onChatAnnouncementRemovedEvent(Amino.Objects.ChatEvent chatEvent)
+{
+    Console.WriteLine($"Chat Announcement of Chat thread {chatEvent.chatId} has been removed.");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatAnnouncementUnPin += onChatAnnouncementRemovedEvent;
+}
+```
+
+### Returns:
+- Amino.Objects.ChatEvent
+</details>
+
+
+<details>
+<summary id="functionName">onChatViewModeOn</summary>
+<p id="functionDescription">This event fires each time an Amino chat has been put on ViewMode (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ViewMode Object
+### Example:
+```CSharp
+static void onChatViewModeToggle(Amino.Objects.ViewMode viewMode)
+{
+    Console.WriteLine($"Chat {viewMode.chatId} got put into ViewMode by {viewMode.Author.nickname}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatViewModeOn += onChatViewModeToggle;
+}
+```
+
+### Returns:
+- Amino.Objects.ViewMode
+</details>
+
+
+<details>
+<summary id="functionName">onChatViewModeOff</summary>
+<p id="functionDescription">This event fires each time an Amino chat has been put out of ViewMode (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ViewMode Object
+### Example:
+```CSharp
+static void onChatViewModeToggle(Amino.Objects.ViewMode viewMode)
+{
+    Console.WriteLine($"Chat {viewMode.chatId} got put out of ViewMode by {viewMode.Author.nickname}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatViewModeOff += onChatViewModeToggle;
+}
+```
+### Returns:
+- Amino.Objects.ViewMode
+</details>
+
+
+<details>
+<summary id="functionName">onChatTipEnabled</summary>
+<p id="functionDescription">This event fires each time an Amino chat has enabled Chat Tipping (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.chatTipToggle Object
+### Example:
+```CSharp
+static void onChatTipToggle(Amino.Objects.ChatTipToggle chatTipToggle)
+{
+    Console.WriteLine($"Chat {chatTipToggle.chatId} has enabled tipping");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatTipEnabled += onChatTipToggle;
+}
+```
+### Returns:
+- Amino.Objects.ChatTipToggle
+</details>
+
+
+<details>
+<summary id="functionName">onChatTipDisabled</summary>
+<p id="functionDescription">This event fires each time an Amino chat has disabled Chat Tipping (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.chatTipToggle Object
+### Example:
+```CSharp
+static void onChatTipToggle(Amino.Objects.ChatTipToggle chatTipToggle)
+{
+    Console.WriteLine($"Chat {chatTipToggle.chatId} has disabled tipping");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatTipDisabled += onChatTipToggle;
+}
+```
+### Returns:
+- Amino.Objects.ChatTipToggle
+</details>
+
+
+<details>
+<summary id="functionName">onMessageForceRemovedByAdmin</summary>
+<p id="functionDescription">This event fires each time an Amino chat message has been removed by an admin (only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.SpecialChatEvent Object
+### Example:
+```CSharp
+static void onMesssageRemoved(Amino.Objects.SpecialChatEvent specialChatEvent)
+{
+    Console.WriteLine($"Message {specialChatEvent.messageId} has been removed on chat {specialChatEvent.chatId} by {specialChatEvent.Author.nickname}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onMessageForceRemovedByAdmins += onChatMessageRemoved;
+}
+```
+### Returns:
+- Amino.Objects.SpecialChatEvent
+</details>
+
+
+<details>
+<summary id="functionName">onChatTip</summary>
+<p id="functionDescription">This event fires each time an Amino user has given a chat tip(only for chats where the current Amino account is in)</p>
+
+### Event:
+- This event returns an Amino.Objects.ChatTip Object
+### Example:
+```CSharp
+static void chatTip(Amino.Objects.ChatTip tip)
+{
+    Console.WriteLine($"User {tip.Author.nickname} has tipped {tip.Extensions.tippedCoins} Coins in chat {tip.chatId}");
+}
+
+
+[...]
+
+static void main(string[] args) 
+{
+    [...]
+    client.onChatTip += chatTip;
+}
+```
+### Returns:
+- Amino.Objects.ChatTip
+</details>
+
+
+
+
+
 <!--- JUST A TEMPLATE
 
 <details>

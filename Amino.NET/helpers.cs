@@ -49,6 +49,15 @@ namespace Amino
         }
 
         /// <summary>
+        /// Returns the current Amino compatible Timezone
+        /// </summary>
+        /// <returns></returns>
+        public static int getTimezone()
+        {
+            return TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).Divide(1000).Seconds;
+        }
+
+        /// <summary>
         /// This function allows you to generate an Amino valid signiture for file uploads
         /// </summary>
         /// <param name="data"></param>
@@ -202,6 +211,113 @@ namespace Amino
                     break;
             }
             return _type;
+        }
+
+
+        public static int TzFilter()
+        {
+            string localhour = DateTime.UtcNow.ToString("HH");
+            string localminute = DateTime.UtcNow.ToString("mm");
+            Dictionary<string, string> UTC = new Dictionary<string, string> {
+                { "GMT0", "+0" },
+                { "GMT1", "+60" },
+                { "GMT2", "+120" },
+                { "GMT3", "+180" },
+                { "GMT4", "+240" },
+                { "GMT5", "+300" },
+                { "GMT6", "+360" },
+                { "GMT7", "+420" },
+                { "GMT8", "+480" },
+                { "GMT9", "+540" },
+                { "GMT10", "+600" },
+                { "GMT11", "+660" },
+                { "GMT12", "+720" },
+                { "GMT13", "+780" },
+                { "GMT-1", "-60" },
+                { "GMT-2", "-120" },
+                { "GMT-3", "-180" },
+                { "GMT-4", "-240" },
+                { "GMT-5", "-300" },
+                { "GMT-6", "-360" },
+                { "GMT-7", "-420" },
+                { "GMT-8", "-480" },
+                { "GMT-9", "-540" },
+                { "GMT-10", "-600" },
+                { "GMT-11", "-660" }
+            };
+            string[] hour = new string[] { localhour, localminute };
+            switch (hour[0])
+            {
+                case "00":
+                    return int.Parse(UTC["GMT-1"]);
+                case "01":
+                    return int.Parse(UTC["GMT-2"]);
+                case "02":
+                    return int.Parse(UTC["GMT-3"]);
+                case "03":
+                    return int.Parse(UTC["GMT-4"]);
+                case "04":
+                    return int.Parse(UTC["GMT-5"]);
+                case "05":
+                    return int.Parse(UTC["GMT-6"]);
+                case "06":
+                    return int.Parse(UTC["GMT-7"]);
+                case "07":
+                    return int.Parse(UTC["GMT-8"]);
+                case "08":
+                    return int.Parse(UTC["GMT-9"]);
+                case "09":
+                    return int.Parse(UTC["GMT-10"]);
+                case "10":
+                    return int.Parse(UTC["GMT13"]);
+                case "11":
+                    return int.Parse(UTC["GMT12"]);
+                case "12":
+                    return int.Parse(UTC["GMT11"]);
+                case "13":
+                    return int.Parse(UTC["GMT10"]);
+                case "14":
+                    return int.Parse(UTC["GMT9"]);
+                case "15":
+                    return int.Parse(UTC["GMT8"]);
+                case "16":
+                    return int.Parse(UTC["GMT7"]);
+                case "17":
+                    return int.Parse(UTC["GMT6"]);
+                case "18":
+                    return int.Parse(UTC["GMT5"]);
+                case "19":
+                    return int.Parse(UTC["GMT4"]);
+                case "20":
+                    return int.Parse(UTC["GMT3"]);
+                case "21":
+                    return int.Parse(UTC["GMT2"]);
+                case "22":
+                    return int.Parse(UTC["GMT1"]);
+                case "23":
+                    return int.Parse(UTC["GMT0"]);
+                default:
+                    return int.Parse(UTC["GMT-1"]);
+
+            }
+        }
+
+        public static List<Dictionary<string, long>> getTimeData()
+        {
+            long t = (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
+            List<Dictionary<string, long>> timers = new List<Dictionary<string, long>>();
+            for (int i = 0; i < 50; i++)
+            {
+                long start = t + (i * 300);
+                long end = start + 300;
+                Dictionary<string, long> timer = new Dictionary<string, long>
+                {
+                    {"start", start},
+                    {"end", end}
+                };
+                timers.Add(timer);
+            }
+            return timers;
         }
 
     }

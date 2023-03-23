@@ -139,6 +139,11 @@
             Fires each time an Amino chat title has been changed (only chats where the current Amino account is in)
             </summary>
         </member>
+        <member name="E:Amino.Client.onChatContentChanged">
+            <summary>
+            Fires each time an Amino chat content has been changed (only in chats where the currnt Amino account is in)
+            </summary>
+        </member>
         <member name="M:Amino.Client.#ctor(System.String)">
             <summary>
             Creates an instance of the Amino.Client object and builds headers
@@ -723,6 +728,12 @@
             </summary>
             <param name="data"></param>
             <returns>string : The signiture.</returns>
+        </member>
+        <member name="M:Amino.helpers.getTimezone">
+            <summary>
+            Returns the current Amino compatible Timezone
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:Amino.helpers.generate_file_signiture(System.Byte[])">
             <summary>
