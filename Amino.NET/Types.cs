@@ -85,6 +85,13 @@
             Membeership = 2
         }
 
+        public enum Send_Coin_Targets
+        {
+            Chat,
+            Blog,
+            Wiki
+        }
+
         /// <summary>
         /// Activity status types.
         /// </summary>

@@ -48,6 +48,19 @@ namespace Amino
             return Convert.ToBase64String(CombineTwoArrays(StringToByteArray(prefix), result));
         }
 
+
+
+        public static string generate_transaction_id()
+        {
+            var rng = new RNGCryptoServiceProvider();
+            var buffer = new byte[16];
+            rng.GetBytes(buffer);
+            var hex = BitConverter.ToString(buffer).Replace("-", "").ToLower();
+            var uuid = Guid.ParseExact(hex, "N");
+            return uuid.ToString();
+        }
+
+
         /// <summary>
         /// Returns the current Amino compatible Timezone
         /// </summary>

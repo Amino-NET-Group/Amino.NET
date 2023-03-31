@@ -1091,6 +1091,150 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        public Task send_coins(string targetId, int coins,Types.Send_Coin_Targets type, string transactionId = null)
+        {
+            if(transactionId == null) { transactionId = helpers.generate_transaction_id(); }
+            string endpoint = "";
+            try
+            {
+                JObject data = new JObject();
+                JObject sub = new JObject();
+                switch(type)
+                {
+                    case Types.Send_Coin_Targets.Chat:
+                        endpoint = $"/x{communityId}/s/chat/thread/{targetId}/tipping";
+                        break;
+                    case Types.Send_Coin_Targets.Blog:
+                        endpoint = $"/x{communityId}/s/blog/{targetId}/tipping";
+                        break;
+                    case Types.Send_Coin_Targets.Wiki:
+                        endpoint = $"/x{communityId}/s/tipping";
+                        data.Add("objectId", targetId);
+                        data.Add("objectType", 2);
+                        break;
+                }
+                data.Add("coins", coins);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                sub.Add("transactionId", transactionId);
+                data.Add("tippingContext", sub);
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest(endpoint);
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task thank_tip(string chatId, string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/tipping/tipped-users/{userId}/thank");
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if(debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task follow(List<string> userIds)
+        {
+            try
+            {
+                JObject data = new JObject();
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                data.Add("targetUidList", new JArray(userIds));
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{this.client.userID}/joined");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task follow(string userId)
+        {
+            try
+            {
+                follow(new List<string>() { userId });
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task unfollow(string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{this.client.userID}/joined/{userId}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task block(string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/block/{userId}");
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task unblock(string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/block/{userId}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task visit(string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}?action=visit");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+
+
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
         /// </summary>
