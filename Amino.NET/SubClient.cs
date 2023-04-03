@@ -1233,7 +1233,85 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        public Task flag(string targetId, string reason, Types.Flag_Types flagType, Types.Flag_Targets targetType, bool asGuest = false)
+        {
+            try
+            {
+                int _objectType = 0;
+                string flg = "";
+                int _flagType = 0;
+                if (asGuest) { flg = "g-flag"; } else { flg = "flag"; }
+                switch (flagType)
+                {
+                    case Types.Flag_Types.Aggression:
+                        _flagType = 0;
+                        break;
+                    case Types.Flag_Types.Spam:
+                        _flagType = 2;
+                        break;
+                    case Types.Flag_Types.Off_Topic:
+                        _flagType = 4;
+                        break;
+                    case Types.Flag_Types.Violence:
+                        _flagType = 106;
+                        break;
+                    case Types.Flag_Types.Intolerance:
+                        _flagType = 107;
+                        break;
+                    case Types.Flag_Types.Suicide:
+                        _flagType = 108;
+                        break;
+                    case Types.Flag_Types.Trolling:
+                        _flagType = 109;
+                        break;
+                    case Types.Flag_Types.Pronography:
+                        _flagType = 110;
+                        break;
+                    default:
+                        _flagType = 0;
+                        break;
+                }
+                switch (targetType)
+                {
+                    case Types.Flag_Targets.User:
+                        _objectType = 0;
+                        break;
+                    case Types.Flag_Targets.Blog:
+                        _objectType = 1;
+                        break;
+                    case Types.Flag_Targets.Wiki:
+                        _objectType = 2;
+                        break;
+                    default:
+                        _objectType = 0;
+                        break;
+                }
 
+                JObject data = new JObject();
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                data.Add("flagType", _flagType);
+                data.Add("message", reason);
+                data.Add("objectId", targetId);
+                data.Add("objectType", _objectType);
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/{flg}");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task send_message(string chatId = null, Types.Message_Types messageType = Types.Message_Types.General, byte[] file = null)
+        {
+
+        }
 
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
