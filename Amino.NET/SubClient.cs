@@ -4,6 +4,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Amino
@@ -1308,10 +1309,35 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task send_message(string chatId = null, Types.Message_Types messageType = Types.Message_Types.General, byte[] file = null)
+        public Task send_message(string message, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
         {
+            try
+            {
 
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
         }
+
+        public Task send_file_message(byte[] file, Types.upload_File_Types fileType)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task send_file_message(string filePath, Types.upload_File_Types fileType)
+        {
+            try
+            {
+                send_file_message(File.ReadAllBytes(filePath), fileType);
+                return Task.CompletedTask;
+            } catch (Exception e) { throw new Exception(e.Message); }
+            
+        }
+
+        public Task send_embed(string replyTo = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, byte[] embedImage = null, string linkSnipped = null, byte[] linkSnippedImage = null)
+        {
+            return Task.CompletedTask;
+        }
+
 
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
