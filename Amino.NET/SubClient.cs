@@ -1309,11 +1309,55 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task send_message(string message, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
+        public Task send_message(string message, string chatId, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
         {
             try
             {
+                List<JObject> mentions = new List<JObject>();
+                if(mentionUserIds == null) { mentionUserIds = new List<string>(); } else
+                {
+                    foreach(string user in mentionUserIds)
+                    {
+                        JObject _mention = new JObject();
+                        _mention.Add("uid", user);
+                        mentions.Add(_mention);
+                    }
+                }
+                message = message.Replace("<$", "").Replace("$>", "");
+                JObject data = new JObject();
+                JObject attachementSub = new JObject();
+                JObject extensionSub = new JObject();
+                JObject extensionSuBArray = new JObject();
+                data.Add("type", (int)messageType);
+                data.Add("content", message);
+                data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                attachementSub.Add("objectId", null);
+                attachementSub.Add("objectType", null);
+                attachementSub.Add("link", null);
+                attachementSub.Add("title", null);
+                attachementSub.Add("content", null);
+                attachementSub.Add("mediaList", null);
+                extensionSuBArray.Add("link", null);
+                extensionSuBArray.Add("mediaType", 100);
+                extensionSuBArray.Add("mediaUploadValue", null);
+                extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+                extensionSub.Add("mentionedArray", new JArray(mentions));
+                extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+                data.Add("attachedObject", attachementSub);
+                data.Add("extensions", extensionSub);
+                if(replyTo != null) { data.Add("replyMessageId", replyTo); }
 
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/message");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                Console.WriteLine(data);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
             }
             catch (Exception e) { throw new Exception(e.Message); }
         }
