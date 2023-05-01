@@ -1353,7 +1353,6 @@ namespace Amino
                 request.AddHeaders(headers);
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 request.AddJsonBody(JsonConvert.SerializeObject(data));
-                Console.WriteLine(data);
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
@@ -1381,6 +1380,49 @@ namespace Amino
         {
             return Task.CompletedTask;
         }
+
+        public Task send_sticker(string chatId, string stickerId)
+        {
+            try
+            {
+                JObject data = new JObject();
+                JObject attachementSub = new JObject();
+                JObject extensionSub = new JObject();
+                JObject extensionSuBArray = new JObject();
+                data.Add("type", 3);
+                data.Add("content", null);
+                data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                attachementSub.Add("objectId", null);
+                attachementSub.Add("objectType", null);
+                attachementSub.Add("link", null);
+                attachementSub.Add("title", null);
+                attachementSub.Add("content", null);
+                attachementSub.Add("mediaList", null);
+                extensionSuBArray.Add("link", null);
+                extensionSuBArray.Add("mediaType", 100);
+                extensionSuBArray.Add("mediaUploadValue", null);
+                extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+                extensionSub.Add("mentionedArray", new JArray());
+                extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+                data.Add("attachedObject", attachementSub);
+                data.Add("extensions", extensionSub);
+                data.Add("stickerId", stickerId);
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/message");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
 
 
         /// <summary>
