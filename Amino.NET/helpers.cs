@@ -13,7 +13,7 @@ namespace Amino
         /// <summary>
         /// This value represents the baseURL to Aminos REST backend
         /// </summary>
-        public static string BaseUrl = "https://service.narvii.com/api/v1";
+        public static string BaseUrl = "https://service.aminoapps.com/api/v1";
 
         private static T[] CombineTwoArrays<T>(T[] a1, T[] a2)
         {
