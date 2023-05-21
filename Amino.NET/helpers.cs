@@ -13,7 +13,7 @@ namespace Amino
         /// <summary>
         /// This value represents the baseURL to Aminos REST backend
         /// </summary>
-        public static string BaseUrl = "https://service.narvii.com/api/v1";
+        public static string BaseUrl = "https://service.aminoapps.com/api/v1";
 
         private static T[] CombineTwoArrays<T>(T[] a1, T[] a2)
         {
@@ -47,6 +47,19 @@ namespace Amino
             byte[] result = hmac.ComputeHash(buffer);
             return Convert.ToBase64String(CombineTwoArrays(StringToByteArray(prefix), result));
         }
+
+
+
+        public static string generate_transaction_id()
+        {
+            var rng = new RNGCryptoServiceProvider();
+            var buffer = new byte[16];
+            rng.GetBytes(buffer);
+            var hex = BitConverter.ToString(buffer).Replace("-", "").ToLower();
+            var uuid = Guid.ParseExact(hex, "N");
+            return uuid.ToString();
+        }
+
 
         /// <summary>
         /// Returns the current Amino compatible Timezone
