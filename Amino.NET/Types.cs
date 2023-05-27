@@ -63,8 +63,9 @@
         /// </summary>
         public enum upload_File_Types
         {
-            Audio, 
-            Image
+            Audio = 110, 
+            Image = 100,
+            Gif
         }
         /// <summary>
         /// Sorting types for stuff

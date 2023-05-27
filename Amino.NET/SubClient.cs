@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Amino
@@ -1361,16 +1362,66 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task send_file_message(byte[] file, Types.upload_File_Types fileType)
+        public Task send_file_message(string chatId, byte[] file, Types.upload_File_Types fileType)
         {
+            JObject data = new JObject();
+            JObject attachementSub = new JObject();
+            JObject extensionSub = new JObject();
+            JObject extensionSuBArray = new JObject();
+            data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+            data.Add("content", null);
+            data.Add("type", 0);
+            attachementSub.Add("objectId", null);
+            attachementSub.Add("objectType", null);
+            attachementSub.Add("link", null);
+            attachementSub.Add("title", null);
+            attachementSub.Add("content", null);
+            attachementSub.Add("mediaList", null);
+            extensionSuBArray.Add("link", null);
+            extensionSuBArray.Add("mediaType", 100);
+            extensionSuBArray.Add("mediaUploadValue", null);
+            extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+            extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+            data.Add("attachedObject", attachementSub);
+            data.Add("extensions", extensionSub);
+
+            switch(fileType)
+            {
+                case Types.upload_File_Types.Image:
+                    data.Add("mediaType", 100);
+                    data.Add("mediaUploadValueContentType", "image/jpg");
+                    data.Add("mediaUhqEnabled", true);
+                    break;
+                case Types.upload_File_Types.Gif:
+                    data.Add("mediaType", 100);
+                    data.Add("mediaUploadValueContentType", "image/gif");
+                    data.Add("enableUhqEnabled", true);
+                    break;
+                case Types.upload_File_Types.Audio:
+                    data.Add("type", 2);
+                    data.Add("mediaType", 110);
+                    break;
+            }
+            data.Add("mediaUploadValue", Encoding.UTF8.GetString(Convert.FromBase64String(Convert.ToBase64String(file))));
+           
+
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/message");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
 
-        public Task send_file_message(string filePath, Types.upload_File_Types fileType)
+        public Task send_file_message(string chatId, string filePath, Types.upload_File_Types fileType)
         {
             try
             {
-                send_file_message(File.ReadAllBytes(filePath), fileType);
+                send_file_message(chatId, File.ReadAllBytes(filePath), fileType);
                 return Task.CompletedTask;
             } catch (Exception e) { throw new Exception(e.Message); }
             
@@ -1423,6 +1474,58 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        public Task delete_message(string chatId, string messageId, bool asStaff = false, string reason = null)
+        {
+            try
+            {
+                string endPoint = $"/x{communityId}/s/chat/thread/{chatId}/message/{messageId}";
+                JObject data = new JObject();
+                data.Add("adminOpName", 102);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                if((asStaff && reason != null)) { data.Add("adminOpNote", reason); }
+                if(asStaff) { endPoint = endPoint + "/admin"; }
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest(endPoint);
+                request.AddHeaders(headers);
+                if(asStaff)
+                {
+                    request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                    request.AddJsonBody(JsonConvert.SerializeObject(data));
+                    var response = client.ExecutePost(request);
+                    if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                    if (debug) { Trace.WriteLine(response.Content); }
+                } else
+                {
+                    var response = client.Delete(request);
+                    if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                    if(debug) { Trace.WriteLine(response.Content); }
+                }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task mark_as_read(string chatId, string messageId)
+        {
+            try
+            {
+                JObject data = new JObject();
+                data.Add("messageId", messageId);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/mark-as-read");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
 
 
         /// <summary>

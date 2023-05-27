@@ -1585,6 +1585,9 @@ namespace Amino
                 case Types.upload_File_Types.Image:
                     _fileType = "image/jpg";
                     break;
+                case Types.upload_File_Types.Gif:
+                    _fileType = "image/gif";
+                    break;
                 default:
                     _fileType = "image/jpg";
                     break;
