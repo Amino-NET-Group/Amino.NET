@@ -1528,6 +1528,83 @@ namespace Amino
         }
 
 
+        public Task transfer_host(string chatId, List<string> userIds)
+        {
+            try
+            {
+                JObject data = new JObject();
+                data.Add("uidList", new JArray(userIds));
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/transfer-organizer");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task transfer_host(string chatId, string userId)
+        {
+            try
+            {
+                return transfer_host(chatId, new List<string> { userId });
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task accept_host(string chatId, string requestId)
+        {
+            try
+            {
+                JObject data = new JObject();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/transfer-organizer/{requestId}/accept");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task join_chat(string chatId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.userID}");
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task leave_chat(string chatId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.userID}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
         /// </summary>
