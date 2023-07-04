@@ -1605,6 +1605,57 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
+        public List<Amino.Objects.UserFollowings> get_user_following(string userId, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserFollowings> userFollowingsList = new List<Objects.UserFollowings>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/joined?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userFollowings = jsonObj["userProfileList"];
+                foreach (JObject following in userFollowings)
+                {
+                    Objects.UserFollowings _following = new Objects.UserFollowings(following);
+                    userFollowingsList.Add(_following);
+                }
+                return userFollowingsList;
+
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Objects.UserFollowings> get_user_followers(string userId, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserFollowings> userFollowerList = new List<Objects.UserFollowings>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/member?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userFollowers = jsonObj["userProfileList"];
+                foreach (JObject follower in userFollowers)
+                {
+                    Objects.UserFollowings _follower = new Objects.UserFollowings(follower);
+                    userFollowerList.Add(_follower);
+                }
+                return userFollowerList;
+
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+
+        }
+
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
         /// </summary>
