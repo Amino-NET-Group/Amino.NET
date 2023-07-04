@@ -29,22 +29,22 @@ namespace Amino.Objects
         public ImageMessage(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            _type = (int)jsonObj["t"];
-            communityId = (int)jsonObj["o"]["ndcId"];
-            mediaUrl = (string)jsonObj["o"]["chatMessage"]["mediaValue"];
-            chatId = (string)jsonObj["o"]["chatMessage"]["threadId"];
-            mediaType = (int)jsonObj["o"]["chatMessage"]["mediaType"];
-            clientRefId = (int)jsonObj["o"]["chatMessage"]["clientRefId"];
-            messageId = (string)jsonObj["o"]["chatMessage"]["messageId"];
-            objectId = (string)jsonObj["o"]["chatMessage"]["uid"];
-            createdTime = (string)jsonObj["o"]["chatMessage"]["createdTime"];
-            type = (int)jsonObj["o"]["chatMessage"]["type"];
-            isHidden = (bool)jsonObj["o"]["chatMessage"]["isHidden"];
-            includedInSummary = (bool)jsonObj["o"]["chatMessage"]["includedInSummary"];
-            chatBubbleId = (string)jsonObj["o"]["chatMessage"]["chatBubbleId"];
-            chatBubbleVersion = (int)jsonObj["o"]["chatMessage"]["chatBubbleVersion"];
-            alertOption = (int)jsonObj["o"]["alertOption"];
-            membershipStatus = (int)jsonObj["o"]["membershipStatus"];
+            try { _type = (int)jsonObj["t"]; } catch { }
+            try { communityId = (int)jsonObj["o"]["ndcId"]; } catch { }
+            try { mediaUrl = (string)jsonObj["o"]["chatMessage"]["mediaValue"]; } catch { }
+            try { chatId = (string)jsonObj["o"]["chatMessage"]["threadId"]; } catch { }
+            try { mediaType = (int)jsonObj["o"]["chatMessage"]["mediaType"]; } catch { }
+            try { clientRefId = (int)jsonObj["o"]["chatMessage"]["clientRefId"]; } catch { }
+            try { messageId = (string)jsonObj["o"]["chatMessage"]["messageId"]; } catch { }
+            try { objectId = (string)jsonObj["o"]["chatMessage"]["uid"]; } catch { }
+            try { createdTime = (string)jsonObj["o"]["chatMessage"]["createdTime"]; } catch { }
+            try { type = (int)jsonObj["o"]["chatMessage"]["type"]; } catch { }
+            try { isHidden = (bool)jsonObj["o"]["chatMessage"]["isHidden"]; } catch { }
+            try { includedInSummary = (bool)jsonObj["o"]["chatMessage"]["includedInSummary"]; } catch { }
+            try { chatBubbleId = (string)jsonObj["o"]["chatMessage"]["chatBubbleId"]; } catch { }
+            try { chatBubbleVersion = (int)jsonObj["o"]["chatMessage"]["chatBubbleVersion"]; } catch { }
+            try { alertOption = (int)jsonObj["o"]["alertOption"]; } catch { }
+            try { membershipStatus = (int)jsonObj["o"]["membershipStatus"]; } catch { }
             json = _json.ToString();
             Author = new _Author(_json);
         }
@@ -67,15 +67,15 @@ namespace Amino.Objects
             public _Author(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-                userId = (string)jsonObj["o"]["chatMessage"]["author"]["uid"];
-                status = (int)jsonObj["o"]["chatMessage"]["author"]["status"];
-                iconUrl = (string)jsonObj["o"]["chatMessage"]["author"]["icon"];
-                reputation = (int)jsonObj["o"]["chatMessage"]["author"]["reputation"];
-                role = (int)jsonObj["o"]["chatMessage"]["author"]["role"];
-                nickname = (string)jsonObj["o"]["chatMessage"]["author"]["nickname"];
-                level = (int)jsonObj["o"]["chatMessage"]["author"]["level"];
-                if(jsonObj["o"]["chatMessage"]["author"]["avatarFrame"] != null) { AvatarFrame = new _AvatarFrame(_json); }
-                if(jsonObj["o"]["chatMessage"]["author"]["influencerInfo"] != null) { InfluencerInfo = new _InfluencerInfo(_json); }
+                try { userId = (string)jsonObj["o"]["chatMessage"]["author"]["uid"]; } catch { }
+                try { status = (int)jsonObj["o"]["chatMessage"]["author"]["status"]; } catch { }
+                try { iconUrl = (string)jsonObj["o"]["chatMessage"]["author"]["icon"]; } catch { }
+                try { reputation = (int)jsonObj["o"]["chatMessage"]["author"]["reputation"]; } catch { }
+                try { role = (int)jsonObj["o"]["chatMessage"]["author"]["role"]; } catch { }
+                try { nickname = (string)jsonObj["o"]["chatMessage"]["author"]["nickname"]; } catch { }
+                try { level = (int)jsonObj["o"]["chatMessage"]["author"]["level"]; } catch { }
+                try { if (jsonObj["o"]["chatMessage"]["author"]["avatarFrame"] != null) { AvatarFrame = new _AvatarFrame(_json); } } catch { }
+                try { if (jsonObj["o"]["chatMessage"]["author"]["influencerInfo"] != null) { InfluencerInfo = new _InfluencerInfo(_json); } } catch { }
             }
 
 
@@ -93,13 +93,13 @@ namespace Amino.Objects
                 public _AvatarFrame(JObject _json)
                 {
                     dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-                    status = (int)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["status"];
-                    version = (int)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["version"];
-                    resourceUrl = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["resourceUrl"];
-                    name = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["name"];
-                    iconUrl = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["icon"];
-                    frameType = (int)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["frameType"];
-                    frameId = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["frameId"];
+                    try { status = (int)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["status"]; } catch { }
+                    try { version = (int)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["version"]; } catch { }
+                    try { resourceUrl = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["resourceUrl"]; } catch { }
+                    try { name = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["name"]; } catch { }
+                    try { iconUrl = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["icon"]; } catch { }
+                    try { frameType = (int)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["frameType"]; } catch { }
+                    try { frameId = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["frameId"]; } catch { }
                 }
             }
 
@@ -112,8 +112,8 @@ namespace Amino.Objects
                 public _InfluencerInfo(JObject _json)
                 {
                     dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-                    fansCount = (int)jsonObj["o"]["chatMessage"]["author"]["influencerInfo"]["fansCount"];
-                    monthlyFee = (int)jsonObj["o"]["chatMessage"]["author"]["influencerInfo"]["monthlyFee"];
+                    try { fansCount = (int)jsonObj["o"]["chatMessage"]["author"]["influencerInfo"]["fansCount"]; } catch { }
+                    try { monthlyFee = (int)jsonObj["o"]["chatMessage"]["author"]["influencerInfo"]["monthlyFee"]; } catch { }
                 }
 
             }

@@ -1637,7 +1637,7 @@ namespace Amino
             {
                 List<Objects.UserFollowings> userFollowerList = new List<Objects.UserFollowings>();
                 RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/member?start={start}&size={size}");
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/member?start={start}&size={size}");
                 request.AddHeaders(headers);
                 var response = client.ExecuteGet(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }

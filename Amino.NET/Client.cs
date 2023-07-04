@@ -324,7 +324,7 @@ namespace Amino
                 nickname = null;
                 is_Global = false;
                 headerBuilder();
-                _ = webSocket.disconnect_socket();
+                _ = webSocket.DisconnectSocket();
                 subClient.Dispose();
                 subClient = null;
                 return Task.CompletedTask;
@@ -443,7 +443,7 @@ namespace Amino
                 nickname = null;
                 is_Global = false;
                 headerBuilder();
-                _ = webSocket.disconnect_socket();
+                _ = webSocket.DisconnectSocket();
                 return Task.CompletedTask;
             }catch(Exception e)
             {
