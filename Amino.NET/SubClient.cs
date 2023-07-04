@@ -1653,7 +1653,22 @@ namespace Amino
 
             }
             catch (Exception e) { throw new Exception(e.Message); }
+        }
 
+        public Objects.UserProfile get_user_info(string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                Amino.Objects.UserProfile profile = new Amino.Objects.UserProfile((JObject)JObject.Parse(response.Content)["userProfile"]);
+                return profile;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
