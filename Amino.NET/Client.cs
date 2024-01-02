@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -1241,66 +1242,18 @@ namespace Amino
         public Task flag(string reason, Types.Flag_Types flagType, Types.Flag_Targets targetType, string targetId, bool asGuest)
         {
             if(!asGuest) { if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); } }
-            int _objectType;
-            int _flagType;
-            string _flag;
-            switch(targetType)
-            {
-                case Types.Flag_Targets.User:
-                    _objectType = 0;
-                    break;
-                case Types.Flag_Targets.Blog:
-                    _objectType = 1;
-                    break;
-                case Types.Flag_Targets.Wiki:
-                    _objectType = 2;
-                    break;
-                default:
-                    _objectType = 0;
-                    break;
-            }
-            switch(flagType)
-            {
-                case Types.Flag_Types.Aggression:
-                    _flagType = 0;
-                    break;
-                case Types.Flag_Types.Spam:
-                    _flagType = 2;
-                    break;
-                case Types.Flag_Types.Off_Topic:
-                    _flagType = 4;
-                    break;
-                case Types.Flag_Types.Violence:
-                    _flagType = 106;
-                    break;
-                case Types.Flag_Types.Intolerance:
-                    _flagType = 107;
-                    break;
-                case Types.Flag_Types.Suicide:
-                    _flagType = 108;
-                    break;
-                case Types.Flag_Types.Trolling:
-                    _flagType = 109;
-                    break;
-                case Types.Flag_Types.Pronography:
-                    _flagType = 110;
-                    break;
-                default:
-                    _flagType = 0;
-                    break;
-            }
-            if(asGuest) { _flag = "g-flag"; } else { _flag = "flag"; }
+            string _flag = asGuest ? "g-flag" : "flag";
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s/{_flag}");
                 var data = new
                 {
-                    flagType = _flagType,
+                    flagType = (int)flagType,
                     message = reason,
                     timestamp = helpers.GetTimestamp() * 1000,
                     objectId = targetId,
-                    objetType = _objectType
+                    objetType = (int)targetType
                 };
                 request.AddHeaders(headers);
                 request.AddJsonBody(data);
@@ -1325,18 +1278,18 @@ namespace Amino
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             try
             {
-                var data = new
+                JObject data = new JObject()
                 {
-                    adminOpName = 102,
-                    adminOpNote = new { content = reason },
-                    timestamp = helpers.GetTimestamp() * 1000
+                    { "adminOpName", 102 },
+                    { "adminOpNote", new JObject() { "content", reason } },
+                    { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
                 RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest();
-                if(asStaff) { request.Resource = $"/g/s/chat/thread/{chatId}/message/{messageId}/admin"; } else { request.Resource = $"/g/s/chat/thread/{chatId}/message/{messageId}"; }
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message/{messageId}");
+                if (asStaff) { request.Resource = request.Resource + "/admin"; }
                 request.AddHeaders(headers);
-                request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
@@ -1352,18 +1305,18 @@ namespace Amino
         public Task mark_as_read(string _chatId, string _messageId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            var data = new
+            JObject data = new JObject()
             {
-                messageId = _messageId,
-                timestamp = helpers.GetTimestamp() * 1000
+                { "messageId", _messageId },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
             };
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s/chat/thread/{_chatId}/mark-as-read");
                 request.AddHeaders(headers);
-                request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
@@ -1488,7 +1441,7 @@ namespace Amino
                 RestRequest request = new RestRequest($"/x{communityId}/s/community/join");
                 request.AddJsonBody(JsonConvert.SerializeObject(data));
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }

@@ -39,14 +39,14 @@
         /// </summary>
         public enum Flag_Types
         {
-            Aggression,
-            Spam,
-            Off_Topic,
-            Violence,
-            Intolerance,
-            Suicide,
-            Trolling,
-            Pronography
+            Aggression = 0,
+            Spam = 2,
+            Off_Topic = 4,
+            Violence = 106,
+            Intolerance = 107,
+            Suicide = 108,
+            Trolling = 109,
+            Pronography = 110
         }
 
         /// <summary>
@@ -233,9 +233,9 @@
         }
         public enum Flag_Targets
         {
-            User,
-            Blog,
-            Wiki
+            User = 0,
+            Blog = 1,
+            Wiki = 2
         }
 
         public enum Comment_Types
