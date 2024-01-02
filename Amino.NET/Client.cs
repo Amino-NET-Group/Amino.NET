@@ -295,7 +295,6 @@ namespace Amino
                     Amino.WebSocketHandler _webSocket = new WebSocketHandler(this);
                     this.webSocket = _webSocket;
                 }
-
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
@@ -564,19 +563,20 @@ namespace Amino
         public Task change_password(string _email, string _password, string _verificationCode)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            var data = new
+            JObject data = new JObject()
             {
-                updateSecret = $"0 {_password}",
-                emailValidationContext = new
-                {
-                    data = new { code = _verificationCode },
-                    type = 1,
-                    identity = _email,
-                    level = 2,
-                    deviceID = deviceID
+                { "updateSecret", $"0 {_password}" },
+                { "emailValidationContext", new JObject()
+                    {
+                        { "data", new JObject() { "code", _verificationCode } },
+                        { "type", 1 },
+                        { "identity", _email },
+                        { "level", 2 },
+                        { "deviceID", this.deviceID }
+                    }
                 },
-                phoneNumberValidationContext = String.Empty,
-                deviceID = deviceID
+                { "phoneNumberValidationContext", String.Empty },
+                { "deviceID", this.deviceID }
             };
 
             try
@@ -584,8 +584,8 @@ namespace Amino
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/reset-password");
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
@@ -617,21 +617,23 @@ namespace Amino
         /// <summary>
         /// Allows you to check if a Device ID is valid
         /// </summary>
-        /// <param name="_deviceId"></param>
+        /// <param name="_deviceId">The Device ID you want to check</param>
         /// <returns>bool : true / false</returns>
         public bool check_device(string _deviceId)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
-            JObject data = new JObject();
-            data.Add("deviceID", _deviceId);
-            data.Add("bundleID", "com.narvii.amino.master");
-            data.Add("clientType", 100);
-            data.Add("systemPushEnabled", true);
-            data.Add("timezone", 0);
-            data.Add("locale", currentCulture.Name);
-            data.Add("timestamp", helpers.GetTimestamp() * 1000);
-            
+            JObject data = new JObject
+            {
+                { "deviceID", _deviceId },
+                { "bundleID", "com.narvii.amino.master" },
+                { "clientType", 100 },
+                { "systemPushEnabled", true },
+                { "timezone", 0 },
+                { "locale", currentCulture.Name },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
@@ -2351,7 +2353,7 @@ namespace Amino
         /// Allows you to get information about an Amino Invite Code
         /// </summary>
         /// <param name="inviteCode"></param>
-        /// <returns>Obejct : Amino.Objects.FromInvite</returns>
+        /// <returns>Object : Amino.Objects.FromInvite</returns>
         public Amino.Objects.FromInvite link_identify(string inviteCode)
         {
             try
@@ -2376,20 +2378,18 @@ namespace Amino
         public Task wallet_config(Types.Wallet_Config_Levels walletLevel)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            int _walletLevel;
-            if(walletLevel == Types.Wallet_Config_Levels.lvl_1) { _walletLevel = 1; } else { _walletLevel = 2; }
             try
             {
-                var data = new
+                JObject data = new JObject()
                 {
-                    adsLevel = _walletLevel,
-                    timestamp = helpers.GetTimestamp() * 1000
+                    { "adsLevel", (int)walletLevel },
+                    { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/wallet/ads/config");
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }

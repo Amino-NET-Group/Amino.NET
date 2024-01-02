@@ -259,8 +259,8 @@
 
         public enum Wallet_Config_Levels
         {
-            lvl_1,
-            lvl_2
+            lvl_1 = 1,
+            lvl_2 = 2
         }
 
         public enum Repost_Types
