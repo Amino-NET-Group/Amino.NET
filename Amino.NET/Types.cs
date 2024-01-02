@@ -7,9 +7,9 @@
         /// </summary>
         public enum account_gender
         {
-            Male,
-            Female,
-            Non_Binary
+            Male = 1,
+            Female = 2,
+            Non_Binary = 255
         }
 
         /// <summary>
@@ -143,37 +143,37 @@
         }
         public enum Object_Types
         {
-            User,
-            Blog,
-            Item,
-            Comment,
-            Blog_Category,
-            Blog_Category_Item_Tag,
-            Featured_Item,
-            Chat_Message,
-            Reputationlog_Item,
-            Poll_Option,
-            Chat_Thread,
-            Community,
-            Image,
-            Music,
-            Video,
-            YouTube,
-            Shared_Folder,
-            Shared_File,
-            Voice,
-            Moderation_Task,
-            Screenshot,
-            Sticker,
-            Sticker_Collection,
-            Prop,
-            Chat_Bubble,
-            Video_Filter,
-            Order,
-            Share_Request,
-            VV_Chat,
-            P2A,
-            Amino_Video
+            User = 0,
+            Blog = 1,
+            Item = 2,
+            Comment = 3,
+            Blog_Category = 4,
+            Blog_Category_Item_Tag = 5,
+            Featured_Item = 6,
+            Chat_Message = 7,
+            Reputationlog_Item = 10,
+            Poll_Option = 11,
+            Chat_Thread = 12,
+            Community = 16,
+            Image = 100,
+            Music = 101,
+            Video = 102,
+            YouTube = 103,
+            Shared_Folder = 106,
+            Shared_File = 109,
+            Voice = 110,
+            Moderation_Task = 111,
+            Screenshot = 112,
+            Sticker = 113,
+            Sticker_Collection = 114,
+            Prop = 115,
+            Chat_Bubble = 116,
+            Video_Filter = 117,
+            Order = 118,
+            Share_Request = 119,
+            VV_Chat = 120,
+            P2A = 121,
+            Amino_Video = 123
         }
         public enum Message_Types
         {

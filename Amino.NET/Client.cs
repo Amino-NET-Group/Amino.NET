@@ -84,6 +84,7 @@ namespace Amino
 
 
         private SubClient subClient = null;
+        private string UserAgent;
 
 
         //The value to access the websocket manager
@@ -183,7 +184,7 @@ namespace Amino
             headers.Add("Host", "service.aminoapps.com");
             headers.Add("Accept-Encoding", "gzip");
             headers.Add("Connection", "Keep-Alive");
-            headers.Add("User-Agent", "Apple iPhone13,4 iOS v15.6.1 Main/3.12.9");
+            headers.Add("User-Agent", UserAgent);
             if(sessionID != null) { headers.Add("NDCAUTH", $"sid={sessionID}"); }
             return Task.CompletedTask;
         }
@@ -193,10 +194,12 @@ namespace Amino
         /// <para>This object can hold a deviceId, if left empty, it will generate one.</para>
         /// </summary>
         /// <param>This object can hold a deviceId, if left empty, it will generate one.</param>
-        /// <param name="_deviceID"></param>
-        public Client(string _deviceID = null)
+        /// <param name="_deviceID">The Device ID of your Account, can remain null</param>
+        /// <param name="userAgent">The User Agent of your client, default: latest compatible</param>
+        public Client(string _deviceID = null, string userAgent = "Apple iPhone13,4 iOS v15.6.1 Main/3.12.9")
         {
-            if(_deviceID == null) { deviceID = helpers.generate_device_id(); } else { deviceID = _deviceID; }
+            this.deviceID = (_deviceID == null) ? helpers.generate_device_id() : _deviceID;
+            this.UserAgent = userAgent;
             headerBuilder();
         }
 
@@ -213,7 +216,18 @@ namespace Amino
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/request-security-validation", Method.Post);
-                if(!resetPassword) { request.AddJsonBody(new { identity = email, type = 1, deviceID = deviceID}); } else { request.AddJsonBody(new { identity = email, type = 1, deviceID = deviceID, level = 2, purpose = "reset-password"}); }
+                JObject data = new JObject()
+                {
+                    { "identity", email },
+                    { "deviceID", this.deviceID },
+                    { "type", 1 }
+                };
+                if(resetPassword)
+                {
+                    data.Add("level", 2);
+                    data.Add("purpose", "reset-password");
+                }
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 request.AddHeaders(headers);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -234,21 +248,22 @@ namespace Amino
         /// <param name="_email"></param>
         /// <param name="_password"></param>
         /// <param name="_secret"></param>
+        /// <param name="connectSocket">Determines if the WebSocket should be connected, will disable Events if false</param>
         /// <returns></returns>
-        public Task login(string _email, string _password, string _secret = null)
+        public Task login(string _email, string _password = null, string _secret = null, bool connectSocket = true)
         {
             try
             {
-                string secret;
-                if (_secret == null) { secret = $"0 {_password}"; } else { secret = _secret; }
-                JObject data = new JObject();
-                data.Add("email", _email);
-                data.Add("v", 2);
-                data.Add("secret", secret);
-                data.Add("deviceID", deviceID);
-                data.Add("clientType", 100);
-                data.Add("action", "normal");
-                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                JObject data = new JObject
+                {
+                    { "email", _email },
+                    { "v", 2 },
+                    { "secret", (_secret == null) ? $"0 {_password}" : _secret },
+                    { "deviceID", deviceID },
+                    { "clientType", 100 },
+                    { "action", "normal" },
+                    { "timestamp", helpers.GetTimestamp() * 1000 }
+                };
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/login", Method.Post);
                 request.AddHeaders(headers);
@@ -275,8 +290,12 @@ namespace Amino
                     is_Global = (bool)jsonObj["userProfile"]["isGlobal"];
                 }catch(Exception e) { throw new Exception(e.Message); }
                 headerBuilder();
-                Amino.WebSocketHandler _webSocket = new WebSocketHandler(this);
-                this.webSocket = _webSocket;
+                if(connectSocket)
+                {
+                    Amino.WebSocketHandler _webSocket = new WebSocketHandler(this);
+                    this.webSocket = _webSocket;
+                }
+
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
             }catch(Exception e)
@@ -295,16 +314,16 @@ namespace Amino
             if(sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             try
             {
-                var data = new
+                JObject data = new JObject()
                 {
-                    deviceID = this.deviceID,
-                    clientType = 100,
-                    timestamp = helpers.GetTimestamp() * 1000
+                    { "deviceID", this.deviceID },
+                    { "clientType", 100 },
+                    { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/logout");
                 request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 request.AddHeaders(headers);
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -337,6 +356,19 @@ namespace Amino
         }
 
         /// <summary>
+        /// Allows you to log into your Amino Account using a Session Token
+        /// </summary>
+        /// <param name="sessionId">The Session token of your Account</param>
+        /// <param name="fetchProfile">Determines if the profile data should be fetched</param>
+        /// <param name="connectSocket">Determines if the WebSocket should connect</param>
+        /// <returns></returns>
+        public Task login_sid(string sessionId, bool fetchProfile = true, bool connectSocket = true)
+        {
+            
+        }
+
+
+        /// <summary>
         /// Allows you to register an Amino account
         /// <para>This function requires a verification code, refer to <b>request_verify_code()</b></para>
         /// </summary>
@@ -351,32 +383,33 @@ namespace Amino
             try
             {
                 if (_deviceID == null) { if (deviceID != null) { _deviceID = deviceID; } else { _deviceID = helpers.generate_device_id(); } }
-                var data = new
+                JObject data = new JObject()
                 {
-                    secret = $"0 {_password}",
-                    deviceID = _deviceID,
-                    email = _email,
-                    clientType = 100,
-                    nickname = _name,
-                    latitude = 0,
-                    longtitude = 0,
-                    address = String.Empty,
-                    clientCallbackURL = "narviiapp://relogin",
-                    validationContext = new
-                    {
-                        data = new { code = _verificationCode },
-                        type = 1,
-                        identity = _email
+                    { "secret", $"0 {_password}" },
+                    { "deviceID", _deviceID },
+                    { "email", _email },
+                    { "clientType", 100 },
+                    { "nickname", _name },
+                    { "latitude", 0 },
+                    { "longtitude", 0 },
+                    { "address", String.Empty },
+                    { "clientCallbackURL", "narviiapp://relogin" },
+                    { "validationContext", new JObject()
+                        {
+                            { "data", new JObject() { "code", _verificationCode } },
+                            { "type", 1 },
+                            { "identity", _email }
+                        }
                     },
-                    type = 1,
-                    identity = _email,
-                    timestamp = helpers.GetTimestamp() * 1000
+                    { "type", 1 },
+                    { "identity", _email },
+                    { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/register");
                 request.AddHeaders(headers);
                 request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
@@ -399,13 +432,17 @@ namespace Amino
             
             try
             {
-                if (_deviceID == null) { if (deviceID != null) { _deviceID = deviceID; } else { _deviceID = helpers.generate_device_id(); } }
-                var data = new { secret = $"0 {_password}", deviceID = _deviceID, email = _email, timestamp = helpers.GetTimestamp() * 1000 };
+                JObject data = new JObject()
+                {
+                    { "secret", $"0 {_password}" },
+                    { "deviceID", (_deviceID == null) ? helpers.generate_device_id() : _deviceID },
+                    { "timestamp", helpers.GetTimestamp() * 1000 }
+                };
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/account/delete-request/cancel");
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
@@ -493,34 +530,23 @@ namespace Amino
         /// <param name="_gender"></param>
         /// <param name="_age"></param>
         /// <returns></returns>
-        public Task configure_account(Types.account_gender _gender, int _age)
+        public Task configure_account(Types.account_gender _gender = Types.account_gender.Non_Binary, int _age = 18)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (_age <= 12) { throw new Exception("The given account age is too low"); }
-            int gender;
-            switch(_gender)
+            JObject data = new JObject()
             {
-                case Types.account_gender.Male:
-                    gender = 1;
-                    break;
-                case Types.account_gender.Female:
-                    gender = 2;
-                    break;
-                case Types.account_gender.Non_Binary:
-                    gender = 255;
-                    break;
-                default:
-                    gender = 255;
-                    break;
-            }
-            var data = new { age = _age, gender = gender, timestamp = helpers.GetTimestamp() * 1000 };
+                { "age", _age },
+                { "gender", (int)_gender },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
             try
             {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/persona/profile/basic");
                 request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
@@ -2146,13 +2172,12 @@ namespace Amino
         public Objects.FromId get_from_id(string objectId, Amino.Types.Object_Types type, string communityId = null)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            int _type = helpers.get_ObjectTypeID(type);
             var data = new
             {
                 objectId = objectId,
                 targetCode = 1,
                 timestamp = helpers.GetTimestamp() * 1000,
-                objectType = _type
+                objectType = (int)type
             };
             try
             {
@@ -2250,7 +2275,12 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
-
+        /// <summary>
+        /// Allows you to get Information about a Community
+        /// </summary>
+        /// <param name="communityId">The ID of the Community you want to get info from</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public Objects.AdvancedCommunityInfo get_community_info(string communityId)
         {
             try
@@ -2267,6 +2297,16 @@ namespace Amino
             }catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to get Information about a Community
+        /// </summary>
+        /// <param name="communityId">The ID of the Community you want to get info from</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Objects.AdvancedCommunityInfo get_community_info(int communityId)
+        {
+            return get_community_info(communityId.ToString());
+        }
 
         /// <summary>
         /// Allows you to accept host / organizer of a chatroom with the current Amino account
