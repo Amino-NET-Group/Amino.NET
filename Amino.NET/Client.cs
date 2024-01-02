@@ -363,7 +363,31 @@ namespace Amino
         /// <returns></returns>
         public Task login_sid(string sessionId, bool fetchProfile = true, bool connectSocket = true)
         {
-            
+            this.sessionID = sessionId;
+            headerBuilder();
+            if (fetchProfile)
+            {
+                Objects.UserAccount currentAccount = get_account_info();
+
+                this.userID = currentAccount.userId;
+                this.googleID = currentAccount.googleID;
+                this.appleID = currentAccount.appleID;
+                this.twitterID = currentAccount.twitterID;
+                this.iconURL = currentAccount.iconUrl;
+                this.aminoID = currentAccount.aminoId;
+                this.email = currentAccount.email;
+                this.phoneNumber = currentAccount.phoneNumber;
+                this.nickname = currentAccount.nickName;
+                this.is_Global = true;
+
+            }
+            if (connectSocket)
+            {
+                Amino.WebSocketHandler _webSocket = new WebSocketHandler(this);
+                this.webSocket = _webSocket;
+            }
+
+            return Task.CompletedTask;
         }
 
 

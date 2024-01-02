@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -222,6 +224,28 @@ namespace Amino
             }
             return timers;
         }
+
+
+        // Session ID Tools
+
+        /// <summary>
+        /// Allows you to get information about a Session ID
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public static dynamic DecodeSid(string session)
+        {
+            var decoded = Convert.FromBase64String(session + new string('=', 4 - session.Length % 4));
+            var jsonStr = Encoding.UTF8.GetString(decoded, 1, decoded.Length - 21);
+            return JsonConvert.DeserializeObject<dynamic>(jsonStr);
+        }
+
+        public static string sid_to_uid(string session) { return DecodeSid(session)["2"]; }
+        public static string sid_to_ip_address(string session) { return DecodeSid(session)["4"]; }
+        public static string sid_created_time(string session) { return DecodeSid(session)["5"]; }
+        public static string sid_to_client_type(string session) { return DecodeSid(session)["6"]; }
+
+
 
     }
 }
