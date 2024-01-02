@@ -325,8 +325,12 @@ namespace Amino
                 is_Global = false;
                 headerBuilder();
                 _ = webSocket.DisconnectSocket();
-                subClient.Dispose();
-                subClient = null;
+                if(subClient != null)
+                {
+                    subClient.Dispose();
+                    subClient = null;
+                }
+
                 return Task.CompletedTask;
 
             }catch(Exception e) { throw new Exception(e.Message); }
