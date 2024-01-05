@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Amino.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -2404,6 +2406,252 @@ namespace Amino
                 return _avataFrameList;
             }catch(Exception e) { throw new Exception(e.Message); }
         }
+
+        /// <summary>
+        /// Allows you to invite a user to a voice chat
+        /// </summary>
+        /// <param name="chatId">The ID of the chat you invite the user to</param>
+        /// <param name="userId">The ID of the user you invite to the chat</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Task invite_to_vc(string chatId, string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/vvchat-presenter/invite");
+
+                JObject data = new JObject()
+                {
+                    { "uid", userId },
+                    { "timestamp", helpers.GetTimestamp() * 1000 }
+                };
+
+                request.AddHeaders(headers);
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to send a Text message to a chat
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="chatId"></param>
+        /// <param name="messageType"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="mentionUserIds"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Task send_message(string message, string chatId, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
+        {
+            try
+            {
+                List<JObject> mentions = new List<JObject>();
+                if (mentionUserIds == null) { mentionUserIds = new List<string>(); }
+                else
+                {
+                    foreach (string user in mentionUserIds)
+                    {
+                        JObject _mention = new JObject();
+                        _mention.Add("uid", user);
+                        mentions.Add(_mention);
+                    }
+                }
+                message = message.Replace("<$", "").Replace("$>", "");
+                JObject data = new JObject();
+                JObject attachementSub = new JObject();
+                JObject extensionSub = new JObject();
+                JObject extensionSuBArray = new JObject();
+                data.Add("type", (int)messageType);
+                data.Add("content", message);
+                data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                attachementSub.Add("objectId", null);
+                attachementSub.Add("objectType", null);
+                attachementSub.Add("link", null);
+                attachementSub.Add("title", null);
+                attachementSub.Add("content", null);
+                attachementSub.Add("mediaList", null);
+                extensionSuBArray.Add("link", null);
+                extensionSuBArray.Add("mediaType", 100);
+                extensionSuBArray.Add("mediaUploadValue", null);
+                extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+                extensionSub.Add("mentionedArray", new JArray(mentions));
+                extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+                data.Add("attachedObject", attachementSub);
+                data.Add("extensions", extensionSub);
+                if (replyTo != null) { data.Add("replyMessageId", replyTo); }
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        /// <summary>
+        /// Allows you to send a media file to a chat
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="file"></param>
+        /// <param name="fileType"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Task send_file_message(string chatId, byte[] file, Types.upload_File_Types fileType)
+        {
+            JObject data = new JObject();
+            JObject attachementSub = new JObject();
+            JObject extensionSub = new JObject();
+            JObject extensionSuBArray = new JObject();
+            data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+            data.Add("content", null);
+            data.Add("type", 0);
+            attachementSub.Add("objectId", null);
+            attachementSub.Add("objectType", null);
+            attachementSub.Add("link", null);
+            attachementSub.Add("title", null);
+            attachementSub.Add("content", null);
+            attachementSub.Add("mediaList", null);
+            extensionSuBArray.Add("link", null);
+            extensionSuBArray.Add("mediaType", 100);
+            extensionSuBArray.Add("mediaUploadValue", null);
+            extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+            extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+            data.Add("attachedObject", attachementSub);
+            data.Add("extensions", extensionSub);
+
+            switch (fileType)
+            {
+                case Types.upload_File_Types.Image:
+                    data.Add("mediaType", 100);
+                    data.Add("mediaUploadValueContentType", "image/jpg");
+                    data.Add("mediaUhqEnabled", true);
+                    break;
+                case Types.upload_File_Types.Gif:
+                    data.Add("mediaType", 100);
+                    data.Add("mediaUploadValueContentType", "image/gif");
+                    data.Add("enableUhqEnabled", true);
+                    break;
+                case Types.upload_File_Types.Audio:
+                    data.Add("type", 2);
+                    data.Add("mediaType", 110);
+                    break;
+            }
+            data.Add("mediaUploadValue", Encoding.UTF8.GetString(Convert.FromBase64String(Convert.ToBase64String(file))));
+
+
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Allows you to send a media file to a chat
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="filePath"></param>
+        /// <param name="fileType"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Task send_file_message(string chatId, string filePath, Types.upload_File_Types fileType)
+        {
+            try
+            {
+                send_file_message(chatId, File.ReadAllBytes(filePath), fileType);
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+
+        }
+
+        /// <summary>
+        /// Allows you to send an Embed message to a chat
+        /// </summary>
+        /// <param name="replyTo"></param>
+        /// <param name="embedId"></param>
+        /// <param name="embedLink"></param>
+        /// <param name="embedTitle"></param>
+        /// <param name="embedContent"></param>
+        /// <param name="embedImage"></param>
+        /// <param name="linkSnipped"></param>
+        /// <param name="linkSnippedImage"></param>
+        /// <returns></returns>
+        public Task send_embed(string replyTo = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, byte[] embedImage = null, string linkSnipped = null, byte[] linkSnippedImage = null)
+        {
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Allows you to send a Sticker message to a chat
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="stickerId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Task send_sticker(string chatId, string stickerId)
+        {
+            try
+            {
+                JObject data = new JObject();
+                JObject attachementSub = new JObject();
+                JObject extensionSub = new JObject();
+                JObject extensionSuBArray = new JObject();
+                data.Add("type", 3);
+                data.Add("content", null);
+                data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                attachementSub.Add("objectId", null);
+                attachementSub.Add("objectType", null);
+                attachementSub.Add("link", null);
+                attachementSub.Add("title", null);
+                attachementSub.Add("content", null);
+                attachementSub.Add("mediaList", null);
+                extensionSuBArray.Add("link", null);
+                extensionSuBArray.Add("mediaType", 100);
+                extensionSuBArray.Add("mediaUploadValue", null);
+                extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+                extensionSub.Add("mentionedArray", new JArray());
+                extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+                data.Add("attachedObject", attachementSub);
+                data.Add("extensions", extensionSub);
+                data.Add("stickerId", stickerId);
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+
 
         public void SetSubClient(Amino.SubClient subClient)
         {

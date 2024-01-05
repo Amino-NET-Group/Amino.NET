@@ -1671,6 +1671,60 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        public Task comment(string message, Types.Comment_Types type, string objectId)
+        {
+            string _eventSource;
+            bool _isReply = false;
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest();
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("content", message);
+                data.Add("stickerId", null);
+                data.Add("type", 0);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+
+
+                switch (type)
+                {
+                    case Types.Comment_Types.User:
+                        request.Resource = $"/x{communityId}/s/user-profile/{objectId}/g-comment";
+                        _eventSource = "UserProfileView";
+                        break;
+                    case Types.Comment_Types.Blog:
+                        request.Resource = $"/x{communityId}/s/blog/{objectId}/g-comment";
+                        _eventSource = "PostDetailView";
+                        break;
+                    case Types.Comment_Types.Wiki:
+                        request.Resource = $"/x{communityId}/s/item/{objectId}/g-comment";
+                        _eventSource = "PostDetailView";
+                        break;
+                    case Types.Comment_Types.Reply:
+                        _isReply = true;
+                        _eventSource = "";
+                        break;
+                    default:
+                        request.Resource = $"/x{communityId}/s/user-profile/{objectId}/g-comment";
+                        _eventSource = "UserProfileView";
+                        break;
+                }
+                if (!_isReply) { data.Add("eventSource", _eventSource); } else { data.Add("respondTo", objectId); }
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+        public Task get_user_visitors(string userId, int start = 0, int size = 25)
+        {
+
+        }
+
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
         /// </summary>
