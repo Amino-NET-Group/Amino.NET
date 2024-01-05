@@ -1427,8 +1427,54 @@ namespace Amino
             
         }
 
-        public Task send_embed(string replyTo = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, byte[] embedImage = null, string linkSnipped = null, byte[] linkSnippedImage = null)
+        public Task send_embed(string chatId, string content = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, byte[] embedImage = null)
         {
+
+            try
+            {
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/message");
+                JObject data = new JObject
+                {
+                    { "type", 0 },
+                    { "content", content },
+                    { "clientRefId", helpers.GetTimestamp() / 10 % 1000000000 },
+                    { "attachedObject", new JObject()
+                        {
+                            { "objectId", embedId },
+                            { "objectType", null },
+                            { "link", embedLink },
+                            { "title", embedTitle },
+                            { "content", embedContent },
+                            { "mediaList", (embedImage == null) ? null : new JArray() { new JArray() { 100, this.client.upload_media(embedImage, Types.upload_File_Types.Image), null } } }
+                        }
+                    },
+                    { "extensions", new JObject()
+                        {
+                            { "mentionedArray", new JArray() }
+                        }
+                    },
+                    { "timestamp", helpers.GetTimestamp() }
+                };
+
+
+                request.AddHeaders(headers);
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task send_embed(string chatId, string content = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, string embedImagePath = null)
+        {
+            send_embed(chatId, content, embedId, embedLink, embedTitle, embedContent, (embedImagePath == null) ? null : File.ReadAllBytes(embedImagePath));
             return Task.CompletedTask;
         }
 
@@ -1436,6 +1482,8 @@ namespace Amino
         {
             try
             {
+
+
                 JObject data = new JObject();
                 JObject attachementSub = new JObject();
                 JObject extensionSub = new JObject();
@@ -1722,7 +1770,7 @@ namespace Amino
         }
         public Task get_user_visitors(string userId, int start = 0, int size = 25)
         {
-
+            return Task.CompletedTask;
         }
 
         /// <summary>
