@@ -2606,7 +2606,7 @@ namespace Amino
                             { "link", embedLink },
                             { "title", embedTitle },
                             { "content", embedContent },
-                            { "mediaList", (embedImage == null) ? null : new JArray() { new JArray() { 100, this.client.upload_media(embedImage, Types.upload_File_Types.Image), null } } }
+                            { "mediaList", (embedImage == null) ? null : new JArray() { new JArray() { 100, this.upload_media(embedImage, Types.upload_File_Types.Image), null } } }
                         }
                     },
                     { "extensions", new JObject()
