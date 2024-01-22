@@ -1093,6 +1093,15 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to send coins to a user post
+        /// </summary>
+        /// <param name="targetId">The ID of the target</param>
+        /// <param name="coins">The amount of Coins to send (max. 500)</param>
+        /// <param name="type">The type of Object you are sending coins to</param>
+        /// <param name="transactionId">The ID of the current transaction, can be left empy</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public Task send_coins(string targetId, int coins,Types.Send_Coin_Targets type, string transactionId = null)
         {
             if(transactionId == null) { transactionId = helpers.generate_transaction_id(); }

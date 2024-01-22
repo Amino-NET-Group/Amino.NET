@@ -2687,7 +2687,11 @@ namespace Amino
         }
 
 
-
+        /// <summary>
+        /// Sets the SubClient of the Client, not for development use
+        /// </summary>
+        /// <param name="subClient"></param>
+        /// <exception cref="Exception"></exception>
         public void SetSubClient(Amino.SubClient subClient)
         {
             if(subClient == null) { throw new Exception("No SubClient provided!"); }
