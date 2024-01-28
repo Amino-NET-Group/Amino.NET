@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reactive.Subjects;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Amino
@@ -1777,10 +1779,85 @@ namespace Amino
             }
             catch (Exception e) { throw new Exception(e.Message); }
         }
-        public Task get_user_visitors(string userId, int start = 0, int size = 25)
+        public List<Objects.UserVisitor> get_user_visitors(string userId, int start = 0, int size = 25)
         {
-            return Task.CompletedTask;
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserVisitor> userVisitorList = new List<Objects.UserVisitor>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/visitors?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userVisitors = jsonObj["visitors"];
+                foreach (JObject visitor in userVisitors)
+                {
+                    Objects.UserVisitor _visitor = new Objects.UserVisitor(visitor, jsonObj);
+                    userVisitorList.Add(_visitor);
+                }
+                return userVisitorList;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
         }
+
+        public Objects.UserCheckins get_user_checkins(string userId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/check-in/stats/{userId}?timezone={helpers.getTimezone()}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return new Objects.UserCheckins(JObject.Parse(response.Content));
+        }
+
+        public List<Objects.Blog> get_user_blogs(string userId, int start = 0, int size = 25)
+        {
+            List<Objects.Blog> blogs = new List<Objects.Blog>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/blog?type=user&q={userId}&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            foreach(JObject blog in JObject.Parse(response.Content)["blogList"])
+            {
+                blogs.Add(new Objects.Blog(blog));
+            }
+            return blogs;
+        }
+
+        public List<Objects.Wiki> get_user_wikis(string userId, int start = 0, int size = 25)
+        {
+            List<Objects.Wiki> wikis = new List<Objects.Wiki>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/item?type=user-all&start={start}&size={size}&cv=1.2&uid={userId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            foreach(JObject wiki in JObject.Parse(response.Content)["itemList"])
+            {
+                wikis.Add(new Objects.Wiki(wiki));
+            }
+            return wikis;
+        }
+
+        public Objects.UserAchievements get_user_achievements(string userId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/achievements");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return new Objects.UserAchievements((JObject)JObject.Parse(response.Content)["achievements"]);
+        }
+
+        public 
 
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
