@@ -1857,7 +1857,61 @@ namespace Amino
             return new Objects.UserAchievements((JObject)JObject.Parse(response.Content)["achievements"]);
         }
 
-        public 
+        public List<Objects.InfluencerFan> get_influencer_fans(string userId, int start = 0, int size = 25)
+        {
+            return new();
+        }
+
+        public Task add_influencer(string userId, int monthlyFee)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/influencer/{userId}");
+            request.AddHeaders(headers);
+            JObject data = new JObject()
+            {
+                { "monthlyFee", monthlyFee },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+        public Task remove_influencer(string userId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/influencer/{userId}");
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task subscribe(string userId, bool autoRenew = false, string transactionId = null)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/influencer/{userId}/subscribe");
+            request.AddHeaders(headers);
+            JObject data = new JObject()
+            {
+                { "paymentContext", new JObject()
+                    {
+                        { "transactionId", transactionId != null ? transactionId : helpers.generate_transaction_id() },
+                        { "isAutoRenew", autoRenew }
+                    }
+                },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
