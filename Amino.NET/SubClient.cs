@@ -1857,7 +1857,7 @@ namespace Amino
             return new Objects.UserAchievements((JObject)JObject.Parse(response.Content)["achievements"]);
         }
 
-        public List<Objects.InfluencerFan> get_influencer_fans(string userId, int start = 0, int size = 25)
+        public Objects.InfluencerInfo get_influencer_info(string userId, int start = 0, int size = 25)
         {
             return new();
         }
