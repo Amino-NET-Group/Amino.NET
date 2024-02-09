@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Security.Principal;
 
 namespace Amino.Objects
 {
@@ -156,7 +154,10 @@ namespace Amino.Objects
 
                 public _InfluencerInfo(JObject json)
                 {
-
+                    try { pinned = (bool)json["pinned"]; } catch { }
+                    try { createdTime = (string)json["createdTime"]; } catch { }
+                    try { fansCount = (int)json["fansCount"]; } catch { }
+                    try { monthlyFee = (int)json["monthlyFee"]; } catch { }
                 }
             }
 
@@ -168,7 +169,12 @@ namespace Amino.Objects
 
                 public _Extensions(JObject json)
                 {
-
+                    try { defaultBubbleId = (string)json["defaultBubbleId"]; } catch { }
+                    if (json["style"] != null) { Style = new(JObject.Parse((string)json["style"])); }
+                    if (json["customTitles"] != null)
+                    {
+                        foreach(JObject title in json["customTitles"]) { CustomTitles.Add(new(title)); }
+                    }
                 }
 
                 public class _CustomTitle
@@ -178,7 +184,8 @@ namespace Amino.Objects
 
                     public _CustomTitle(JObject json)
                     {
-
+                        try { color = (string)json["color"]; } catch { }
+                        try { title = (string)json["title"]; } catch { }
                     }
                 }
 
@@ -188,7 +195,7 @@ namespace Amino.Objects
 
                     public _Style(JObject json)
                     {
-
+                        try { backgroundColor = (string)json["backgroundColor"]; } catch { }
                     }
                 }
             }

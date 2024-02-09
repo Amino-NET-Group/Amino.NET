@@ -1859,7 +1859,9 @@ namespace Amino
 
         public Objects.InfluencerInfo get_influencer_info(string userId, int start = 0, int size = 25)
         {
-            return new();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest rquest = new RestRequest("");
+            
         }
 
         public Task add_influencer(string userId, int monthlyFee)
