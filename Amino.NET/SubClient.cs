@@ -1860,7 +1860,12 @@ namespace Amino
         public Objects.InfluencerInfo get_influencer_info(string userId, int start = 0, int size = 25)
         {
             RestClient client = new RestClient(helpers.BaseUrl);
-            RestRequest rquest = new RestRequest("");
+            RestRequest request = new RestRequest($"/x{communityId}/s/influencer/{userId}/fans?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) {  Trace.WriteLine(response.Content); }
+            return new(JObject.Parse(response.Content));
             
         }
 
@@ -1914,6 +1919,49 @@ namespace Amino
             if (debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
+
+        public List<Objects.BlockedUser> get_blocked_users(int start = 0, int size = 25)
+        {
+            List<Objects.BlockedUser> blocked = new List<Objects.BlockedUser>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/block?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            foreach(JObject user in JObject.Parse(response.Content)["userProfileList"])
+            {
+                blocked.Add(new(user));
+            }
+            return blocked;
+        }
+
+        public List<string> get_blocker_users(int start = 0, int size = 25)
+        {
+            List<string> blockers = new();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/block?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            foreach(string blocker in JObject.Parse(response.Content)["blockerUidList"]) { blockers.Add(blocker); }
+            return blockers;
+        }
+
+        public List<Objects.UserProfile> get_leaderboard_info(Types.Leaderboard_Ranking_Types type, int start = 0, int size = 25)
+        {
+            List<Objects.UserProfile> leaderboard = new();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s-x{communityId}/community/leaderboard?rankingType={(int)type}&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            foreach(JObject user in JObject.Parse(response.Content)["userProfileList"]) { leaderboard.Add(new(user)); }
+            return leaderboard;
+        }
+
 
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)

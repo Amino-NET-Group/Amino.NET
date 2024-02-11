@@ -125,14 +125,6 @@
             Leaders,
             Curators
         }
-        public enum Leaderboard_Types
-        {
-            Day,
-            Week,
-            Reputation,
-            Check_In,
-            Quiz
-        }
         public enum Featured_Types
         {
             Unfreature,
@@ -267,6 +259,15 @@
         {
             Blog = 1,
             Wiki = 2
+        }
+
+        public enum Leaderboard_Ranking_Types
+        {
+            Daily = 1,
+            Weekly = 2,
+            Reputation = 3,
+            CheckIn = 4,
+            quiz = 5
         }
     }
 }
