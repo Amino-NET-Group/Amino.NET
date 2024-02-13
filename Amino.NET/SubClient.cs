@@ -4,8 +4,10 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reactive.Subjects;
+using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1961,6 +1963,92 @@ namespace Amino
             foreach(JObject user in JObject.Parse(response.Content)["userProfileList"]) { leaderboard.Add(new(user)); }
             return leaderboard;
         }
+
+
+        public Objects.Wiki get_wiki_info(string wikiId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/item/{wikiId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return new((JObject)JObject.Parse(response.Content)["item"]);
+        }
+
+        public Task kick_from_chat(string userId, string chatId, bool allowRejoin = true)
+        {
+            int _allowRejoin = allowRejoin ? 1 : 0;
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{userId}?allowRejoin={_allowRejoin}");
+            request.AddHeaders(headers);
+
+            var response = client.Delete(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); } 
+            return Task.CompletedTask;
+        }
+
+        public Task delete_chat(string chatId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}");
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+
+        public Task handle_promotion(string noticeId, bool accept = true)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            string _type = accept ? "accept" : "decline";
+            RestRequest request = new RestRequest($"/x{communityId}/s/notice/{noticeId}/{_type}");
+            request.AddHeaders(headers);
+            var response = client.ExecutePost(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task play_quiz(string quizId, List<string> questionIdList, List<string> answerIdList, int quizMode = 0)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/blog/{quizId}/quiz/result");
+
+            JArray quizData = new JArray();
+
+
+            for (int i = 0; i < questionIdList.Count && i < answerIdList.Count; i++)
+            {
+                JObject part = new JObject
+                {
+                    { "optIdList", new JArray { answerIdList[i] } },
+                    { "quizQuestionId", questionIdList[i] },
+                    { "timeSpent", 0.0 }
+                };
+
+                quizData.Add(part);
+            }
+
+
+            JObject data = new JObject()
+            {
+                { "mode", quizMode },
+                { "quizAnswerList", quizData },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            request.AddHeaders(headers);
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
 
 
         /// <summary>
