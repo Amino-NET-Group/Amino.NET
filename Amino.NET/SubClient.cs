@@ -4,7 +4,12 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Reactive.Subjects;
+using System.Runtime.Serialization.Formatters;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Amino
@@ -1092,6 +1097,15 @@ namespace Amino
             catch(Exception e) { throw new Exception(e.Message); }
         }
 
+        /// <summary>
+        /// Allows you to send coins to a user post
+        /// </summary>
+        /// <param name="targetId">The ID of the target</param>
+        /// <param name="coins">The amount of Coins to send (max. 500)</param>
+        /// <param name="type">The type of Object you are sending coins to</param>
+        /// <param name="transactionId">The ID of the current transaction, can be left empy</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public Task send_coins(string targetId, int coins,Types.Send_Coin_Targets type, string transactionId = null)
         {
             if(transactionId == null) { transactionId = helpers.generate_transaction_id(); }
@@ -1361,23 +1375,119 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task send_file_message(byte[] file, Types.upload_File_Types fileType)
+        public Task send_file_message(string chatId, byte[] file, Types.upload_File_Types fileType)
         {
+            JObject data = new JObject();
+            JObject attachementSub = new JObject();
+            JObject extensionSub = new JObject();
+            JObject extensionSuBArray = new JObject();
+            data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+            data.Add("content", null);
+            data.Add("type", 0);
+            attachementSub.Add("objectId", null);
+            attachementSub.Add("objectType", null);
+            attachementSub.Add("link", null);
+            attachementSub.Add("title", null);
+            attachementSub.Add("content", null);
+            attachementSub.Add("mediaList", null);
+            extensionSuBArray.Add("link", null);
+            extensionSuBArray.Add("mediaType", 100);
+            extensionSuBArray.Add("mediaUploadValue", null);
+            extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+            extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+            data.Add("attachedObject", attachementSub);
+            data.Add("extensions", extensionSub);
+
+            switch(fileType)
+            {
+                case Types.upload_File_Types.Image:
+                    data.Add("mediaType", 100);
+                    data.Add("mediaUploadValueContentType", "image/jpg");
+                    data.Add("mediaUhqEnabled", true);
+                    break;
+                case Types.upload_File_Types.Gif:
+                    data.Add("mediaType", 100);
+                    data.Add("mediaUploadValueContentType", "image/gif");
+                    data.Add("enableUhqEnabled", true);
+                    break;
+                case Types.upload_File_Types.Audio:
+                    data.Add("type", 2);
+                    data.Add("mediaType", 110);
+                    break;
+            }
+            data.Add("mediaUploadValue", Encoding.UTF8.GetString(Convert.FromBase64String(Convert.ToBase64String(file))));
+           
+
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/message");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
 
-        public Task send_file_message(string filePath, Types.upload_File_Types fileType)
+        public Task send_file_message(string chatId, string filePath, Types.upload_File_Types fileType)
         {
             try
             {
-                send_file_message(File.ReadAllBytes(filePath), fileType);
+                send_file_message(chatId, File.ReadAllBytes(filePath), fileType);
                 return Task.CompletedTask;
             } catch (Exception e) { throw new Exception(e.Message); }
             
         }
 
-        public Task send_embed(string replyTo = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, byte[] embedImage = null, string linkSnipped = null, byte[] linkSnippedImage = null)
+        public Task send_embed(string chatId, string content = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, byte[] embedImage = null)
         {
+
+            try
+            {
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/message");
+                JObject data = new JObject
+                {
+                    { "type", 0 },
+                    { "content", content },
+                    { "clientRefId", helpers.GetTimestamp() / 10 % 1000000000 },
+                    { "attachedObject", new JObject()
+                        {
+                            { "objectId", embedId },
+                            { "objectType", null },
+                            { "link", embedLink },
+                            { "title", embedTitle },
+                            { "content", embedContent },
+                            { "mediaList", (embedImage == null) ? null : new JArray() { new JArray() { 100, this.client.upload_media(embedImage, Types.upload_File_Types.Image), null } } }
+                        }
+                    },
+                    { "extensions", new JObject()
+                        {
+                            { "mentionedArray", new JArray() }
+                        }
+                    },
+                    { "timestamp", helpers.GetTimestamp() }
+                };
+
+
+                request.AddHeaders(headers);
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task send_embed(string chatId, string content = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, string embedImagePath = null)
+        {
+            send_embed(chatId, content, embedId, embedLink, embedTitle, embedContent, (embedImagePath == null) ? null : File.ReadAllBytes(embedImagePath));
             return Task.CompletedTask;
         }
 
@@ -1385,6 +1495,8 @@ namespace Amino
         {
             try
             {
+
+
                 JObject data = new JObject();
                 JObject attachementSub = new JObject();
                 JObject extensionSub = new JObject();
@@ -1421,6 +1533,520 @@ namespace Amino
 
             }
             catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task delete_message(string chatId, string messageId, bool asStaff = false, string reason = null)
+        {
+            try
+            {
+                string endPoint = $"/x{communityId}/s/chat/thread/{chatId}/message/{messageId}";
+                JObject data = new JObject();
+                data.Add("adminOpName", 102);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                if((asStaff && reason != null)) { data.Add("adminOpNote", reason); }
+                if(asStaff) { endPoint = endPoint + "/admin"; }
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest(endPoint);
+                request.AddHeaders(headers);
+                if(asStaff)
+                {
+                    request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                    request.AddJsonBody(JsonConvert.SerializeObject(data));
+                    var response = client.ExecutePost(request);
+                    if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                    if (debug) { Trace.WriteLine(response.Content); }
+                } else
+                {
+                    var response = client.Delete(request);
+                    if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                    if(debug) { Trace.WriteLine(response.Content); }
+                }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task mark_as_read(string chatId, string messageId)
+        {
+            try
+            {
+                JObject data = new JObject();
+                data.Add("messageId", messageId);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/mark-as-read");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+
+        public Task transfer_host(string chatId, List<string> userIds)
+        {
+            try
+            {
+                JObject data = new JObject();
+                data.Add("uidList", new JArray(userIds));
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/transfer-organizer");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task transfer_host(string chatId, string userId)
+        {
+            try
+            {
+                return transfer_host(chatId, new List<string> { userId });
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task accept_host(string chatId, string requestId)
+        {
+            try
+            {
+                JObject data = new JObject();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/transfer-organizer/{requestId}/accept");
+                request.AddHeaders(headers);
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task join_chat(string chatId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.userID}");
+                request.AddHeaders(headers);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task leave_chat(string chatId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.userID}");
+                request.AddHeaders(headers);
+                var response = client.Delete(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Amino.Objects.UserFollowings> get_user_following(string userId, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserFollowings> userFollowingsList = new List<Objects.UserFollowings>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/joined?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userFollowings = jsonObj["userProfileList"];
+                foreach (JObject following in userFollowings)
+                {
+                    Objects.UserFollowings _following = new Objects.UserFollowings(following);
+                    userFollowingsList.Add(_following);
+                }
+                return userFollowingsList;
+
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public List<Objects.UserFollowings> get_user_followers(string userId, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserFollowings> userFollowerList = new List<Objects.UserFollowings>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/member?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userFollowers = jsonObj["userProfileList"];
+                foreach (JObject follower in userFollowers)
+                {
+                    Objects.UserFollowings _follower = new Objects.UserFollowings(follower);
+                    userFollowerList.Add(_follower);
+                }
+                return userFollowerList;
+
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Objects.UserProfile get_user_info(string userId)
+        {
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                Amino.Objects.UserProfile profile = new Amino.Objects.UserProfile((JObject)JObject.Parse(response.Content)["userProfile"]);
+                return profile;
+            }
+            catch(Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Task comment(string message, Types.Comment_Types type, string objectId)
+        {
+            string _eventSource;
+            bool _isReply = false;
+            try
+            {
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest();
+                request.AddHeaders(headers);
+                JObject data = new JObject();
+                data.Add("content", message);
+                data.Add("stickerId", null);
+                data.Add("type", 0);
+                data.Add("timestamp", helpers.GetTimestamp() * 1000);
+
+
+                switch (type)
+                {
+                    case Types.Comment_Types.User:
+                        request.Resource = $"/x{communityId}/s/user-profile/{objectId}/g-comment";
+                        _eventSource = "UserProfileView";
+                        break;
+                    case Types.Comment_Types.Blog:
+                        request.Resource = $"/x{communityId}/s/blog/{objectId}/g-comment";
+                        _eventSource = "PostDetailView";
+                        break;
+                    case Types.Comment_Types.Wiki:
+                        request.Resource = $"/x{communityId}/s/item/{objectId}/g-comment";
+                        _eventSource = "PostDetailView";
+                        break;
+                    case Types.Comment_Types.Reply:
+                        _isReply = true;
+                        _eventSource = "";
+                        break;
+                    default:
+                        request.Resource = $"/x{communityId}/s/user-profile/{objectId}/g-comment";
+                        _eventSource = "UserProfileView";
+                        break;
+                }
+                if (!_isReply) { data.Add("eventSource", _eventSource); } else { data.Add("respondTo", objectId); }
+                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+                request.AddJsonBody(data);
+                var response = client.ExecutePost(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                return Task.CompletedTask;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+        public List<Objects.UserVisitor> get_user_visitors(string userId, int start = 0, int size = 25)
+        {
+            if (start < 0) { throw new Exception("start cannot be lower than 0"); }
+            try
+            {
+                List<Objects.UserVisitor> userVisitorList = new List<Objects.UserVisitor>();
+                RestClient client = new RestClient(helpers.BaseUrl);
+                RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/visitors?start={start}&size={size}");
+                request.AddHeaders(headers);
+                var response = client.ExecuteGet(request);
+                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+                if (debug) { Trace.WriteLine(response.Content); }
+                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+                JArray userVisitors = jsonObj["visitors"];
+                foreach (JObject visitor in userVisitors)
+                {
+                    Objects.UserVisitor _visitor = new Objects.UserVisitor(visitor, jsonObj);
+                    userVisitorList.Add(_visitor);
+                }
+                return userVisitorList;
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
+
+        public Objects.UserCheckins get_user_checkins(string userId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/check-in/stats/{userId}?timezone={helpers.getTimezone()}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return new Objects.UserCheckins(JObject.Parse(response.Content));
+        }
+
+        public List<Objects.Blog> get_user_blogs(string userId, int start = 0, int size = 25)
+        {
+            List<Objects.Blog> blogs = new List<Objects.Blog>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/blog?type=user&q={userId}&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            foreach(JObject blog in JObject.Parse(response.Content)["blogList"])
+            {
+                blogs.Add(new Objects.Blog(blog));
+            }
+            return blogs;
+        }
+
+        public List<Objects.Wiki> get_user_wikis(string userId, int start = 0, int size = 25)
+        {
+            List<Objects.Wiki> wikis = new List<Objects.Wiki>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/item?type=user-all&start={start}&size={size}&cv=1.2&uid={userId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            foreach(JObject wiki in JObject.Parse(response.Content)["itemList"])
+            {
+                wikis.Add(new Objects.Wiki(wiki));
+            }
+            return wikis;
+        }
+
+        public Objects.UserAchievements get_user_achievements(string userId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/achievements");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return new Objects.UserAchievements((JObject)JObject.Parse(response.Content)["achievements"]);
+        }
+
+        public Objects.InfluencerInfo get_influencer_info(string userId, int start = 0, int size = 25)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/influencer/{userId}/fans?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) {  Trace.WriteLine(response.Content); }
+            return new(JObject.Parse(response.Content));
+            
+        }
+
+        public Task add_influencer(string userId, int monthlyFee)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/influencer/{userId}");
+            request.AddHeaders(headers);
+            JObject data = new JObject()
+            {
+                { "monthlyFee", monthlyFee },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+        public Task remove_influencer(string userId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/influencer/{userId}");
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task subscribe(string userId, bool autoRenew = false, string transactionId = null)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/influencer/{userId}/subscribe");
+            request.AddHeaders(headers);
+            JObject data = new JObject()
+            {
+                { "paymentContext", new JObject()
+                    {
+                        { "transactionId", transactionId != null ? transactionId : helpers.generate_transaction_id() },
+                        { "isAutoRenew", autoRenew }
+                    }
+                },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public List<Objects.BlockedUser> get_blocked_users(int start = 0, int size = 25)
+        {
+            List<Objects.BlockedUser> blocked = new List<Objects.BlockedUser>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/block?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            foreach(JObject user in JObject.Parse(response.Content)["userProfileList"])
+            {
+                blocked.Add(new(user));
+            }
+            return blocked;
+        }
+
+        public List<string> get_blocker_users(int start = 0, int size = 25)
+        {
+            List<string> blockers = new();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/block?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            foreach(string blocker in JObject.Parse(response.Content)["blockerUidList"]) { blockers.Add(blocker); }
+            return blockers;
+        }
+
+        public List<Objects.UserProfile> get_leaderboard_info(Types.Leaderboard_Ranking_Types type, int start = 0, int size = 25)
+        {
+            List<Objects.UserProfile> leaderboard = new();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s-x{communityId}/community/leaderboard?rankingType={(int)type}&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            foreach(JObject user in JObject.Parse(response.Content)["userProfileList"]) { leaderboard.Add(new(user)); }
+            return leaderboard;
+        }
+
+
+        public Objects.Wiki get_wiki_info(string wikiId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/item/{wikiId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return new((JObject)JObject.Parse(response.Content)["item"]);
+        }
+
+        public Task kick_from_chat(string userId, string chatId, bool allowRejoin = true)
+        {
+            int _allowRejoin = allowRejoin ? 1 : 0;
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{userId}?allowRejoin={_allowRejoin}");
+            request.AddHeaders(headers);
+
+            var response = client.Delete(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); } 
+            return Task.CompletedTask;
+        }
+
+        public Task delete_chat(string chatId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}");
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+
+        public Task handle_promotion(string noticeId, bool accept = true)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            string _type = accept ? "accept" : "decline";
+            RestRequest request = new RestRequest($"/x{communityId}/s/notice/{noticeId}/{_type}");
+            request.AddHeaders(headers);
+            var response = client.ExecutePost(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task play_quiz(string quizId, List<string> questionIdList, List<string> answerIdList, int quizMode = 0)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/blog/{quizId}/quiz/result");
+
+            JArray quizData = new JArray();
+
+
+            for (int i = 0; i < questionIdList.Count && i < answerIdList.Count; i++)
+            {
+                JObject part = new JObject
+                {
+                    { "optIdList", new JArray { answerIdList[i] } },
+                    { "quizQuestionId", questionIdList[i] },
+                    { "timeSpent", 0.0 }
+                };
+
+                quizData.Add(part);
+            }
+
+
+            JObject data = new JObject()
+            {
+                { "mode", quizMode },
+                { "quizAnswerList", quizData },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            request.AddHeaders(headers);
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
 

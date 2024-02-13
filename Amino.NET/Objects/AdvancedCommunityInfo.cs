@@ -75,11 +75,15 @@ namespace Amino.Objects
             try
             {
                 JArray userArray = jsonObj["community"]["communityHeadList"];
-                foreach (JObject user in userArray)
+                if (userArray != null)
                 {
-                    _User _user = new _User(user);
-                    communityHeadList.Add(_user);
+                    foreach (JObject user in userArray)
+                    {
+                        _User _user = new _User(user);
+                        communityHeadList.Add(_user);
+                    }
                 }
+
             }catch { }
         
         }

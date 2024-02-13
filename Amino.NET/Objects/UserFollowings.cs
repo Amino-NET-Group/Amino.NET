@@ -43,36 +43,36 @@ namespace Amino.Objects
         public UserFollowings(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            status = (int)jsonObj["status"];
-            moodSticker = (string)jsonObj["moodSticker"];
-            itemsCount = (int)jsonObj["itemsCount"];
-            consecutiveCheckInDays = (string)jsonObj["consecutiveCheckInDays"];
-            userId = (string)jsonObj["uid"];
-            modifiedTime = (string)jsonObj["modifiedTime"];
-            followingStatus = (int)jsonObj["followingStatus"];
-            onlineStatus = (int)jsonObj["onlineStatus"];
-            accountMembershipStatus = (int)jsonObj["accountMembershipStatus"];
-            isGlobal = (bool)jsonObj["isGlobal"];
-            reputation = (int)jsonObj["reputation"];
-            postsCount = (int)jsonObj["postsCount"];
-            membersCount = (int)jsonObj["membersCount"];
-            nickname = (string)jsonObj["nickname"];
-            iconUrl = (string)jsonObj["icon"];
-            isNicknameVerified = (bool)jsonObj["isNicknameVerified"];
-            mood = (string)jsonObj["mood"];
-            level = (int)jsonObj["level"];
-            notificationSubscriptionStatus = (int)jsonObj["notificationSubscriptionStatus"];
-            if (jsonObj["pushEnabled"] != null) { pushEnabled = (bool)jsonObj["pushEnabled"]; }
-            membershipStatus = (int)jsonObj["membershipStatus"];
-            content = (string)jsonObj["content"];
-            joinedCount = (int)jsonObj["joinedCount"];
-            role = (int)jsonObj["role"];
-            commentsCount = (int)jsonObj["commentsCount"];
-            aminoId = (string)jsonObj["aminoId"];
-            communityId = (int)jsonObj["ndcId"];
-            createdTime = (string)jsonObj["createdTime"];
-            storiesCount = (int)jsonObj["storiesCount"];
-            blogsCount = (int)jsonObj["blogsCount"];
+            try { status = (int)jsonObj["status"]; } catch { }
+            try { moodSticker = (string)jsonObj["moodSticker"]; } catch { }
+            try { itemsCount = (int)jsonObj["itemsCount"]; } catch { }
+            try { consecutiveCheckInDays = (string)jsonObj["consecutiveCheckInDays"]; } catch { }
+            try { userId = (string)jsonObj["uid"]; } catch { }
+            try { modifiedTime = (string)jsonObj["modifiedTime"]; } catch { }
+            try { followingStatus = (int)jsonObj["followingStatus"]; } catch { }
+            try { onlineStatus = (int)jsonObj["onlineStatus"]; } catch { }
+            try { accountMembershipStatus = (int)jsonObj["accountMembershipStatus"]; } catch { }
+            try { isGlobal = (bool)jsonObj["isGlobal"]; } catch { }
+            try { reputation = (int)jsonObj["reputation"]; } catch { }
+            try { postsCount = (int)jsonObj["postsCount"]; } catch { }
+            try { membersCount = (int)jsonObj["membersCount"]; } catch { }
+            try { nickname = (string)jsonObj["nickname"]; } catch { }
+            try { iconUrl = (string)jsonObj["icon"]; } catch { }
+            try { isNicknameVerified = (bool)jsonObj["isNicknameVerified"]; } catch { }
+            try { mood = (string)jsonObj["mood"]; } catch { }
+            try { level = (int)jsonObj["level"]; } catch { }
+            try { notificationSubscriptionStatus = (int)jsonObj["notificationSubscriptionStatus"]; } catch { }
+            try { if (jsonObj["pushEnabled"] != null) { pushEnabled = (bool)jsonObj["pushEnabled"]; } } catch { }
+            try { membershipStatus = (int)jsonObj["membershipStatus"]; } catch { }
+            try { content = (string)jsonObj["content"]; } catch { }
+            try { joinedCount = (int)jsonObj["joinedCount"]; } catch { }
+            try { role = (int)jsonObj["role"]; } catch { }
+            try { commentsCount = (int)jsonObj["commentsCount"]; } catch { }
+            try { aminoId = (string)jsonObj["aminoId"]; } catch { }
+            try { communityId = (int)jsonObj["ndcId"]; } catch { }
+            try { createdTime = (string)jsonObj["createdTime"]; } catch { }
+            try { storiesCount = (int)jsonObj["storiesCount"]; } catch { }
+            try { blogsCount = (int)jsonObj["blogsCount"]; } catch { }
             json = _json.ToString();
         }
     }

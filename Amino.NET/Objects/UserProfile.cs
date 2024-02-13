@@ -42,33 +42,33 @@ namespace Amino.Objects
         public UserProfile(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            status = (int)jsonObj["status"];
-            moodSticker = (string)jsonObj["moodSticker"];
-            itemsCount = (int)jsonObj["itemsCount"];
-            if(jsonObj["consecutiveCheckInDays"] != null) { consecutiveCheckInDays = (int)jsonObj["consecutiveCheckInDays"]; }
-            userId = (string)jsonObj["uid"];
-            modifiedTime = (string)jsonObj["modifiedTime"];
-            followingStatus = (int)jsonObj["followingStatus"];
-            onlineStatus = (int)jsonObj["onlineStatus"];
-            accountMembershipStatus = (int)jsonObj["accountMembershipStatus"];
-            isGlobal = (bool)jsonObj["isGlobal"];
-            reputation = (int)jsonObj["reputation"];
-            postsCount = (int)jsonObj["postsCount"];
-            membersCount = (int)jsonObj["membersCount"];
-            nickname = (string)jsonObj["nickname"];
-            iconUrl = (string)jsonObj["icon"];
-            isNicknameVerified = (bool)jsonObj["isNicknameVerified"];
-            level = (int)jsonObj["level"];
-            notificationSubscriptionStatus = (int)jsonObj["notificationSubscriptionStatus"];
-            pushEnabled = (bool)jsonObj["pushEnabled"];
-            membershipStatus = (int)jsonObj["membershipStatus"];
-            if(jsonObj["content"] != null) { content = (string)jsonObj["content"]; }
-            joinedCount = (int)jsonObj["joinedCount"];
-            role = (int)jsonObj["role"];
-            commentsCount = (int)jsonObj["commentsCount"];
-            aminoId = (string)jsonObj["aminoId"];
-            communityId = (int)jsonObj["ndcId"];
-            createdTime = (string)jsonObj["createdTime"];
+            try { status = (int)jsonObj["status"]; } catch { }
+            try { moodSticker = (string)jsonObj["moodSticker"]; } catch { }
+            try { itemsCount = (int)jsonObj["itemsCount"]; } catch { }
+            try { if (jsonObj["consecutiveCheckInDays"] != null) { consecutiveCheckInDays = (int)jsonObj["consecutiveCheckInDays"]; } } catch { }
+            try { userId = (string)jsonObj["uid"]; } catch{ }
+            try { modifiedTime = (string)jsonObj["modifiedTime"]; } catch { }
+            try { followingStatus = (int)jsonObj["followingStatus"]; } catch { }
+            try { onlineStatus = (int)jsonObj["onlineStatus"]; } catch { }
+            try { accountMembershipStatus = (int)jsonObj["accountMembershipStatus"]; } catch { }
+            try { isGlobal = (bool)jsonObj["isGlobal"]; } catch { }
+            try { reputation = (int)jsonObj["reputation"]; } catch { }
+            try { postsCount = (int)jsonObj["postsCount"]; } catch { }
+            try { membersCount = (int)jsonObj["membersCount"]; } catch { }
+            try { nickname = (string)jsonObj["nickname"]; } catch { }
+            try { iconUrl = (string)jsonObj["icon"]; } catch { }
+            try { isNicknameVerified = (bool)jsonObj["isNicknameVerified"]; } catch { }
+            try { level = (int)jsonObj["level"]; } catch { }
+            try { notificationSubscriptionStatus = (int)jsonObj["notificationSubscriptionStatus"]; } catch { }
+            try { pushEnabled = (bool)jsonObj["pushEnabled"]; } catch { }
+            try { membershipStatus = (int)jsonObj["membershipStatus"]; } catch { }
+            try { if (jsonObj["content"] != null) { content = (string)jsonObj["content"]; } } catch { }
+            try { joinedCount = (int)jsonObj["joinedCount"]; } catch { }
+            try { role = (int)jsonObj["role"]; } catch { }
+            try { commentsCount = (int)jsonObj["commentsCount"]; } catch { }
+            try { aminoId = (string)jsonObj["aminoId"]; } catch { }
+            try { communityId = (int)jsonObj["ndcId"]; } catch { }
+            try { createdTime = (string)jsonObj["createdTime"]; } catch { }
             json = _json.ToString();
             
             if(jsonObj["extensions"] != null) { Extensions = new _Extensions(_json); }
@@ -84,7 +84,7 @@ namespace Amino.Objects
             public _Extensions(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-                defaultBubbleId = (string)jsonObj["extensions"]["defaultBubbleId"];
+                try { defaultBubbleId = (string)jsonObj["extensions"]["defaultBubbleId"]; } catch { }
             }
         }
 

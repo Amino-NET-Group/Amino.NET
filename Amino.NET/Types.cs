@@ -7,9 +7,9 @@
         /// </summary>
         public enum account_gender
         {
-            Male,
-            Female,
-            Non_Binary
+            Male = 1,
+            Female = 2,
+            Non_Binary = 255
         }
 
         /// <summary>
@@ -39,14 +39,14 @@
         /// </summary>
         public enum Flag_Types
         {
-            Aggression,
-            Spam,
-            Off_Topic,
-            Violence,
-            Intolerance,
-            Suicide,
-            Trolling,
-            Pronography
+            Aggression = 0,
+            Spam = 2,
+            Off_Topic = 4,
+            Violence = 106,
+            Intolerance = 107,
+            Suicide = 108,
+            Trolling = 109,
+            Pronography = 110
         }
 
         /// <summary>
@@ -63,8 +63,9 @@
         /// </summary>
         public enum upload_File_Types
         {
-            Audio, 
-            Image
+            Audio = 110, 
+            Image = 100,
+            Gif
         }
         /// <summary>
         /// Sorting types for stuff
@@ -124,14 +125,6 @@
             Leaders,
             Curators
         }
-        public enum Leaderboard_Types
-        {
-            Day,
-            Week,
-            Reputation,
-            Check_In,
-            Quiz
-        }
         public enum Featured_Types
         {
             Unfreature,
@@ -142,37 +135,37 @@
         }
         public enum Object_Types
         {
-            User,
-            Blog,
-            Item,
-            Comment,
-            Blog_Category,
-            Blog_Category_Item_Tag,
-            Featured_Item,
-            Chat_Message,
-            Reputationlog_Item,
-            Poll_Option,
-            Chat_Thread,
-            Community,
-            Image,
-            Music,
-            Video,
-            YouTube,
-            Shared_Folder,
-            Shared_File,
-            Voice,
-            Moderation_Task,
-            Screenshot,
-            Sticker,
-            Sticker_Collection,
-            Prop,
-            Chat_Bubble,
-            Video_Filter,
-            Order,
-            Share_Request,
-            VV_Chat,
-            P2A,
-            Amino_Video
+            User = 0,
+            Blog = 1,
+            Item = 2,
+            Comment = 3,
+            Blog_Category = 4,
+            Blog_Category_Item_Tag = 5,
+            Featured_Item = 6,
+            Chat_Message = 7,
+            Reputationlog_Item = 10,
+            Poll_Option = 11,
+            Chat_Thread = 12,
+            Community = 16,
+            Image = 100,
+            Music = 101,
+            Video = 102,
+            YouTube = 103,
+            Shared_Folder = 106,
+            Shared_File = 109,
+            Voice = 110,
+            Moderation_Task = 111,
+            Screenshot = 112,
+            Sticker = 113,
+            Sticker_Collection = 114,
+            Prop = 115,
+            Chat_Bubble = 116,
+            Video_Filter = 117,
+            Order = 118,
+            Share_Request = 119,
+            VV_Chat = 120,
+            P2A = 121,
+            Amino_Video = 123
         }
         public enum Message_Types
         {
@@ -232,9 +225,9 @@
         }
         public enum Flag_Targets
         {
-            User,
-            Blog,
-            Wiki
+            User = 0,
+            Blog = 1,
+            Wiki = 2
         }
 
         public enum Comment_Types
@@ -258,14 +251,23 @@
 
         public enum Wallet_Config_Levels
         {
-            lvl_1,
-            lvl_2
+            lvl_1 = 1,
+            lvl_2 = 2
         }
 
         public enum Repost_Types
         {
             Blog = 1,
             Wiki = 2
+        }
+
+        public enum Leaderboard_Ranking_Types
+        {
+            Daily = 1,
+            Weekly = 2,
+            Reputation = 3,
+            CheckIn = 4,
+            quiz = 5
         }
     }
 }

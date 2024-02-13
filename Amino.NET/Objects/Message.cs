@@ -20,14 +20,14 @@ namespace Amino.Objects
         public Message(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            Author = new _Author(_json);
-            content = (string)jsonObj["o"]["chatMessage"]["content"];
-            messageId = (string)jsonObj["o"]["chatMessage"]["messageId"];
-            chatId = (string)jsonObj["o"]["chatMessage"]["threadId"];
-            objectId = (string)jsonObj["o"]["chatMessage"]["uid"];
+            try { Author = new _Author(_json); } catch { }
+            try { content = (string)jsonObj["o"]["chatMessage"]["content"]; } catch { }
+            try { messageId = (string)jsonObj["o"]["chatMessage"]["messageId"]; } catch { }
+            try { chatId = (string)jsonObj["o"]["chatMessage"]["threadId"]; }catch{ }
+            try { objectId = (string)jsonObj["o"]["chatMessage"]["uid"]; } catch { }
             json = _json.ToString();
-            communityId = (int)jsonObj["o"]["ndcId"];
-            chatBubbleId = (string)jsonObj["o"]["chatBubbleId"];
+            try { communityId = (int)jsonObj["o"]["ndcId"]; } catch { }
+            try { chatBubbleId = (string)jsonObj["o"]["chatBubbleId"]; }catch{ }
         }
 
         [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
@@ -43,11 +43,11 @@ namespace Amino.Objects
             public _Author(JObject _json)
             {
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-                userName = (string)jsonObj["o"]["chatMessage"]["author"]["nickname"];
-                userId = (string)jsonObj["o"]["chatMessage"]["author"]["uid"];
-                userLevel = (int)jsonObj["o"]["chatMessage"]["author"]["level"];
-                iconUrl = (string)jsonObj["o"]["chatMessage"]["author"]["icon"];
-                userReputation = (int)jsonObj["o"]["chatMessage"]["author"]["reputation"];
+                try { userName = (string)jsonObj["o"]["chatMessage"]["author"]["nickname"]; } catch { }
+                try { userId = (string)jsonObj["o"]["chatMessage"]["author"]["uid"]; } catch { }
+                try { userLevel = (int)jsonObj["o"]["chatMessage"]["author"]["level"]; } catch { }
+                try { iconUrl = (string)jsonObj["o"]["chatMessage"]["author"]["icon"]; } catch { }
+                try { userReputation = (int)jsonObj["o"]["chatMessage"]["author"]["reputation"]; } catch { }
                 try { frameId = (string)jsonObj["o"]["chatMessage"]["author"]["avatarFrame"]["frameId"]; } catch { }
             }
         }
