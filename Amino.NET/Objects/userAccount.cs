@@ -22,7 +22,7 @@ namespace Amino.Objects
         public int? securityLevel { get; private set; }
         public string phoneNumber { get; private set; }
         public int? role { get; private set; }
-        public bool aminoIdEditable { get; private set; }
+        public bool aminoIdEditable { get; private set; } = false;
         public string aminoId { get; private set; }
         public string createdTime { get; private set; }
         public string email { get; private set; }

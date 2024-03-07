@@ -1323,7 +1323,7 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task send_message(string message, string chatId, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
+        public Objects.Message send_message(string message, string chatId, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
         {
             try
             {
@@ -1370,7 +1370,7 @@ namespace Amino
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
+                return new Objects.Message(JObject.Parse(response.Content));
             }
             catch (Exception e) { throw new Exception(e.Message); }
         }
