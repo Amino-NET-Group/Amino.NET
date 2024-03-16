@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Version>1.5.1</Version>
+    <Version>1.5.1-Dev-7.1.2.8.3.5.0</Version>
     <Authors>FabioTheFox</Authors>
     <Company>FabiDev</Company>
     <Description>An unofficial C# wrapper for Aminos REST API for making amino bots and tools</Description>
