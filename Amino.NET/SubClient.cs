@@ -37,6 +37,7 @@ namespace Amino
             headers.Add("Accept-Encoding", "gzip");
             headers.Add("Connection", "Keep-Alive");
             headers.Add("User-Agent", "Apple iPhone13,4 iOS v15.6.1 Main/3.12.9");
+            headers.Add("AUID", this.client.userID);
             if (client.sessionID != null) { headers.Add("NDCAUTH", $"sid={client.sessionID}"); }
             return Task.CompletedTask;
         }
