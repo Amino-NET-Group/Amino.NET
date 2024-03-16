@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Amino
@@ -235,9 +236,21 @@ namespace Amino
         /// <returns></returns>
         public static dynamic DecodeSid(string session)
         {
-            var decoded = Convert.FromBase64String(session + new string('=', 4 - session.Length % 4));
-            var jsonStr = Encoding.UTF8.GetString(decoded, 1, decoded.Length - 21);
-            return JsonConvert.DeserializeObject<dynamic>(jsonStr);
+            // Replace characters and adjust padding
+            session = session.Replace('-', '_').Replace('+', '/');
+            int padding = session.Length % 4;
+            if (padding > 0)
+            {
+                session = session.PadRight(session.Length + (4 - padding), '=');
+            }
+
+            // Decode base64, remove the first byte, and remove the last 21 bytes
+            byte[] bytes = Convert.FromBase64String(session);
+            bytes = bytes.Skip(1).Take(bytes.Length - 21).ToArray();
+
+            // Convert bytes to UTF-8 string and parse JSON directly
+            string jsonString = Encoding.UTF8.GetString(bytes);
+            return System.Text.Json.JsonSerializer.Deserialize<dynamic>(jsonString);
         }
 
         public static string sid_to_uid(string session) { return DecodeSid(session)["2"]; }

@@ -37,6 +37,7 @@ namespace Amino
             headers.Add("Accept-Encoding", "gzip");
             headers.Add("Connection", "Keep-Alive");
             headers.Add("User-Agent", "Apple iPhone13,4 iOS v15.6.1 Main/3.12.9");
+            headers.Add("AUID", this.client.userID);
             if (client.sessionID != null) { headers.Add("NDCAUTH", $"sid={client.sessionID}"); }
             return Task.CompletedTask;
         }
@@ -1323,7 +1324,7 @@ namespace Amino
             catch (Exception e) { throw new Exception(e.Message); }
         }
 
-        public Task send_message(string message, string chatId, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
+        public Objects.Message send_message(string message, string chatId, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
         {
             try
             {
@@ -1370,7 +1371,7 @@ namespace Amino
                 var response = client.ExecutePost(request);
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
+                return new Objects.Message(JObject.Parse(response.Content));
             }
             catch (Exception e) { throw new Exception(e.Message); }
         }
