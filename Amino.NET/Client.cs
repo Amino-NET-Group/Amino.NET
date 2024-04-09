@@ -476,39 +476,32 @@ namespace Amino
         /// <returns></returns>
         public Task delete_account(string _password)
         {
-            var data = new { deviceID = deviceID, secret = $"0 {_password}" };
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/account/delete-request");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                sessionID = null;
-                secret = null;
-                userID = null;
-                json = null;
-                googleID = null;
-                appleID = null;
-                facebookID = null;
-                twitterID = null;
-                iconURL = null;
-                aminoID = null;
-                email = null;
-                phoneNumber = null;
-                nickname = null;
-                is_Global = false;
-                headerBuilder();
-                _ = webSocket.DisconnectSocket();
-                return Task.CompletedTask;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+            JObject data = new JObject() { { "deviceID", deviceID }, { "secret", $"0 {_password}" } };
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/account/delete-request");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+            request.AddJsonBody(data);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            sessionID = null;
+            secret = null;
+            userID = null;
+            json = null;
+            googleID = null;
+            appleID = null;
+            facebookID = null;
+            twitterID = null;
+            iconURL = null;
+            aminoID = null;
+            email = null;
+            phoneNumber = null;
+            nickname = null;
+            is_Global = false;
+            headerBuilder();
+            _ = webSocket.DisconnectSocket();
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -522,26 +515,23 @@ namespace Amino
         public Task activate_account(string _email, string _verificationCode, string _deviceID = null)
         {
             if (_deviceID == null) { if (deviceID != null) { _deviceID = deviceID; } else { _deviceID = helpers.generate_device_id(); } }
-            var data = new
+
+            JObject data = new JObject()
             {
-                type = 1,
-                identity = _email,
-                data = new { code = _verificationCode },
-                deviceID = _deviceID
+                { "type", 1 },
+                { "identity", _email },
+                { "data", new JObject() { "code", _verificationCode } },
+                { "deviceId", _deviceID }
             };
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/auth/activate-email");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/auth/activate-email");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -560,19 +550,16 @@ namespace Amino
                 { "gender", (int)_gender },
                 { "timestamp", helpers.GetTimestamp() * 1000 }
             };
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/persona/profile/basic");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/persona/profile/basic");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -623,18 +610,14 @@ namespace Amino
         /// <returns>Object : Amino.Objects.GlobalProfile</returns>
         public Amino.Objects.GlobalProfile get_user_info(string _userId)
         {
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{_userId}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                Amino.Objects.GlobalProfile profile = new Amino.Objects.GlobalProfile((JObject)JObject.Parse(response.Content));
-                return profile;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{_userId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            Amino.Objects.GlobalProfile profile = new Amino.Objects.GlobalProfile((JObject)JObject.Parse(response.Content));
+            return profile;
         }
 
         /// <summary>
@@ -679,18 +662,15 @@ namespace Amino
         public Amino.Objects.EventLog get_event_log()
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/eventlog/profile?language=en");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                Amino.Objects.EventLog eventLog = new Amino.Objects.EventLog(JObject.Parse(response.Content));
-                return eventLog;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/eventlog/profile?language=en");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            Amino.Objects.EventLog eventLog = new Amino.Objects.EventLog(JObject.Parse(response.Content));
+            return eventLog;
+
         }
 
 
@@ -706,25 +686,21 @@ namespace Amino
 
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/community/joined?v=1&start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/community/joined?v=1&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
 
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray _jsonArray = jsonObj["communityList"];
-                foreach (JObject _communityJson in _jsonArray)
-                {
-                    Amino.Objects.Community community = new Objects.Community(_communityJson);
-                    communityList.Add(community);
-                }
-                return communityList;
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray _jsonArray = jsonObj["communityList"];
+            foreach (JObject _communityJson in _jsonArray)
+            {
+                Amino.Objects.Community community = new Objects.Community(_communityJson);
+                communityList.Add(community);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return communityList;
         }
 
         /// <summary>
@@ -737,29 +713,25 @@ namespace Amino
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.CommunityProfile> profileList = new List<Objects.CommunityProfile>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/community/joined?v=1&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            var profiles = ((JObject)JObject.Parse(response.Content)["userInfoInCommunities"])
+            .Properties()
+            .Select(x => x.Value)
+            .Cast<JObject>()
+            .ToList();
+            foreach (var profile in profiles)
             {
-                List<Objects.CommunityProfile> profileList = new List<Objects.CommunityProfile>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/community/joined?v=1&start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                var profiles = ((JObject)JObject.Parse(response.Content)["userInfoInCommunities"])
-                .Properties()
-                .Select(x => x.Value)
-                .Cast<JObject>()
-                .ToList();
-                foreach (var profile in profiles)
-                {
-                    Objects.CommunityProfile C_Profile = new Objects.CommunityProfile(profile);
-                    profileList.Add(C_Profile);
-                }
-
-                return profileList;
+                Objects.CommunityProfile C_Profile = new Objects.CommunityProfile(profile);
+                profileList.Add(C_Profile);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+
+            return profileList;
         }
 
         /// <summary>
@@ -769,19 +741,14 @@ namespace Amino
         public Objects.UserAccount get_account_info()
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/account");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                Objects.UserAccount account = new Objects.UserAccount(JObject.Parse(response.Content));
-                return account;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/account");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            Objects.UserAccount account = new Objects.UserAccount(JObject.Parse(response.Content));
+            return account;
 
         }
         /// <summary>
@@ -795,29 +762,25 @@ namespace Amino
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
 
-            try
+            List<Objects.Chat> chatList = new List<Objects.Chat>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread?type=joined-me&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray _chatList = jsonObj["threadList"];
+            foreach (JObject chatJson in _chatList)
             {
-                List<Objects.Chat> chatList = new List<Objects.Chat>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread?type=joined-me&start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
+                Objects.Chat chat = new Objects.Chat(chatJson);
 
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray _chatList = jsonObj["threadList"];
-                foreach (JObject chatJson in _chatList)
-                {
-                    Objects.Chat chat = new Objects.Chat(chatJson);
-
-                    chatList.Add(chat);
-                }
-
-                return chatList;
-
+                chatList.Add(chat);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+
+            return chatList;
+
         }
 
         /// <summary>
@@ -829,19 +792,15 @@ namespace Amino
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
 
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                Objects.Chat chat = new Objects.Chat(jsonObj["thread"]);
-                return chat;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            Objects.Chat chat = new Objects.Chat(jsonObj["thread"]);
+            return chat;
         }
 
         /// <summary>
@@ -855,25 +814,21 @@ namespace Amino
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.ChatMember> chatMembers = new List<Objects.ChatMember>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member?start={start}&size={size}&type=default&cv=1.2");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray chatUserList = jsonObj["memberList"];
+            foreach (JObject chatUser in chatUserList)
             {
-                List<Objects.ChatMember> chatMembers = new List<Objects.ChatMember>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member?start={start}&size={size}&type=default&cv=1.2");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray chatUserList = jsonObj["memberList"];
-                foreach (JObject chatUser in chatUserList)
-                {
-                    Objects.ChatMember member = new Objects.ChatMember(chatUser);
-                    chatMembers.Add(member);
-                }
-                return chatMembers;
+                Objects.ChatMember member = new Objects.ChatMember(chatUser);
+                chatMembers.Add(member);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return chatMembers;
         }
         /// <summary>
         /// Allows you to join a chat with the current Amino account
@@ -883,17 +838,13 @@ namespace Amino
         public Task join_chat(string chatId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userID}");
-                request.AddHeaders(headers);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userID}");
+            request.AddHeaders(headers);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -904,18 +855,14 @@ namespace Amino
         public Task leave_chat(string chatId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userID}");
-                request.AddHeaders(headers);
-                request.Method = Method.Delete;
-                var response = client.Execute(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userID}");
+            request.AddHeaders(headers);
+            request.Method = Method.Delete;
+            var response = client.Execute(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -927,23 +874,19 @@ namespace Amino
         public Task invite_to_chat(string[] userIds, string chatId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                JObject data = new JObject();
-                data.Add("timestamp", (Math.Round(helpers.GetTimestamp())) * 1000);
-                data.Add("uids", JToken.FromObject(new { userIds }));
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/invite");
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+            JObject data = new JObject();
+            data.Add("timestamp", (Math.Round(helpers.GetTimestamp())) * 1000);
+            data.Add("uids", JToken.FromObject(new { userIds }));
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/invite");
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
 
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -958,17 +901,13 @@ namespace Amino
             int _allowRejoin;
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (allowRejoin) { _allowRejoin = 1; } else { _allowRejoin = 0; }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userId}?allowRejoin={_allowRejoin}");
-                request.AddHeaders(headers);
-                var response = client.Delete(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/member/{userId}?allowRejoin={_allowRejoin}");
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -983,25 +922,21 @@ namespace Amino
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             string endPoint;
             if (!string.IsNullOrEmpty(pageToken) || !string.IsNullOrWhiteSpace(pageToken)) { endPoint = $"/g/s/chat/thread/{chatId}/message?v=2&pagingType=t&pageToken={pageToken}&size={size}"; } else { endPoint = $"/g/s/chat/thread/{chatId}/message?v=2&pagingType=t&size={size}"; }
-            try
+            List<Objects.MessageCollection> messageCollection = new List<Objects.MessageCollection>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest(endPoint);
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray chatMessageList = jsonObj["messageList"];
+            foreach (JObject chatMessage in chatMessageList)
             {
-                List<Objects.MessageCollection> messageCollection = new List<Objects.MessageCollection>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest(endPoint);
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray chatMessageList = jsonObj["messageList"];
-                foreach (JObject chatMessage in chatMessageList)
-                {
-                    Objects.MessageCollection message = new Objects.MessageCollection(chatMessage, JObject.Parse(response.Content));
-                    messageCollection.Add(message);
-                }
-                return messageCollection;
+                Objects.MessageCollection message = new Objects.MessageCollection(chatMessage, JObject.Parse(response.Content));
+                messageCollection.Add(message);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return messageCollection;
         }
 
         /// <summary>
@@ -1011,25 +946,21 @@ namespace Amino
         /// <returns>List : Amino.Objects.CommunityInfo</returns>
         public List<Objects.CommunityInfo> search_community(string aminoId)
         {
-            try
+            List<Objects.CommunityInfo> communityInfoList = new List<Objects.CommunityInfo>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/search/amino-id-and-link?q={aminoId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray communityInfo = jsonObj["resultList"];
+            foreach (JObject community in communityInfo)
             {
-                List<Objects.CommunityInfo> communityInfoList = new List<Objects.CommunityInfo>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/search/amino-id-and-link?q={aminoId}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray communityInfo = jsonObj["resultList"];
-                foreach (JObject community in communityInfo)
-                {
-                    Objects.CommunityInfo com = new Objects.CommunityInfo(community);
-                    communityInfoList.Add(com);
-                }
-                return communityInfoList;
+                Objects.CommunityInfo com = new Objects.CommunityInfo(community);
+                communityInfoList.Add(com);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return communityInfoList;
         }
 
         /// <summary>
@@ -1042,26 +973,21 @@ namespace Amino
         public List<Objects.UserFollowings> get_user_following(string userId, int start = 0, int size = 25)
         {
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.UserFollowings> userFollowingsList = new List<Objects.UserFollowings>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/joined?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray userFollowings = jsonObj["userProfileList"];
+            foreach (JObject following in userFollowings)
             {
-                List<Objects.UserFollowings> userFollowingsList = new List<Objects.UserFollowings>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/joined?start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray userFollowings = jsonObj["userProfileList"];
-                foreach (JObject following in userFollowings)
-                {
-                    Objects.UserFollowings _following = new Objects.UserFollowings(following);
-                    userFollowingsList.Add(_following);
-                }
-                return userFollowingsList;
-
+                Objects.UserFollowings _following = new Objects.UserFollowings(following);
+                userFollowingsList.Add(_following);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return userFollowingsList;
         }
 
         /// <summary>
@@ -1074,26 +1000,21 @@ namespace Amino
         public List<Objects.UserFollowings> get_user_followers(string userId, int start = 0, int size = 25)
         {
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.UserFollowings> userFollowerList = new List<Objects.UserFollowings>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/member?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray userFollowers = jsonObj["userProfileList"];
+            foreach (JObject follower in userFollowers)
             {
-                List<Objects.UserFollowings> userFollowerList = new List<Objects.UserFollowings>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/member?start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray userFollowers = jsonObj["userProfileList"];
-                foreach (JObject follower in userFollowers)
-                {
-                    Objects.UserFollowings _follower = new Objects.UserFollowings(follower);
-                    userFollowerList.Add(_follower);
-                }
-                return userFollowerList;
-
+                Objects.UserFollowings _follower = new Objects.UserFollowings(follower);
+                userFollowerList.Add(_follower);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return userFollowerList;
 
         }
 
@@ -1107,25 +1028,21 @@ namespace Amino
         public List<Objects.UserVisitor> get_user_visitors(string userId, int start = 0, int size = 25)
         {
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.UserVisitor> userVisitorList = new List<Objects.UserVisitor>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/visitors?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray userVisitors = jsonObj["visitors"];
+            foreach (JObject visitor in userVisitors)
             {
-                List<Objects.UserVisitor> userVisitorList = new List<Objects.UserVisitor>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/visitors?start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray userVisitors = jsonObj["visitors"];
-                foreach (JObject visitor in userVisitors)
-                {
-                    Objects.UserVisitor _visitor = new Objects.UserVisitor(visitor, jsonObj);
-                    userVisitorList.Add(_visitor);
-                }
-                return userVisitorList;
+                Objects.UserVisitor _visitor = new Objects.UserVisitor(visitor, jsonObj);
+                userVisitorList.Add(_visitor);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return userVisitorList;
         }
 
         /// <summary>
@@ -1138,25 +1055,21 @@ namespace Amino
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.BlockedUser> blockedUserList = new List<Objects.BlockedUser>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/block?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.StatusCode); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray blockedUsers = jsonObj["userProfileList"];
+            foreach (JObject user in blockedUsers)
             {
-                List<Objects.BlockedUser> blockedUserList = new List<Objects.BlockedUser>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/block?start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.StatusCode); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray blockedUsers = jsonObj["userProfileList"];
-                foreach (JObject user in blockedUsers)
-                {
-                    Objects.BlockedUser _blockedUser = new Objects.BlockedUser(user);
-                    blockedUserList.Add(_blockedUser);
-                }
-                return blockedUserList;
+                Objects.BlockedUser _blockedUser = new Objects.BlockedUser(user);
+                blockedUserList.Add(_blockedUser);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return blockedUserList;
         }
 
         /// <summary>
@@ -1169,24 +1082,20 @@ namespace Amino
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<string> blockerUserList = new List<string>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/block/full-list?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray blockerUsers = jsonObj["blockerUidList"];
+            foreach (var user in blockerUsers)
             {
-                List<string> blockerUserList = new List<string>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/block/full-list?start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray blockerUsers = jsonObj["blockerUidList"];
-                foreach (var user in blockerUsers)
-                {
-                    blockerUserList.Add(user.ToString());
-                }
-                return blockerUserList;
+                blockerUserList.Add(user.ToString());
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return blockerUserList;
         }
 
         /// <summary>
@@ -1200,42 +1109,37 @@ namespace Amino
         public List<Objects.Comment> get_wall_comments(string userId, Types.Sorting_Types type, int start = 0, int size = 25)
         {
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.Comment> commentList = new List<Objects.Comment>();
+            string _sorting_type;
+            switch (type)
             {
-                List<Objects.Comment> commentList = new List<Objects.Comment>();
-                string _sorting_type;
-                switch (type)
-                {
-                    case Types.Sorting_Types.Newest:
-                        _sorting_type = "newest";
-                        break;
-                    case Types.Sorting_Types.Oldest:
-                        _sorting_type = "oldest";
-                        break;
-                    case Types.Sorting_Types.Top:
-                        _sorting_type = "vote";
-                        break;
-                    default:
-                        _sorting_type = "newest";
-                        break;
-                }
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/g-comment?sort={_sorting_type}&start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray comments = jsonObj["commentList"];
-                foreach (JObject comment in comments)
-                {
-                    Objects.Comment _comment = new Objects.Comment(comment);
-                    commentList.Add(_comment);
-                }
-                return commentList;
-
+                case Types.Sorting_Types.Newest:
+                    _sorting_type = "newest";
+                    break;
+                case Types.Sorting_Types.Oldest:
+                    _sorting_type = "oldest";
+                    break;
+                case Types.Sorting_Types.Top:
+                    _sorting_type = "vote";
+                    break;
+                default:
+                    _sorting_type = "newest";
+                    break;
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/g-comment?sort={_sorting_type}&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray comments = jsonObj["commentList"];
+            foreach (JObject comment in comments)
+            {
+                Objects.Comment _comment = new Objects.Comment(comment);
+                commentList.Add(_comment);
+            }
+            return commentList;
         }
 
         /// <summary>
@@ -1251,27 +1155,23 @@ namespace Amino
         {
             if (!asGuest) { if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); } }
             string _flag = asGuest ? "g-flag" : "flag";
-            try
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/{_flag}");
+            var data = new
             {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/{_flag}");
-                var data = new
-                {
-                    flagType = (int)flagType,
-                    message = reason,
-                    timestamp = helpers.GetTimestamp() * 1000,
-                    objectId = targetId,
-                    objetType = (int)targetType
-                };
-                request.AddHeaders(headers);
-                request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+                flagType = (int)flagType,
+                message = reason,
+                timestamp = helpers.GetTimestamp() * 1000,
+                objectId = targetId,
+                objetType = (int)targetType
+            };
+            request.AddHeaders(headers);
+            request.AddJsonBody(data);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1285,26 +1185,22 @@ namespace Amino
         public Task delete_message(string chatId, string messageId, bool asStaff = false, string reason = null)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                JObject data = new JObject()
+            JObject data = new JObject()
                 {
                     { "adminOpName", 102 },
                     { "adminOpNote", new JObject() { "content", reason } },
                     { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message/{messageId}");
-                if (asStaff) { request.Resource = request.Resource + "/admin"; }
-                request.AddHeaders(headers);
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message/{messageId}");
+            if (asStaff) { request.Resource = request.Resource + "/admin"; }
+            request.AddHeaders(headers);
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
         /// <summary>
         /// Allows you to mark a message as read with the current Amino account
@@ -1320,19 +1216,15 @@ namespace Amino
                 { "messageId", _messageId },
                 { "timestamp", helpers.GetTimestamp() * 1000 }
             };
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{_chatId}/mark-as-read");
-                request.AddHeaders(headers);
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{_chatId}/mark-as-read");
+            request.AddHeaders(headers);
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1342,17 +1234,13 @@ namespace Amino
         /// <returns></returns>
         public Task visit(string userId)
         {
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}?action=visit");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{userId}?action=visit");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1363,17 +1251,13 @@ namespace Amino
         public Task follow_user(string userId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/member");
-                request.AddHeaders(headers);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{userId}/member");
+            request.AddHeaders(headers);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1384,18 +1268,13 @@ namespace Amino
         public Task unfollow_user(string _userId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{_userId}/member/{userID}");
-                request.AddHeaders(headers);
-                var response = client.Delete(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{_userId}/member/{userID}");
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
         /// <summary>
         /// Allows you to block a user with the current Amino account
@@ -1405,17 +1284,13 @@ namespace Amino
         public Task block_user(string _userId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/block/{_userId}");
-                request.AddHeaders(headers);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/block/{_userId}");
+            request.AddHeaders(headers);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1426,17 +1301,13 @@ namespace Amino
         public Task unblock_user(string _userId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/block/{_userId}");
-                request.AddHeaders(headers);
-                var response = client.Delete(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/block/{_userId}");
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1448,22 +1319,18 @@ namespace Amino
         public Task join_community(string communityId, string invitationCode = null)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                JObject data = new JObject();
-                data.Add("timestamp", helpers.GetTimestamp() * 1000);
-                if (invitationCode != null) { data.Add("invitationId", invitationCode); }
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/x{communityId}/s/community/join");
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            JObject data = new JObject();
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+            if (invitationCode != null) { data.Add("invitationId", invitationCode); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/community/join");
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1475,24 +1342,20 @@ namespace Amino
         public Task join_community_request(string communityId, string message = null)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/community/membership-request");
+            var data = new JObject()
             {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/x{communityId}/s/community/membership-request");
-                var data = new
-                {
-                    message = message,
-                    timestamp = helpers.GetTimestamp() * 1000
-                };
-                request.AddJsonBody(data);
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+                { "message", message },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1503,17 +1366,13 @@ namespace Amino
         public Task leave_community(string communityId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/s/community/leave");
-                request.AddHeaders(headers);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/s/community/leave");
+            request.AddHeaders(headers);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1528,57 +1387,24 @@ namespace Amino
         {
             if (!asGuest) { if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); } }
             int _flagType;
-            string _flag;
-            switch (flagType)
+            string _flag = asGuest ? "g-flag" : "flag";
+            JObject data = new JObject()
             {
-                case Types.Flag_Types.Aggression:
-                    _flagType = 0;
-                    break;
-                case Types.Flag_Types.Spam:
-                    _flagType = 2;
-                    break;
-                case Types.Flag_Types.Off_Topic:
-                    _flagType = 4;
-                    break;
-                case Types.Flag_Types.Violence:
-                    _flagType = 106;
-                    break;
-                case Types.Flag_Types.Intolerance:
-                    _flagType = 107;
-                    break;
-                case Types.Flag_Types.Suicide:
-                    _flagType = 108;
-                    break;
-                case Types.Flag_Types.Pronography:
-                    _flagType = 110;
-                    break;
-                default:
-                    _flagType = 0;
-                    break;
-            }
-            if (asGuest) { _flag = "g-flag"; } else { _flag = "flag"; }
-            var data = new
-            {
-                objectId = communityId,
-                objectType = 16,
-                flagType = _flagType,
-                message = reason,
-                timestamp = helpers.GetTimestamp() * 1000
+                { "objectId", communityId },
+                { "objectType", 16 },
+                { "flagType", (int)flagType },
+                { "message", reason },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
             };
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/x{communityId}/s/{_flag}");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/x{communityId}/s/{_flag}");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
 
         }
 
@@ -1618,21 +1444,17 @@ namespace Amino
                     _fileType = "image/jpg";
                     break;
             }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/media/upload");
-                request.AddHeaders(headers);
-                request.AddOrUpdateHeader("Content-Type", _fileType);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_file_signiture(file));
-                request.AddBody(file, _fileType);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                return jsonObj["mediaValue"];
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/media/upload");
+            request.AddHeaders(headers);
+            request.AddOrUpdateHeader("Content-Type", _fileType);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_file_signiture(file));
+            request.AddBody(file, _fileType);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            return jsonObj["mediaValue"];
 
         }
         /// <summary>
@@ -1699,19 +1521,15 @@ namespace Amino
                 }
 
             }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"g/s/user-profile/{userID}");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"g/s/user-profile/{userID}");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1723,29 +1541,23 @@ namespace Amino
         public Task set_privacy_status(bool isAnonymous = false, bool getNotifications = true)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            int _privacyMode;
-            int _notificationStatus;
-            if (isAnonymous) { _privacyMode = 2; } else { _privacyMode = 1; }
-            if (getNotifications) { _notificationStatus = 2; } else { _notificationStatus = 1; }
-            var data = new
+            int _privacyMode = isAnonymous ? 2 : 1;
+            int _notificationStatus = getNotifications ? 2 : 1;
+            JObject data = new JObject()
             {
-                timestamp = helpers.GetTimestamp() * 1000,
-                notificationStatus = _notificationStatus,
-                privacyMode = _privacyMode
+                { "timestamp", helpers.GetTimestamp() * 1000 },
+                { "notificationStatus", _notificationStatus },
+                { "privacyMode", _privacyMode }
             };
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/account/visit-settings");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/account/visit-settings");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1756,24 +1568,20 @@ namespace Amino
         public Task set_amino_id(string aminoId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            var data = new
+            JObject data = new JObject()
             {
-                timestamp = helpers.GetTimestamp() * 1000,
-                aminoId = aminoId
+                { "timestamp", helpers.GetTimestamp() * 1000 },
+                { "aminoId", aminoId }
             };
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/account/change-amino-id");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/account/change-amino-id");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1784,17 +1592,13 @@ namespace Amino
         public Task add_linked_community(int communityId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userID}/linked-community/{communityId}");
-                request.AddHeaders(headers);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{userID}/linked-community/{communityId}");
+            request.AddHeaders(headers);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1805,17 +1609,13 @@ namespace Amino
         public Task remove_linked_community(int communityId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile/{userID}/linked-community/{communityId}");
-                request.AddHeaders(headers);
-                var response = client.Delete(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile/{userID}/linked-community/{communityId}");
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1830,50 +1630,46 @@ namespace Amino
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             string _eventSource;
             bool _isReply = false;
-            try
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest();
+            request.AddHeaders(headers);
+            JObject data = new JObject();
+            data.Add("content", message);
+            data.Add("stickerId", null);
+            data.Add("type", 0);
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+
+
+            switch (type)
             {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest();
-                request.AddHeaders(headers);
-                JObject data = new JObject();
-                data.Add("content", message);
-                data.Add("stickerId", null);
-                data.Add("type", 0);
-                data.Add("timestamp", helpers.GetTimestamp() * 1000);
-
-
-                switch (type)
-                {
-                    case Types.Comment_Types.User:
-                        request.Resource = $"/g/s/user-profile/{objectId}/g-comment";
-                        _eventSource = "UserProfileView";
-                        break;
-                    case Types.Comment_Types.Blog:
-                        request.Resource = $"/g/s/blog/{objectId}/g-comment";
-                        _eventSource = "PostDetailView";
-                        break;
-                    case Types.Comment_Types.Wiki:
-                        request.Resource = $"/g/s/item/{objectId}/g-comment";
-                        _eventSource = "PostDetailView";
-                        break;
-                    case Types.Comment_Types.Reply:
-                        _isReply = true;
-                        _eventSource = "";
-                        break;
-                    default:
-                        request.Resource = $"/g/s/user-profile/{objectId}/g-comment";
-                        _eventSource = "UserProfileView";
-                        break;
-                }
-                if (!_isReply) { data.Add("eventSource", _eventSource); } else { data.Add("respondTo", objectId); }
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
-                request.AddJsonBody(data);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
+                case Types.Comment_Types.User:
+                    request.Resource = $"/g/s/user-profile/{objectId}/g-comment";
+                    _eventSource = "UserProfileView";
+                    break;
+                case Types.Comment_Types.Blog:
+                    request.Resource = $"/g/s/blog/{objectId}/g-comment";
+                    _eventSource = "PostDetailView";
+                    break;
+                case Types.Comment_Types.Wiki:
+                    request.Resource = $"/g/s/item/{objectId}/g-comment";
+                    _eventSource = "PostDetailView";
+                    break;
+                case Types.Comment_Types.Reply:
+                    _isReply = true;
+                    _eventSource = "";
+                    break;
+                default:
+                    request.Resource = $"/g/s/user-profile/{objectId}/g-comment";
+                    _eventSource = "UserProfileView";
+                    break;
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            if (!_isReply) { data.Add("eventSource", _eventSource); } else { data.Add("respondTo", objectId); }
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data.ToString())));
+            request.AddJsonBody(data);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1886,33 +1682,28 @@ namespace Amino
         public Task delete_comment(string commentId, Types.Comment_Types type, string objectId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
+            RestClient client = new RestClient();
+            RestRequest request = new RestRequest();
+            switch (type)
             {
-                RestClient client = new RestClient();
-                RestRequest request = new RestRequest();
-                switch (type)
-                {
-                    case Types.Comment_Types.User:
-                        request.Resource = $"/g/s/user-profile/{objectId}/g-comment/{commentId}";
-                        break;
-                    case Types.Comment_Types.Blog:
-                        request.Resource = $"/g/s/blog/{objectId}/g-comment/{commentId}";
-                        break;
-                    case Types.Comment_Types.Wiki:
-                        request.Resource = $"/g/s/item/{objectId}/g-comment/{commentId}";
-                        break;
-                    default:
-                        request.Resource = $"/g/s/user-profile/{objectId}/g-comment/{commentId}";
-                        break;
-                }
-                request.AddHeaders(headers);
-                var response = client.Delete(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-
+                case Types.Comment_Types.User:
+                    request.Resource = $"/g/s/user-profile/{objectId}/g-comment/{commentId}";
+                    break;
+                case Types.Comment_Types.Blog:
+                    request.Resource = $"/g/s/blog/{objectId}/g-comment/{commentId}";
+                    break;
+                case Types.Comment_Types.Wiki:
+                    request.Resource = $"/g/s/item/{objectId}/g-comment/{commentId}";
+                    break;
+                default:
+                    request.Resource = $"/g/s/user-profile/{objectId}/g-comment/{commentId}";
+                    break;
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            request.AddHeaders(headers);
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1925,41 +1716,36 @@ namespace Amino
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             string _eventSource;
-            try
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest();
+            switch (type)
             {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest();
-                switch (type)
-                {
-                    case Types.Post_Types.Blog:
-                        request.Resource = $"/g/s/blog/{objectId}/g-vote?cv=1.2";
-                        _eventSource = "UserProfileView";
-                        break;
-                    case Types.Post_Types.Wiki:
-                        request.Resource = $"/g/s/item/{objectId}/g-vote?cv=1.2";
-                        _eventSource = "PostDetailView";
-                        break;
-                    default:
-                        request.Resource = $"/g/s/blog/{objectId}/g-vote?cv=1.2";
-                        _eventSource = "UserProfileView";
-                        break;
-                }
-                var data = new
-                {
-                    value = 4,
-                    timestamp = helpers.GetTimestamp() * 1000,
-                    eventSource = _eventSource
-                };
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-
+                case Types.Post_Types.Blog:
+                    request.Resource = $"/g/s/blog/{objectId}/g-vote?cv=1.2";
+                    _eventSource = "UserProfileView";
+                    break;
+                case Types.Post_Types.Wiki:
+                    request.Resource = $"/g/s/item/{objectId}/g-vote?cv=1.2";
+                    _eventSource = "PostDetailView";
+                    break;
+                default:
+                    request.Resource = $"/g/s/blog/{objectId}/g-vote?cv=1.2";
+                    _eventSource = "UserProfileView";
+                    break;
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            JObject data = new JObject()
+            {
+                { "value", 4 },
+                { "timestamp", helpers.GetTimestamp() * 1000 },
+                { "eventSource", _eventSource }
+            };
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1971,30 +1757,26 @@ namespace Amino
         public Task unlike_post(string objectId, Types.Post_Types type)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest();
-                request.AddHeaders(headers);
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest();
+            request.AddHeaders(headers);
 
-                switch (type)
-                {
-                    case Types.Post_Types.Blog:
-                        request.Resource = $"/g/s/blog/{objectId}/g-vote?eventSource=UserProfileView";
-                        break;
-                    case Types.Post_Types.Wiki:
-                        request.Resource = $"/g/s/item/{objectId}/g-vote?eventSource=PostDetailView";
-                        break;
-                    default:
-                        request.Resource = $"/g/s/blog/{objectId}/g-vote?eventSource=UserProfileView";
-                        break;
-                }
-                var response = client.Delete(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
+            switch (type)
+            {
+                case Types.Post_Types.Blog:
+                    request.Resource = $"/g/s/blog/{objectId}/g-vote?eventSource=UserProfileView";
+                    break;
+                case Types.Post_Types.Wiki:
+                    request.Resource = $"/g/s/item/{objectId}/g-vote?eventSource=PostDetailView";
+                    break;
+                default:
+                    request.Resource = $"/g/s/blog/{objectId}/g-vote?eventSource=UserProfileView";
+                    break;
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            var response = client.Delete(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -2004,18 +1786,14 @@ namespace Amino
         public Objects.MembershipInfo get_membership_info()
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/membership?force=true");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                Objects.MembershipInfo membershipInfo = new Objects.MembershipInfo(JObject.Parse(response.Content));
-                return membershipInfo;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/membership?force=true");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            Objects.MembershipInfo membershipInfo = new Objects.MembershipInfo(JObject.Parse(response.Content));
+            return membershipInfo;
         }
 
         /// <summary>
@@ -2056,25 +1834,21 @@ namespace Amino
                     _language = "en";
                     break;
             }
-            try
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/announcement?language={_language}&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray announcements = jsonObj["blogList"];
+            List<Objects.Post> ta_announcements = new List<Objects.Post>();
+            foreach (JObject post in announcements)
             {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/announcement?language={_language}&start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray announcements = jsonObj["blogList"];
-                List<Objects.Post> ta_announcements = new List<Objects.Post>();
-                foreach (JObject post in announcements)
-                {
-                    Objects.Post _post = new Objects.Post(post);
-                    ta_announcements.Add(_post);
-                }
-                return ta_announcements;
+                Objects.Post _post = new Objects.Post(post);
+                ta_announcements.Add(_post);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return ta_announcements;
         }
 
         /// <summary>
@@ -2084,19 +1858,15 @@ namespace Amino
         public Objects.WalletInfo get_wallet_info()
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/wallet");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                JObject jsonObj = JObject.Parse(response.Content);
-                Objects.WalletInfo _walletInfo = new Objects.WalletInfo(jsonObj);
-                return _walletInfo;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/wallet");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            JObject jsonObj = JObject.Parse(response.Content);
+            Objects.WalletInfo _walletInfo = new Objects.WalletInfo(jsonObj);
+            return _walletInfo;
         }
 
         /// <summary>
@@ -2109,26 +1879,21 @@ namespace Amino
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/wallet/coin/history?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray historyEntry = jsonObj["coinHistoryList"];
+            List<Objects.CoinHistoryEntry> coinHistoryList = new List<Objects.CoinHistoryEntry>();
+            foreach (JObject entry in historyEntry)
             {
-
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/wallet/coin/history?start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray historyEntry = jsonObj["coinHistoryList"];
-                List<Objects.CoinHistoryEntry> coinHistoryList = new List<Objects.CoinHistoryEntry>();
-                foreach (JObject entry in historyEntry)
-                {
-                    Objects.CoinHistoryEntry _entry = new Objects.CoinHistoryEntry(entry);
-                    coinHistoryList.Add(_entry);
-                }
-                return coinHistoryList;
+                Objects.CoinHistoryEntry _entry = new Objects.CoinHistoryEntry(entry);
+                coinHistoryList.Add(_entry);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return coinHistoryList;
         }
 
         /// <summary>
@@ -2138,19 +1903,15 @@ namespace Amino
         /// <returns>string : the target users ID</returns>
         public string get_from_deviceId(string deviceId)
         {
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/auid?deviceId={deviceId}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                Console.WriteLine(response.Content);
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                return jsonObj["auid"];
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/auid?deviceId={deviceId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            Console.WriteLine(response.Content);
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            return jsonObj["auid"];
         }
 
         /// <summary>
@@ -2160,19 +1921,15 @@ namespace Amino
         /// <returns>Object : Amino.Objects.FromCode</returns>
         public Objects.FromCode get_from_code(string aminoUrl)
         {
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/link-resolution?q={aminoUrl}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                Amino.Objects.FromCode fromCode = new Objects.FromCode(jsonObj);
-                return fromCode;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/link-resolution?q={aminoUrl}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            Amino.Objects.FromCode fromCode = new Objects.FromCode(jsonObj);
+            return fromCode;
         }
 
         /// <summary>
@@ -2185,33 +1942,29 @@ namespace Amino
         public Objects.FromId get_from_id(string objectId, Amino.Types.Object_Types type, string communityId = null)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            var data = new
+            JObject data = new JObject()
             {
-                objectId = objectId,
-                targetCode = 1,
-                timestamp = helpers.GetTimestamp() * 1000,
-                objectType = (int)type
+                { "objectId", objectId },
+                { "targetCode", 1 },
+                { "timestamp", helpers.GetTimestamp() * 1000 },
+                { "objectType", (int)type }
             };
-            try
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest();
+            if (communityId != null)
             {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest();
-                if (communityId != null)
-                {
-                    request.Resource = $"/g/s-x{communityId}/link-resolution";
-                }
-                else { request.Resource = $"/g/s/link-resolution"; }
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                request.AddJsonBody(data);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                Amino.Objects.FromId fromId = new Objects.FromId(jsonObj);
-                return fromId;
+                request.Resource = $"/g/s-x{communityId}/link-resolution";
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            else { request.Resource = $"/g/s/link-resolution"; }
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            Amino.Objects.FromId fromId = new Objects.FromId(jsonObj);
+            return fromId;
         }
 
         /// <summary>
@@ -2220,25 +1973,21 @@ namespace Amino
         /// <returns>string[] : language keys</returns>
         public string[] get_supported_languages()
         {
-            try
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/community-collection/supported-languages?start=0&size=100");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            Console.WriteLine(response.Content);
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray languageArray = jsonObj["supportedLanguages"];
+            List<string> langList = new List<string>();
+            foreach (JObject language in languageArray)
             {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/community-collection/supported-languages?start=0&size=100");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                Console.WriteLine(response.Content);
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray languageArray = jsonObj["supportedLanguages"];
-                List<string> langList = new List<string>();
-                foreach (JObject language in languageArray)
-                {
-                    langList.Add(language.ToString());
-                }
-                return langList.ToArray();
+                langList.Add(language.ToString());
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return langList.ToArray();
         }
 
         /// <summary>
@@ -2248,17 +1997,13 @@ namespace Amino
         public Task claim_new_user_coupon()
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/coupon/new-user-coupon/claim");
-                request.AddHeaders(headers);
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/coupon/new-user-coupon/claim");
+            request.AddHeaders(headers);
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
 
@@ -2271,25 +2016,21 @@ namespace Amino
         public List<Objects.UserProfile> get_all_users(int start = 0, int size = 25)
         {
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.UserProfile> userList = new List<Objects.UserProfile>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/user-profile?type=recent&start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray userArray = jsonObj["userProfileList"];
+            foreach (JObject user in userArray)
             {
-                List<Objects.UserProfile> userList = new List<Objects.UserProfile>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/user-profile?type=recent&start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray userArray = jsonObj["userProfileList"];
-                foreach (JObject user in userArray)
-                {
-                    Objects.UserProfile _user = new Objects.UserProfile(user);
-                    userList.Add(_user);
-                }
-                return userList;
+                Objects.UserProfile _user = new Objects.UserProfile(user);
+                userList.Add(_user);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return userList;
         }
 
         /// <summary>
@@ -2300,19 +2041,15 @@ namespace Amino
         /// <exception cref="Exception"></exception>
         public Objects.AdvancedCommunityInfo get_community_info(string communityId)
         {
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s-x{communityId}/community/info?withInfluencerList=1&withTopicList=true&influencerListOrderStrategy=fansCount");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                Objects.AdvancedCommunityInfo community = new Objects.AdvancedCommunityInfo(jsonObj);
-                return community;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s-x{communityId}/community/info?withInfluencerList=1&withTopicList=true&influencerListOrderStrategy=fansCount");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            Objects.AdvancedCommunityInfo community = new Objects.AdvancedCommunityInfo(jsonObj);
+            return community;
         }
 
         /// <summary>
@@ -2335,20 +2072,16 @@ namespace Amino
         public Task accept_host(string chatId, string requestId)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/transfer-organizer/{requestId}/accept");
-                request.AddHeaders(headers);
-                var data = new { };
-                request.AddJsonBody(data);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/transfer-organizer/{requestId}/accept");
+            request.AddHeaders(headers);
+            var data = new { };
+            request.AddJsonBody(data);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
 
@@ -2372,19 +2105,15 @@ namespace Amino
         /// <returns>Object : Amino.Objects.FromInvite</returns>
         public Amino.Objects.FromInvite link_identify(string inviteCode)
         {
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/community/link-identify?q=http%3A%2F%2Faminoapps.com%2Finvite%2F{inviteCode}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                JObject json = JObject.Parse(response.Content);
-                Objects.FromInvite fromInvite = new Objects.FromInvite(json);
-                return fromInvite;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/community/link-identify?q=http%3A%2F%2Faminoapps.com%2Finvite%2F{inviteCode}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            JObject json = JObject.Parse(response.Content);
+            Objects.FromInvite fromInvite = new Objects.FromInvite(json);
+            return fromInvite;
         }
 
         /// <summary>
@@ -2395,24 +2124,20 @@ namespace Amino
         public Task wallet_config(Types.Wallet_Config_Levels walletLevel)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
-            try
-            {
-                JObject data = new JObject()
+            JObject data = new JObject()
                 {
                     { "adsLevel", (int)walletLevel },
                     { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest("/g/s/wallet/ads/config");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/wallet/ads/config");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -2425,25 +2150,21 @@ namespace Amino
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
+            List<Objects.AvatarFrame> _avataFrameList = new List<Objects.AvatarFrame>();
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/avatar-frame?start={start}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
+            JArray avatarFrameArrray = jsonObj["avatarFrameList"];
+            foreach (JObject avatarFrame in avatarFrameArrray)
             {
-                List<Objects.AvatarFrame> _avataFrameList = new List<Objects.AvatarFrame>();
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/avatar-frame?start={start}&size={size}");
-                request.AddHeaders(headers);
-                var response = client.ExecuteGet(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-                JArray avatarFrameArrray = jsonObj["avatarFrameList"];
-                foreach (JObject avatarFrame in avatarFrameArrray)
-                {
-                    Objects.AvatarFrame _avatarFrame = new Objects.AvatarFrame(avatarFrame);
-                    _avataFrameList.Add(_avatarFrame);
-                }
-                return _avataFrameList;
+                Objects.AvatarFrame _avatarFrame = new Objects.AvatarFrame(avatarFrame);
+                _avataFrameList.Add(_avatarFrame);
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            return _avataFrameList;
         }
 
         /// <summary>
@@ -2455,28 +2176,23 @@ namespace Amino
         /// <exception cref="Exception"></exception>
         public Task invite_to_vc(string chatId, string userId)
         {
-            try
-            {
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/vvchat-presenter/invite");
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/vvchat-presenter/invite");
 
-                JObject data = new JObject()
+            JObject data = new JObject()
                 {
                     { "uid", userId },
                     { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
 
-                request.AddHeaders(headers);
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddHeaders(headers);
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
 
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -2491,55 +2207,51 @@ namespace Amino
         /// <exception cref="Exception"></exception>
         public Objects.Message send_message(string message, string chatId, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
         {
-            try
+            List<JObject> mentions = new List<JObject>();
+            if (mentionUserIds == null) { mentionUserIds = new List<string>(); }
+            else
             {
-                List<JObject> mentions = new List<JObject>();
-                if (mentionUserIds == null) { mentionUserIds = new List<string>(); }
-                else
+                foreach (string user in mentionUserIds)
                 {
-                    foreach (string user in mentionUserIds)
-                    {
-                        JObject _mention = new JObject();
-                        _mention.Add("uid", user);
-                        mentions.Add(_mention);
-                    }
+                    JObject _mention = new JObject();
+                    _mention.Add("uid", user);
+                    mentions.Add(_mention);
                 }
-                message = message.Replace("<$", "").Replace("$>", "");
-                JObject data = new JObject();
-                JObject attachementSub = new JObject();
-                JObject extensionSub = new JObject();
-                JObject extensionSuBArray = new JObject();
-                data.Add("type", (int)messageType);
-                data.Add("content", message);
-                data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
-                data.Add("timestamp", helpers.GetTimestamp() * 1000);
-                attachementSub.Add("objectId", null);
-                attachementSub.Add("objectType", null);
-                attachementSub.Add("link", null);
-                attachementSub.Add("title", null);
-                attachementSub.Add("content", null);
-                attachementSub.Add("mediaList", null);
-                extensionSuBArray.Add("link", null);
-                extensionSuBArray.Add("mediaType", 100);
-                extensionSuBArray.Add("mediaUploadValue", null);
-                extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
-                extensionSub.Add("mentionedArray", new JArray(mentions));
-                extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
-                data.Add("attachedObject", attachementSub);
-                data.Add("extensions", extensionSub);
-                if (replyTo != null) { data.Add("replyMessageId", replyTo); }
-
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return new Objects.Message(JObject.Parse(response.Content));
             }
-            catch (Exception e) { throw new Exception(e.Message); }
+            message = message.Replace("<$", "").Replace("$>", "");
+            JObject data = new JObject();
+            JObject attachementSub = new JObject();
+            JObject extensionSub = new JObject();
+            JObject extensionSuBArray = new JObject();
+            data.Add("type", (int)messageType);
+            data.Add("content", message);
+            data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+            attachementSub.Add("objectId", null);
+            attachementSub.Add("objectType", null);
+            attachementSub.Add("link", null);
+            attachementSub.Add("title", null);
+            attachementSub.Add("content", null);
+            attachementSub.Add("mediaList", null);
+            extensionSuBArray.Add("link", null);
+            extensionSuBArray.Add("mediaType", 100);
+            extensionSuBArray.Add("mediaUploadValue", null);
+            extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+            extensionSub.Add("mentionedArray", new JArray(mentions));
+            extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+            data.Add("attachedObject", attachementSub);
+            data.Add("extensions", extensionSub);
+            if (replyTo != null) { data.Add("replyMessageId", replyTo); }
+
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return new Objects.Message(JObject.Parse(response.Content));
         }
 
         /// <summary>
@@ -2615,12 +2327,8 @@ namespace Amino
         /// <exception cref="Exception"></exception>
         public Task send_file_message(string chatId, string filePath, Types.upload_File_Types fileType)
         {
-            try
-            {
-                send_file_message(chatId, File.ReadAllBytes(filePath), fileType);
-                return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            send_file_message(chatId, File.ReadAllBytes(filePath), fileType);
+            return Task.CompletedTask;
 
         }
 
@@ -2628,12 +2336,9 @@ namespace Amino
         public Task send_embed(string chatId, string content = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, byte[] embedImage = null)
         {
 
-            try
-            {
-
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
-                JObject data = new JObject
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
+            JObject data = new JObject
                 {
                     { "type", 0 },
                     { "content", content },
@@ -2657,17 +2362,13 @@ namespace Amino
                 };
 
 
-                request.AddHeaders(headers);
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            request.AddHeaders(headers);
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
         public Task send_embed(string chatId, string content = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, string embedImagePath = null)
@@ -2685,44 +2386,39 @@ namespace Amino
         /// <exception cref="Exception"></exception>
         public Task send_sticker(string chatId, string stickerId)
         {
-            try
-            {
-                JObject data = new JObject();
-                JObject attachementSub = new JObject();
-                JObject extensionSub = new JObject();
-                JObject extensionSuBArray = new JObject();
-                data.Add("type", 3);
-                data.Add("content", null);
-                data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
-                data.Add("timestamp", helpers.GetTimestamp() * 1000);
-                attachementSub.Add("objectId", null);
-                attachementSub.Add("objectType", null);
-                attachementSub.Add("link", null);
-                attachementSub.Add("title", null);
-                attachementSub.Add("content", null);
-                attachementSub.Add("mediaList", null);
-                extensionSuBArray.Add("link", null);
-                extensionSuBArray.Add("mediaType", 100);
-                extensionSuBArray.Add("mediaUploadValue", null);
-                extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
-                extensionSub.Add("mentionedArray", new JArray());
-                extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
-                data.Add("attachedObject", attachementSub);
-                data.Add("extensions", extensionSub);
-                data.Add("stickerId", stickerId);
+            JObject data = new JObject();
+            JObject attachementSub = new JObject();
+            JObject extensionSub = new JObject();
+            JObject extensionSuBArray = new JObject();
+            data.Add("type", 3);
+            data.Add("content", null);
+            data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
+            data.Add("timestamp", helpers.GetTimestamp() * 1000);
+            attachementSub.Add("objectId", null);
+            attachementSub.Add("objectType", null);
+            attachementSub.Add("link", null);
+            attachementSub.Add("title", null);
+            attachementSub.Add("content", null);
+            attachementSub.Add("mediaList", null);
+            extensionSuBArray.Add("link", null);
+            extensionSuBArray.Add("mediaType", 100);
+            extensionSuBArray.Add("mediaUploadValue", null);
+            extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
+            extensionSub.Add("mentionedArray", new JArray());
+            extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
+            data.Add("attachedObject", attachementSub);
+            data.Add("extensions", extensionSub);
+            data.Add("stickerId", stickerId);
 
-                RestClient client = new RestClient(helpers.BaseUrl);
-                RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
-                request.AddHeaders(headers);
-                request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-                request.AddJsonBody(JsonConvert.SerializeObject(data));
-                var response = client.ExecutePost(request);
-                if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-                if (debug) { Trace.WriteLine(response.Content); }
-                return Task.CompletedTask;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message");
+            request.AddHeaders(headers);
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            var response = client.ExecutePost(request);
+            if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if (debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
 

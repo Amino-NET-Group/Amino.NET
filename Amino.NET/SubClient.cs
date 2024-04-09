@@ -80,8 +80,6 @@ namespace Amino
         /// <returns></returns>
         public List<Amino.Objects.InviteCode> get_invite_codes(string status = "normal", int start = 0, int size = 25)
         {
-            try
-            {
                 List<Amino.Objects.InviteCode> inviteCodeList = new List<Objects.InviteCode>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s-x{communityId}/community/invitation?status={status}&start={start}&size={size}");
@@ -99,8 +97,6 @@ namespace Amino
                 Console.WriteLine(response.Content);
                 return inviteCodeList;
 
-            } catch(Exception e) { throw new Exception(e.Message); }
-
         } 
 
         /// <summary>
@@ -111,8 +107,6 @@ namespace Amino
         /// <returns></returns>
         public Task generate_invite_code(int duration = 0, bool force = true)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s-x{communityId}/community/invitation");
                 request.AddHeaders(headers);
@@ -126,10 +120,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e)
-            {
-                throw new Exception(e.Message);
-            }
         }
 
         /// <summary>
@@ -139,8 +129,6 @@ namespace Amino
         /// <returns></returns>
         public Task delete_invite_code(string inviteId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/g/s-x{communityId}/community/invitation/{inviteId}");
                 request.AddHeaders(headers);
@@ -148,7 +136,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -162,8 +149,6 @@ namespace Amino
         /// <returns></returns>
         public Task post_blog(string title, string content, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
-            try
-            {
                 JArray mediaList = new JArray();
                 JObject extensionData = new JObject();
 
@@ -204,10 +189,6 @@ namespace Amino
                 if(debug) { Trace.WriteLine(response.Content); }
 
                 return Task.CompletedTask;
-            }catch(Exception e)
-            {
-                throw new Exception(e.Message);
-            }
         }
 
         /// <summary>
@@ -221,8 +202,6 @@ namespace Amino
         /// <returns></returns>
         public Task post_wiki(string title, string content, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
-            try
-            {
                 JArray mediaList = new JArray();
                 JObject extensionData = new JObject();
 
@@ -258,8 +237,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            } catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -274,8 +251,6 @@ namespace Amino
         /// <returns></returns>
         public Task edit_blog(string blogId, string title = null, string content = null, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
-            try
-            {
                 JArray mediaList = new JArray();
                 JObject extensionData = new JObject();
 
@@ -316,11 +291,6 @@ namespace Amino
                 if (debug) { Trace.WriteLine(response.Content); }
 
                 return Task.CompletedTask;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
         }
 
         /// <summary>
@@ -330,8 +300,6 @@ namespace Amino
         /// <returns></returns>
         public Task delete_blog(string blogId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/blog/{blogId}");
                 request.AddHeaders(headers);
@@ -339,7 +307,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            } catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -349,8 +316,6 @@ namespace Amino
         /// <returns></returns>
         public Task delete_wiki(string wikiId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/item/{wikiId}");
                 request.AddHeaders(headers);
@@ -358,7 +323,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            } catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -370,8 +334,6 @@ namespace Amino
         /// <returns></returns>
         public Task repost_blog(string postId, Types.Repost_Types type, string content = null)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/blog");
                 request.AddHeaders(headers);
@@ -387,8 +349,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -398,8 +358,6 @@ namespace Amino
         /// <returns></returns>
         public Task check_in(int? timezone = null)
         {
-            try
-            {
                 int? tz;
                 if (timezone != null) { tz = timezone; } else { tz = helpers.getTimezone(); }
                 RestClient client = new RestClient(helpers.BaseUrl);
@@ -414,7 +372,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -424,8 +381,6 @@ namespace Amino
         /// <returns></returns>
         public Task repair_check_in(Types.Repair_Types repairType)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/check-in/repair");
                 request.AddHeaders(headers);
@@ -438,7 +393,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -448,8 +402,6 @@ namespace Amino
         /// <returns></returns>
         public Task lottery(int? timezone = null)
         {
-            try
-            {
                 int? tz;
                 if (timezone != null) { tz = timezone; } else { tz = helpers.getTimezone(); }
                 RestClient client = new RestClient(helpers.BaseUrl);
@@ -464,8 +416,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -482,8 +432,6 @@ namespace Amino
         /// <returns></returns>
         public Task edit_profile(string nickname = null, string content = null, byte[] icon = null, List<byte[]> imageList = null, List<string> captionList = null, string backgroundColor = null, byte[] backgroundImage = null, string defaultChatBubbleId = null)
         {
-            try
-            {
                 JObject data = new JObject();
 
                 JArray mediaList = new JArray();
@@ -521,8 +469,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) throw new Exception(response.Content);
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -533,8 +479,6 @@ namespace Amino
         /// <returns></returns>
         public Task vote_poll(string postId, string optionId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/blog/{postId}/poll/option/{optionId}/vote");
                 JObject data = new JObject();
@@ -548,7 +492,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -561,8 +504,6 @@ namespace Amino
         /// <returns></returns>
         public Task comment(string message, Amino.Types.Comment_Types type, string targetId, bool isGuest = false)
         {
-            try
-            {
                 string endPoint = null;
                 JObject data = new JObject();
                 data.Add("content", message);
@@ -599,8 +540,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -612,8 +551,6 @@ namespace Amino
         /// <returns></returns>
         public Task delete_comment(string commentId, Amino.Types.Comment_Types type, string targetId)
         {
-            try
-            {
                 string endPoint = null;
                 switch(type)
                 {
@@ -638,7 +575,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
         
         /// <summary>
@@ -649,8 +585,6 @@ namespace Amino
         /// <returns></returns>
         public Task like_post(string postId, bool isWiki = false)
         {
-            try
-            {
                 string endPoint = null;
 
                 JObject data = new JObject();
@@ -667,8 +601,7 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
+            
         }
 
         /// <summary>
@@ -679,8 +612,6 @@ namespace Amino
         /// <returns></returns>
         public Task unlike_post(string postId, bool isWiki = false)
         {
-            try
-            {
                 string endPoint = null;
                 if(!isWiki) { endPoint = $"/x{communityId}/s/blog/{postId}/vote?eventSource=UserProfileView"; } else { endPoint = $"/x{communityId}/s/item/{postId}/vote?eventSource=PostDetailView"; }
                 RestClient client = new RestClient(helpers.BaseUrl);
@@ -690,7 +621,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); } 
         }
 
         /// <summary>
@@ -702,8 +632,6 @@ namespace Amino
         /// <returns></returns>
         public Task like_comment(string commentId, string targetId,Types.Comment_Types targetType)
         {
-            try
-            {
                 string _targetType = null;
                 string voteType = null;
                 string targetValue = null;
@@ -723,8 +651,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
 
@@ -737,8 +663,6 @@ namespace Amino
         /// <returns></returns>
         public Task unlike_comment(string commentId, string targetId, Amino.Types.Comment_Types targetType)
         {
-            try
-            {
                 string _targetType = null;
                 string _eventSource = "PostDetailView";
                 if (targetType == Types.Comment_Types.User) { _targetType = "user-profile"; _eventSource = "UserProfileView"; } else if (targetType == Types.Comment_Types.Wiki) { _targetType = "item"; } else { _targetType = "blog"; }
@@ -752,7 +676,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         } 
 
         /// <summary>
@@ -763,8 +686,6 @@ namespace Amino
         /// <returns></returns>
         public Task upvote_comment(string commentId, string postId)
         {
-            try
-            {
                 JObject data = new JObject();
                 data.Add("value", 1);
                 data.Add("eventSource", "PostDetailView");
@@ -779,7 +700,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -790,8 +710,6 @@ namespace Amino
         /// <returns></returns>
         public Task downvote_comment(string commentId, string postId)
         {
-            try
-            {
                 JObject data = new JObject();
                 data.Add("value", -1);
                 data.Add("eventSource", "PostDetailView");
@@ -806,8 +724,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -818,15 +734,12 @@ namespace Amino
         /// <returns></returns>
         public Task unvote_comment(string commentId, string postId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/blog/{postId}/comment/{commentId}/vote?eventSource=PostDetailView");
                 var response = client.Delete(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -838,8 +751,6 @@ namespace Amino
         /// <returns></returns>
         public Task reply_wall(string userId, string commentId, string message)
         {
-            try
-            {
                 JObject data = new JObject();
                 data.Add("content", message);
                 data.Add("stackId", null);
@@ -857,8 +768,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
-
         }
 
         /// <summary>
@@ -868,8 +777,6 @@ namespace Amino
         /// <returns></returns>
         public Task set_activity_status(Types.Activity_Status_Types status)
         {
-            try
-            {
                 JObject data = new JObject();
                 if (status == Types.Activity_Status_Types.On) { data.Add("onlineStatus", "on"); } else { data.Add("onlineStatus", "off"); }
                 data.Add("duration", 86400);
@@ -884,8 +791,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -894,8 +799,6 @@ namespace Amino
         /// <returns></returns>
         public Task check_notification()
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/notification/checked");
                 request.AddHeaders(headers);
@@ -903,7 +806,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -913,8 +815,6 @@ namespace Amino
         /// <returns></returns>
         public Task delete_notification(string notificationId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/notification/{notificationId}");
                 request.AddHeaders(headers);
@@ -922,7 +822,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -931,8 +830,6 @@ namespace Amino
         /// <returns></returns>
         public Task clear_notifications()
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/notification");
                 request.AddHeaders(headers);
@@ -940,7 +837,6 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -949,8 +845,6 @@ namespace Amino
         /// <returns></returns>
         public Task send_activity_time()
         {
-            try
-            {
                 JObject data = new JObject();
                 JArray timeData = new JArray();
 
@@ -980,8 +874,7 @@ namespace Amino
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
 
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
+            
         }
 
 
@@ -997,8 +890,6 @@ namespace Amino
         /// <returns></returns>
         public Task start_chat(List<string> userIds, string message, string title = null, string content = null, bool isGlobal = false, bool publishToGlobal = false)
         {
-            try
-            {
                 JObject data = new JObject();
                 data.Add("title", title);
                 data.Add("inviteeUids", new JArray(userIds));
@@ -1017,8 +908,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -1045,8 +934,6 @@ namespace Amino
         /// <returns></returns>
         public Task invite_to_chat(List<string> userIds, string chatId)
         {
-            try
-            {
                 JObject data = new JObject();
                 data.Add("uids", new JArray(userIds));
                 data.Add("timestamp", helpers.GetTimestamp() * 1000);
@@ -1060,9 +947,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -1084,8 +968,6 @@ namespace Amino
         /// <returns></returns>
         public Task add_to_favorites(string userId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/user-group/quick-access/{userId}");
                 request.AddHeaders(headers);
@@ -1093,9 +975,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         /// <summary>
@@ -1111,8 +990,6 @@ namespace Amino
         {
             if(transactionId == null) { transactionId = helpers.generate_transaction_id(); }
             string endpoint = "";
-            try
-            {
                 JObject data = new JObject();
                 JObject sub = new JObject();
                 switch(type)
@@ -1143,27 +1020,20 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task thank_tip(string chatId, string userId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/tipping/tipped-users/{userId}/thank");
                 var response = client.ExecutePost(request);
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if(debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task follow(List<string> userIds)
         {
-            try
-            {
                 JObject data = new JObject();
                 data.Add("timestamp", helpers.GetTimestamp() * 1000);
                 data.Add("targetUidList", new JArray(userIds));
@@ -1176,24 +1046,16 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public Task follow(string userId)
         {
-            try
-            {
                 follow(new List<string>() { userId });
                 return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public Task unfollow(string userId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{this.client.userID}/joined/{userId}");
                 request.AddHeaders(headers);
@@ -1201,13 +1063,10 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task block(string userId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/block/{userId}");
                 request.AddHeaders(headers);
@@ -1215,14 +1074,10 @@ namespace Amino
                 if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public Task unblock(string userId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/block/{userId}");
                 request.AddHeaders(headers);
@@ -1230,15 +1085,10 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public Task visit(string userId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}?action=visit");
                 request.AddHeaders(headers);
@@ -1246,69 +1096,18 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task flag(string targetId, string reason, Types.Flag_Types flagType, Types.Flag_Targets targetType, bool asGuest = false)
         {
-            try
-            {
-                int _objectType = 0;
-                string flg = "";
-                int _flagType = 0;
-                if (asGuest) { flg = "g-flag"; } else { flg = "flag"; }
-                switch (flagType)
-                {
-                    case Types.Flag_Types.Aggression:
-                        _flagType = 0;
-                        break;
-                    case Types.Flag_Types.Spam:
-                        _flagType = 2;
-                        break;
-                    case Types.Flag_Types.Off_Topic:
-                        _flagType = 4;
-                        break;
-                    case Types.Flag_Types.Violence:
-                        _flagType = 106;
-                        break;
-                    case Types.Flag_Types.Intolerance:
-                        _flagType = 107;
-                        break;
-                    case Types.Flag_Types.Suicide:
-                        _flagType = 108;
-                        break;
-                    case Types.Flag_Types.Trolling:
-                        _flagType = 109;
-                        break;
-                    case Types.Flag_Types.Pronography:
-                        _flagType = 110;
-                        break;
-                    default:
-                        _flagType = 0;
-                        break;
-                }
-                switch (targetType)
-                {
-                    case Types.Flag_Targets.User:
-                        _objectType = 0;
-                        break;
-                    case Types.Flag_Targets.Blog:
-                        _objectType = 1;
-                        break;
-                    case Types.Flag_Targets.Wiki:
-                        _objectType = 2;
-                        break;
-                    default:
-                        _objectType = 0;
-                        break;
-                }
+                string flg = asGuest ? "g-flag" : "flag";
 
                 JObject data = new JObject();
                 data.Add("timestamp", helpers.GetTimestamp() * 1000);
-                data.Add("flagType", _flagType);
+                data.Add("flagType", (int)flagType);
                 data.Add("message", reason);
                 data.Add("objectId", targetId);
-                data.Add("objectType", _objectType);
+                data.Add("objectType", (int)targetType);
 
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/{flg}");
@@ -1319,15 +1118,10 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public Objects.Message send_message(string message, string chatId, Types.Message_Types messageType = Types.Message_Types.General, string replyTo = null, List<string> mentionUserIds = null)
         {
-            try
-            {
                 List<JObject> mentions = new List<JObject>();
                 if(mentionUserIds == null) { mentionUserIds = new List<string>(); } else
                 {
@@ -1372,8 +1166,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return new Objects.Message(JObject.Parse(response.Content));
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public Task send_file_message(string chatId, byte[] file, Types.upload_File_Types fileType)
@@ -1433,20 +1225,12 @@ namespace Amino
 
         public Task send_file_message(string chatId, string filePath, Types.upload_File_Types fileType)
         {
-            try
-            {
                 send_file_message(chatId, File.ReadAllBytes(filePath), fileType);
                 return Task.CompletedTask;
-            } catch (Exception e) { throw new Exception(e.Message); }
-            
         }
 
         public Task send_embed(string chatId, string content = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, byte[] embedImage = null)
         {
-
-            try
-            {
-
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/message");
                 JObject data = new JObject
@@ -1480,10 +1264,6 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task send_embed(string chatId, string content = null, string embedId = null, string embedLink = null, string embedTitle = null, string embedContent = null, string embedImagePath = null)
@@ -1494,10 +1274,6 @@ namespace Amino
 
         public Task send_sticker(string chatId, string stickerId)
         {
-            try
-            {
-
-
                 JObject data = new JObject();
                 JObject attachementSub = new JObject();
                 JObject extensionSub = new JObject();
@@ -1531,15 +1307,10 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task delete_message(string chatId, string messageId, bool asStaff = false, string reason = null)
         {
-            try
-            {
                 string endPoint = $"/x{communityId}/s/chat/thread/{chatId}/message/{messageId}";
                 JObject data = new JObject();
                 data.Add("adminOpName", 102);
@@ -1564,14 +1335,10 @@ namespace Amino
                     if(debug) { Trace.WriteLine(response.Content); }
                 }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task mark_as_read(string chatId, string messageId)
         {
-            try
-            {
                 JObject data = new JObject();
                 data.Add("messageId", messageId);
                 data.Add("timestamp", helpers.GetTimestamp() * 1000);
@@ -1585,15 +1352,11 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
 
         public Task transfer_host(string chatId, List<string> userIds)
         {
-            try
-            {
                 JObject data = new JObject();
                 data.Add("uidList", new JArray(userIds));
                 data.Add("timestamp", helpers.GetTimestamp() * 1000);
@@ -1606,23 +1369,15 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task transfer_host(string chatId, string userId)
         {
-            try
-            {
                 return transfer_host(chatId, new List<string> { userId });
-            }catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task accept_host(string chatId, string requestId)
         {
-            try
-            {
                 JObject data = new JObject();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/transfer-organizer/{requestId}/accept");
@@ -1633,14 +1388,10 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task join_chat(string chatId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.userID}");
                 request.AddHeaders(headers);
@@ -1648,14 +1399,10 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task leave_chat(string chatId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.userID}");
                 request.AddHeaders(headers);
@@ -1663,15 +1410,11 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public List<Amino.Objects.UserFollowings> get_user_following(string userId, int start = 0, int size = 25)
         {
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
-            {
                 List<Objects.UserFollowings> userFollowingsList = new List<Objects.UserFollowings>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/joined?start={start}&size={size}");
@@ -1687,16 +1430,11 @@ namespace Amino
                     userFollowingsList.Add(_following);
                 }
                 return userFollowingsList;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public List<Objects.UserFollowings> get_user_followers(string userId, int start = 0, int size = 25)
         {
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
-            {
                 List<Objects.UserFollowings> userFollowerList = new List<Objects.UserFollowings>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/member?start={start}&size={size}");
@@ -1712,15 +1450,10 @@ namespace Amino
                     userFollowerList.Add(_follower);
                 }
                 return userFollowerList;
-
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public Objects.UserProfile get_user_info(string userId)
         {
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}");
                 request.AddHeaders(headers);
@@ -1729,16 +1462,12 @@ namespace Amino
                 if (debug) { Trace.WriteLine(response.Content); }
                 Amino.Objects.UserProfile profile = new Amino.Objects.UserProfile((JObject)JObject.Parse(response.Content)["userProfile"]);
                 return profile;
-            }
-            catch(Exception e) { throw new Exception(e.Message); }
         }
 
         public Task comment(string message, Types.Comment_Types type, string objectId)
         {
             string _eventSource;
             bool _isReply = false;
-            try
-            {
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest();
                 request.AddHeaders(headers);
@@ -1779,14 +1508,10 @@ namespace Amino
                 if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
                 if (debug) { Trace.WriteLine(response.Content); }
                 return Task.CompletedTask;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
         public List<Objects.UserVisitor> get_user_visitors(string userId, int start = 0, int size = 25)
         {
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            try
-            {
                 List<Objects.UserVisitor> userVisitorList = new List<Objects.UserVisitor>();
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/visitors?start={start}&size={size}");
@@ -1802,8 +1527,6 @@ namespace Amino
                     userVisitorList.Add(_visitor);
                 }
                 return userVisitorList;
-            }
-            catch (Exception e) { throw new Exception(e.Message); }
         }
 
         public Objects.UserCheckins get_user_checkins(string userId)
