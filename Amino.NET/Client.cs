@@ -13,12 +13,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 
-
+pluh
 namespace Amino
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class Client
-    {
+    { pluh
         //Values the Amino Client can hold
         /// <summary>
         /// Represents the current device ID used by the current Client
