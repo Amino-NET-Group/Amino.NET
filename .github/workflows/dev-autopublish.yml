@@ -18,16 +18,10 @@ jobs:
         with:
           dotnet-version: '7.x'
           
-      - name: Restore dependencies
-        run: dotnet restore
-        
-      - name: Build
-        run: dotnet build --configuration Release
-        
       - name: Determine project name
         id: project_name
         run: |
-          csproj_file=$(find . -name '*.csproj' -print -quit)
+          csproj_file=$(find ${GITHUB_WORKSPACE} -name '*.csproj' -print -quit)
           project_name=$(basename "$csproj_file" .csproj)
           echo "::set-output name=name::$project_name"
         
