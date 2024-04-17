@@ -33,7 +33,10 @@ jobs:
         
       - name: Determine version
         id: version
-        run: echo "::set-output name=version::$(dotnet project-file-name ${GITHUB_WORKSPACE}/${{ steps.project_name.outputs.name }}.csproj --version)"
+        run: |
+          version=$(dotnet project-file-name ${GITHUB_WORKSPACE}/${{ steps.project_name.outputs.name }}.csproj --version)
+          version=$(echo "${version}" | tr -d '[:space:]')
+          echo "::set-output name=version::$version"
       
       - name: Pack
         run: |
