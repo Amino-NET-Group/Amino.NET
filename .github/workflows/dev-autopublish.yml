@@ -26,12 +26,19 @@ jobs:
         
       - name: Determine project name
         id: project_name
-        run: echo "::set-output name=name::$(*.csproj .csproj)"
+        run: |
+          csproj_file=$(find . -name '*.csproj' -print -quit)
+          project_name=$(basename "$csproj_file" .csproj)
+          echo "::set-output name=name::$project_name"
         
+      - name: Determine version
+        id: version
+        run: echo "::set-output name=version::$(dotnet project-file-name ${GITHUB_WORKSPACE}/${{ steps.project_name.outputs.name }}.csproj --version)"
+      
       - name: Pack
         run: |
-          version=$(dotnet project-file-name ${GITHUB_WORKSPACE}/${{ steps.project_name.outputs.name }}.csproj --version)
-          version="${version}-dev${GITHUB_RUN_NUMBER}"
+          base_version="${{ steps.version.outputs.version }}"
+          version="${base_version}-dev0.$((${GITHUB_RUN_NUMBER} / 100)).$((${GITHUB_RUN_NUMBER} % 100))"
           dotnet pack --configuration Release /p:Version=$version --output nupkgs
           
       - name: Publish to NuGet
