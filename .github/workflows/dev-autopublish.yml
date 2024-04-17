@@ -6,36 +6,40 @@ on:
       - dev
 
 jobs:
-  publish:
+  build_and_determine_base_version:
     runs-on: ubuntu-latest
-    
+    outputs:
+      base_version: ${{ steps.determine_version.outputs.base_version }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '7.x'
-          
-      - name: Determine project name
-        id: project_name
-        run: |
-          csproj_file=$(find ${GITHUB_WORKSPACE} -name '*.csproj' -print -quit)
-          project_name=$(basename "$csproj_file" .csproj)
-          echo "::set-output name=name::$project_name"
-        
+
+      - name: Build
+        run: dotnet build --configuration Release
+
       - name: Determine version
-        id: version
+        id: determine_version
         run: |
-          version=$(grep -oP '<Version>.*?</Version>' ${GITHUB_WORKSPACE}/${{ steps.project_name.outputs.name }}.csproj | grep -oP '\d+\.\d+\.\d+')
-          echo "::set-output name=version::$version"
-      
-      - name: Pack
+          version=$(dotnet project-file-name YourProject.csproj --version)
+          echo "::set-output name=base_version::$version"
+
+  rebuild_with_dev_version:
+    needs: build_and_determine_base_version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Rebuild with dev version
         run: |
-          base_version="${{ steps.version.outputs.version }}"
+          base_version="${{ needs.build_and_determine_base_version.outputs.base_version }}"
           version="${base_version}-dev0.$((${GITHUB_RUN_NUMBER} / 100)).$((${GITHUB_RUN_NUMBER} % 100))"
           dotnet pack --configuration Release /p:Version=$version --output nupkgs
-          
+
       - name: Publish to NuGet
         run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
