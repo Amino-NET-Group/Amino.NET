@@ -34,8 +34,7 @@ jobs:
       - name: Determine version
         id: version
         run: |
-          version=$(dotnet project-file-name ${GITHUB_WORKSPACE}/${{ steps.project_name.outputs.name }}.csproj --version)
-          version=$(echo "${version}" | tr -d '[:space:]')
+          version=$(grep -oP '<Version>.*?</Version>' ${GITHUB_WORKSPACE}/${{ steps.project_name.outputs.name }}.csproj | grep -oP '\d+\.\d+\.\d+')
           echo "::set-output name=version::$version"
       
       - name: Pack
