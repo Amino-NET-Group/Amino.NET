@@ -10,29 +10,29 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
       
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '7.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '7.x'
+          
+      - name: Restore dependencies
+        run: dotnet restore
         
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build
-      run: dotnet build --configuration Release
-      
-    - name: Determine version
-      id: version
-      run: echo "::set-output name=version::0.$((${GITHUB_RUN_NUMBER} / 100)).$((${GITHUB_RUN_NUMBER} % 100))"
-      
-    - name: Pack
-      run: dotnet pack --configuration Release --version-suffix "-dev${{ steps.version.outputs.version }}" --output nupkgs
-
-    - name: Show-version
-      run: echo "-dev${{ steps.version.outputs.version }}"
-      
-   # - name: Publish to NuGet
-   #   run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      - name: Build
+        run: dotnet build --configuration Release
+        
+      - name: Determine project name
+        id: project_name
+        run: echo "::set-output name=name::$(*.csproj .csproj)"
+        
+      - name: Pack
+        run: |
+          version=$(dotnet project-file-name ${GITHUB_WORKSPACE}/${{ steps.project_name.outputs.name }}.csproj --version)
+          version="${version}-dev${GITHUB_RUN_NUMBER}"
+          dotnet pack --configuration Release /p:Version=$version --output nupkgs
+          
+      - name: Publish to NuGet
+        run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
