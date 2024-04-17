@@ -26,11 +26,11 @@ jobs:
       
     - name: Determine version
       id: version
-      run: echo "::set-output name=version::0.$((${GITHUB_RUN_NUMBER} / 100)).$((${GITHUB_RUN_NUMBER} % 100))"
+      run: echo "::set-output name=version::0.$((${GITHUB_RUN_NUMBER} / 10)).$((${GITHUB_RUN_NUMBER} % 10))"
 
     - name: Get Project Version
       id: base_version
-      run: version=$(grep '<Version>' < .csproj | sed 's/.*<Version>\(.*\)<\/Version>/\1/')
+      run: version=$(grep '<Version>' < *.csproj | sed 's/.*<Version>\(.*\)<\/Version>/\1/')
           echo "::set-output name=version::$version"
       
     - name: Pack
