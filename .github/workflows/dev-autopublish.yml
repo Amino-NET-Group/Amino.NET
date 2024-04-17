@@ -6,40 +6,35 @@ on:
       - dev
 
 jobs:
-  build_and_determine_base_version:
+  publish:
     runs-on: ubuntu-latest
-    outputs:
-      base_version: ${{ steps.determine_version.outputs.base_version }}
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '7.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release
+      
+    - name: Determine version
+      id: version
+      run: echo "::set-output name=version::0.$((${GITHUB_RUN_NUMBER} / 100)).$((${GITHUB_RUN_NUMBER} % 100))"
 
-      - name: Build
-        run: dotnet build --configuration Release
-
-      - name: Determine version
-        id: determine_version
-        run: |
-          version=$(dotnet project-file-name YourProject.csproj --version)
-          echo "::set-output name=base_version::$version"
-
-  rebuild_with_dev_version:
-    needs: build_and_determine_base_version
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Rebuild with dev version
-        run: |
-          base_version="${{ needs.build_and_determine_base_version.outputs.base_version }}"
-          version="${base_version}-dev0.$((${GITHUB_RUN_NUMBER} / 100)).$((${GITHUB_RUN_NUMBER} % 100))"
-          dotnet pack --configuration Release /p:Version=$version --output nupkgs
-
-      - name: Publish to NuGet
-        run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    - name: Get Project Version
+      id: base_version
+      run: version=$(grep '<Version>' < .csproj | sed 's/.*<Version>\(.*\)<\/Version>/\1/')
+          echo "::set-output name=version::$version"
+      
+    - name: Pack
+      run: dotnet pack --configuration Release /p:Version="${{ steps.base_version.outputs.version }}-dev${{ steps.version.outputs.version }}" --output nupkgs
+      
+    - name: Publish to NuGet
+      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
