@@ -30,8 +30,9 @@ jobs:
     
     - name: Get Project Version
       id: base_version
-      run: version=$(grep '<Version>' < Amino.NET/Amino.NET.csproj | sed 's/.*<Version>\(.*\)<\/Version>/\1/')
-          echo "::set-output name=version::$version"
+      run: |
+        version=$(grep '<Version>' < Amino.NET/Amino.NET.csproj | sed 's/.*<Version>\(.*\)<\/Version>/\1/')
+        echo "::set-output name=version::$version"
       
     - name: Pack
       run: dotnet pack --configuration Release /p:Version="${{ steps.base_version.outputs.version }}-dev${{ steps.version.outputs.version }}" --output nupkgs
