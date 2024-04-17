@@ -27,15 +27,10 @@ jobs:
     - name: Determine version
       id: version
       run: echo "::set-output name=version::0.$((${GITHUB_RUN_NUMBER} / 10)).$((${GITHUB_RUN_NUMBER} % 10))"
-
-    - name: Get Current Path
-      run: pwd
-    - name: Get Current dir Files
-      run: ls
     
     - name: Get Project Version
       id: base_version
-      run: version=$(grep '<Version>' < Amino.NET.csproj | sed 's/.*<Version>\(.*\)<\/Version>/\1/')
+      run: version=$(grep '<Version>' < Amino.NET/Amino.NET.csproj | sed 's/.*<Version>\(.*\)<\/Version>/\1/')
           echo "::set-output name=version::$version"
       
     - name: Pack
