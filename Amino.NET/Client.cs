@@ -4,11 +4,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
-using Amino.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -1416,6 +1415,11 @@ namespace Amino
         /// <returns>string : The URL to the media file you just uploaded</returns>
         public string upload_media(string filePath, Types.upload_File_Types type)
         {
+            if(filePath.StartsWith("http"))
+            {
+                byte[] fileBytes = new HttpClient().GetAsync(filePath).Result.Content.ReadAsByteArrayAsync().Result;
+                return upload_media(fileBytes, type);
+            }
             return upload_media(File.ReadAllBytes(filePath), type);
         }
 

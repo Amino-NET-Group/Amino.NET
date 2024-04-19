@@ -147,7 +147,7 @@ namespace Amino
         /// <param name="fansOnly"></param>
         /// <param name="backgroundColor"></param>
         /// <returns></returns>
-        public Task post_blog(string title, string content, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
+        public Task post_blog(string title, string content, IEnumerable<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
             JArray mediaList = new JArray();
             JObject extensionData = new JObject();
@@ -200,7 +200,7 @@ namespace Amino
         /// <param name="fansOnly"></param>
         /// <param name="backgroundColor"></param>
         /// <returns></returns>
-        public Task post_wiki(string title, string content, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
+        public Task post_wiki(string title, string content, IEnumerable<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
             JArray mediaList = new JArray();
             JObject extensionData = new JObject();
@@ -249,7 +249,7 @@ namespace Amino
         /// <param name="fansOnly"></param>
         /// <param name="backgroundColor"></param>
         /// <returns></returns>
-        public Task edit_blog(string blogId, string title = null, string content = null, List<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
+        public Task edit_blog(string blogId, string title = null, string content = null, IEnumerable<byte[]> imageList = null, bool fansOnly = false, string backgroundColor = null)
         {
             JArray mediaList = new JArray();
             JObject extensionData = new JObject();
