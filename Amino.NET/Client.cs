@@ -2478,6 +2478,41 @@ namespace Amino
             return new Objects.Message(JObject.Parse(response.Content));
         }
 
+        /// <summary>
+        /// Allows you to get comments from a blog, THIS FUNCTION IS NOT FINISHED
+        /// </summary>
+        /// <param name="blogId"></param>
+        /// <param name="start"></param>
+        /// <param name="size"></param>
+        /// <param name="sorting"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public List<Objects.Comment> get_blog_comments(string blogId, int start = 0, int size = 25, Types.Sorting_Types sorting = Types.Sorting_Types.Newest)
+        {
+            string sortingType = "";
+            switch(sorting)
+            {
+                case Types.Sorting_Types.Newest:
+                    sortingType = "newest";
+                    break;
+                case Types.Sorting_Types.Oldest:
+                    sortingType = "oldest";
+                    break;
+                case Types.Sorting_Types.Top:
+                    sortingType = "vote";
+                    break;
+            }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/blog/{blogId}?sort={sortingType}&start={size}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+
+            return null; // FINISH LATER
+
+        }
+
 
         /// <summary>
         /// Sets the SubClient of the Client, not for development use
