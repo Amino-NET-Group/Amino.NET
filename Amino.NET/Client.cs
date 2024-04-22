@@ -2425,6 +2425,59 @@ namespace Amino
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Allows you to get information about a blog post
+        /// </summary>
+        /// <param name="blogId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Objects.Blog get_blog_info(string blogId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/blog/{blogId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return new Objects.Blog(JObject.Parse(response.Content));
+        }
+
+
+        /// <summary>
+        /// Allows you to get information about a wiki post
+        /// </summary>
+        /// <param name="wikiId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Objects.Wiki get_wiki_info(string wikiId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/item/{wikiId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return new Objects.Wiki(JObject.Parse(response.Content));
+        }
+
+        /// <summary>
+        /// Allows you to get information about a message in a chat
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="messageId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Objects.Message get_message_info(string chatId, string messageId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message/{messageId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return new Objects.Message(JObject.Parse(response.Content));
+        }
+
 
         /// <summary>
         /// Sets the SubClient of the Client, not for development use
