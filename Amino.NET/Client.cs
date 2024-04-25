@@ -388,6 +388,47 @@ namespace Amino
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Allows you to register an Amino account using a google account
+        /// </summary>
+        /// <param name="nickname"></param>
+        /// <param name="googleToken"></param>
+        /// <param name="password"></param>
+        /// <param name="deviceId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Task register_google(string nickname, string googleToken, string password, string deviceId = null)
+        {
+            deviceId = deviceId == null ? helpers.generate_device_id() : deviceId;
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/auth/login");
+            request.AddHeaders(headers);
+
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "secret", $"12 {googleToken}" },
+                { "secret2", $"0 {password}" },
+                { "deviceID", deviceId },
+                { "clientType", 100 },
+                { "nickname", nickname },
+                { "latitude", 0 },
+                { "longitude", 0 },
+                { "address", null },
+                { "clientCallbackURL", "narviiapp://relogin" },
+                { "timestamp", helpers.GetTimestamp() * 1000 },
+            };
+
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+
+            var response = client.ExecutePost(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        
+
 
         /// <summary>
         /// Allows you to register an Amino account
@@ -427,7 +468,7 @@ namespace Amino
             RestClient client = new RestClient(helpers.BaseUrl);
             RestRequest request = new RestRequest("/g/s/auth/register");
             request.AddHeaders(headers);
-            request.AddJsonBody(data);
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
             request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
             var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
