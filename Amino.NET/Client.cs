@@ -456,7 +456,7 @@ namespace Amino
                     { "clientCallbackURL", "narviiapp://relogin" },
                     { "validationContext", new JObject()
                         {
-                            { "data", new JObject() { "code", _verificationCode } },
+                            { "data", new JObject() { {"code", _verificationCode } } },
                             { "type", 1 },
                             { "identity", _email }
                         }
