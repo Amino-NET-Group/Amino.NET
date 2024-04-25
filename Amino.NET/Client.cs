@@ -4,11 +4,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
-using Amino.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -389,6 +388,47 @@ namespace Amino
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Allows you to register an Amino account using a google account
+        /// </summary>
+        /// <param name="nickname"></param>
+        /// <param name="googleToken"></param>
+        /// <param name="password"></param>
+        /// <param name="deviceId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Task register_google(string nickname, string googleToken, string password, string deviceId = null)
+        {
+            deviceId = deviceId == null ? helpers.generate_device_id() : deviceId;
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest("/g/s/auth/login");
+            request.AddHeaders(headers);
+
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "secret", $"12 {googleToken}" },
+                { "secret2", $"0 {password}" },
+                { "deviceID", deviceId },
+                { "clientType", 100 },
+                { "nickname", nickname },
+                { "latitude", 0 },
+                { "longitude", 0 },
+                { "address", null },
+                { "clientCallbackURL", "narviiapp://relogin" },
+                { "timestamp", helpers.GetTimestamp() * 1000 },
+            };
+
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+
+            var response = client.ExecutePost(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        
+
 
         /// <summary>
         /// Allows you to register an Amino account
@@ -428,7 +468,7 @@ namespace Amino
             RestClient client = new RestClient(helpers.BaseUrl);
             RestRequest request = new RestRequest("/g/s/auth/register");
             request.AddHeaders(headers);
-            request.AddJsonBody(data);
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
             request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
             var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -1416,6 +1456,11 @@ namespace Amino
         /// <returns>string : The URL to the media file you just uploaded</returns>
         public string upload_media(string filePath, Types.upload_File_Types type)
         {
+            if(filePath.StartsWith("http"))
+            {
+                byte[] fileBytes = new HttpClient().GetAsync(filePath).Result.Content.ReadAsByteArrayAsync().Result;
+                return upload_media(fileBytes, type);
+            }
             return upload_media(File.ReadAllBytes(filePath), type);
         }
 
@@ -2419,6 +2464,94 @@ namespace Amino
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
             if (debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Allows you to get information about a blog post
+        /// </summary>
+        /// <param name="blogId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Objects.Blog get_blog_info(string blogId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/blog/{blogId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return new Objects.Blog(JObject.Parse(response.Content));
+        }
+
+
+        /// <summary>
+        /// Allows you to get information about a wiki post
+        /// </summary>
+        /// <param name="wikiId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Objects.Wiki get_wiki_info(string wikiId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/item/{wikiId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return new Objects.Wiki(JObject.Parse(response.Content));
+        }
+
+        /// <summary>
+        /// Allows you to get information about a message in a chat
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="messageId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Objects.Message get_message_info(string chatId, string messageId)
+        {
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/chat/thread/{chatId}/message/{messageId}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+            return new Objects.Message(JObject.Parse(response.Content));
+        }
+
+        /// <summary>
+        /// Allows you to get comments from a blog, THIS FUNCTION IS NOT FINISHED
+        /// </summary>
+        /// <param name="blogId"></param>
+        /// <param name="start"></param>
+        /// <param name="size"></param>
+        /// <param name="sorting"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public List<Objects.Comment> get_blog_comments(string blogId, int start = 0, int size = 25, Types.Sorting_Types sorting = Types.Sorting_Types.Newest)
+        {
+            string sortingType = "";
+            switch(sorting)
+            {
+                case Types.Sorting_Types.Newest:
+                    sortingType = "newest";
+                    break;
+                case Types.Sorting_Types.Oldest:
+                    sortingType = "oldest";
+                    break;
+                case Types.Sorting_Types.Top:
+                    sortingType = "vote";
+                    break;
+            }
+            RestClient client = new RestClient(helpers.BaseUrl);
+            RestRequest request = new RestRequest($"/g/s/blog/{blogId}?sort={sortingType}&start={size}&size={size}");
+            request.AddHeaders(headers);
+            var response = client.ExecuteGet(request);
+            if((int)response.StatusCode != 200) { throw new Exception(response.Content); }
+            if(debug) { Trace.WriteLine(response.Content); }
+
+            return null; // FINISH LATER
+
         }
 
 
