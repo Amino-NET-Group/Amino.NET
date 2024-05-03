@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Amino.NET.Builders;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
@@ -190,6 +192,24 @@ namespace Amino
 
             return Task.CompletedTask;
         }
+
+        public Task create_post(PostBuilder post)
+        {
+            List<byte[]> _media = new List<byte[]>();
+            switch(post.PostType)
+            {
+                case PostBuilder.PostTypes.Blog:
+                    foreach (var media in post.MediaList) { _media.Add(media.Item1); }
+                    post_blog(post.Title, post.Content, _media, post.FansOnly, post.BackgroundColor);
+                    break;
+                case PostBuilder.PostTypes.Wiki:
+                    foreach (var media in post.MediaList) { _media.Add(media.Item1); }
+                    post_wiki(post.Title, post.Content, _media, post.FansOnly, post.BackgroundColor);
+                    break;
+            }
+            return Task.CompletedTask;
+        }
+
 
         /// <summary>
         /// Allows you to post a Wiki post on the current Community
