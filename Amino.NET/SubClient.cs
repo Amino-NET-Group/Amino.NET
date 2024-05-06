@@ -1155,27 +1155,11 @@ namespace Amino
             }
             message = message.Replace("<$", "").Replace("$>", "");
             JObject data = new JObject();
-            JObject attachementSub = new JObject();
-            JObject extensionSub = new JObject();
-            JObject extensionSuBArray = new JObject();
             data.Add("type", (int)messageType);
             data.Add("content", message);
             data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
             data.Add("timestamp", helpers.GetTimestamp() * 1000);
-            attachementSub.Add("objectId", null);
-            attachementSub.Add("objectType", null);
-            attachementSub.Add("link", null);
-            attachementSub.Add("title", null);
-            attachementSub.Add("content", null);
-            attachementSub.Add("mediaList", null);
-            extensionSuBArray.Add("link", null);
-            extensionSuBArray.Add("mediaType", 100);
-            extensionSuBArray.Add("mediaUploadValue", null);
-            extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
-            extensionSub.Add("mentionedArray", new JArray(mentions));
-            extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
-            data.Add("attachedObject", attachementSub);
-            data.Add("extensions", extensionSub);
+            data.Add("extensions", new JObject() { { "mentionedArray", new JArray(mentions) } });
             if (replyTo != null) { data.Add("replyMessageId", replyTo); }
 
             RestClient client = new RestClient(helpers.BaseUrl);
@@ -1192,26 +1176,10 @@ namespace Amino
         public Task send_file_message(string chatId, byte[] file, Types.upload_File_Types fileType)
         {
             JObject data = new JObject();
-            JObject attachementSub = new JObject();
-            JObject extensionSub = new JObject();
-            JObject extensionSuBArray = new JObject();
             data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
             data.Add("timestamp", helpers.GetTimestamp() * 1000);
             data.Add("content", null);
             data.Add("type", 0);
-            attachementSub.Add("objectId", null);
-            attachementSub.Add("objectType", null);
-            attachementSub.Add("link", null);
-            attachementSub.Add("title", null);
-            attachementSub.Add("content", null);
-            attachementSub.Add("mediaList", null);
-            extensionSuBArray.Add("link", null);
-            extensionSuBArray.Add("mediaType", 100);
-            extensionSuBArray.Add("mediaUploadValue", null);
-            extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
-            extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
-            data.Add("attachedObject", attachementSub);
-            data.Add("extensions", extensionSub);
 
             switch (fileType)
             {
@@ -1303,20 +1271,6 @@ namespace Amino
             data.Add("content", null);
             data.Add("clientRefId", helpers.GetTimestamp() / 10 % 1000000000);
             data.Add("timestamp", helpers.GetTimestamp() * 1000);
-            attachementSub.Add("objectId", null);
-            attachementSub.Add("objectType", null);
-            attachementSub.Add("link", null);
-            attachementSub.Add("title", null);
-            attachementSub.Add("content", null);
-            attachementSub.Add("mediaList", null);
-            extensionSuBArray.Add("link", null);
-            extensionSuBArray.Add("mediaType", 100);
-            extensionSuBArray.Add("mediaUploadValue", null);
-            extensionSuBArray.Add("mediaUploadValueContentType", "image/jpg");
-            extensionSub.Add("mentionedArray", new JArray());
-            extensionSub.Add("linkSnippetList", new JArray(extensionSuBArray));
-            data.Add("attachedObject", attachementSub);
-            data.Add("extensions", extensionSub);
             data.Add("stickerId", stickerId);
 
             RestClient client = new RestClient(helpers.BaseUrl);
