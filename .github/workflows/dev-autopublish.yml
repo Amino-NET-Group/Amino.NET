@@ -1,0 +1,41 @@
+name: Publish NuGet Package
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '7.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release
+      
+    - name: Determine version
+      id: version
+      run: echo "::set-output name=version::0.$((${GITHUB_RUN_NUMBER} / 10)).$((${GITHUB_RUN_NUMBER} % 10))"
+    
+    - name: Get Project Version
+      id: base_version
+      run: |
+        version=$(grep '<Version>' < Amino.NET/Amino.NET.csproj | sed 's/.*<Version>\(.*\)<\/Version>/\1/')
+        echo "::set-output name=version::$version"
+      
+    - name: Pack
+      run: dotnet pack --configuration Release /p:Version="${{ steps.base_version.outputs.version }}-dev${{ steps.version.outputs.version }}" --output nupkgs
+      
+    - name: Publish to NuGet
+      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

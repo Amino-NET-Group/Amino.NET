@@ -127,7 +127,7 @@
         }
         public enum Featured_Types
         {
-            Unfreature,
+            Unfeature,
             User,
             Blog,
             Wiki,
