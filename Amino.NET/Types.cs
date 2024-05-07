@@ -133,6 +133,13 @@
             Wiki,
             Chat
         }
+
+        public enum Join_Types
+        {
+            Open = 0,
+            Request = 1,
+            Private = 2
+        }
         public enum Object_Types
         {
             User = 0,
