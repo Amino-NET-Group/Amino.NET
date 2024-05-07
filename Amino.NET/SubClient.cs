@@ -1700,6 +1700,8 @@ namespace Amino
         }
 
 
+        public Amino.Client GetClient() => this.client;
+        public string GetCurrentCommunityId() => this.communityId;
 
         /// <summary>
         /// Not to be used in general use (THIS FUNCTION WILL DISPOSE THE SUBCLIENT)
