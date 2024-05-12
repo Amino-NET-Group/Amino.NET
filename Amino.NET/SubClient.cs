@@ -1194,6 +1194,7 @@ namespace Amino
                     data.Add("enableUhqEnabled", true);
                     break;
                 case Types.upload_File_Types.Audio:
+                    data.Remove("type");
                     data.Add("type", 2);
                     data.Add("mediaType", 110);
                     break;
