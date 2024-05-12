@@ -317,7 +317,7 @@ namespace Amino
                 };
                 RestClient client = new RestClient(helpers.BaseUrl);
                 RestRequest request = new RestRequest("/g/s/auth/logout");
-                request.AddJsonBody(data);
+                request.AddJsonBody(JsonConvert.SerializeObject(data));
                 request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
                 request.AddHeaders(headers);
                 var response = client.ExecutePost(request);
