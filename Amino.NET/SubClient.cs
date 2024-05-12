@@ -118,7 +118,7 @@ namespace Amino
             data.Add("timestamp", helpers.GetTimestamp() * 1000);
             request.AddJsonBody(JsonConvert.SerializeObject(data));
             request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
-            var response = client.ExecuteGet(request);
+            var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
             if (debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
