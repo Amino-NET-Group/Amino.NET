@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Amino
@@ -101,7 +102,24 @@ namespace Amino
 
         public Task delete_community(string email, string password, string verificationCode)
         {
-
+            JObject data = new JObject()
+            {
+                { "secret", $"0 {password}" },
+                { "validationContext", new JObject() {
+                    { "data", new JObject() { "code", verificationCode } }
+                }},
+                { "type", 1 },
+                { "identity", email },
+                { "deviceId", this.Client.deviceID },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            RestRequest request = new RestRequest($"/g/s-x{CommunityId}/community/delete-request");
+            request.AddJsonBody(JsonConvert.SerializeObject(data));
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
+            var response = RClient.ExecutePost(request);
+            if(!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Client.debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
         }
 
     }
