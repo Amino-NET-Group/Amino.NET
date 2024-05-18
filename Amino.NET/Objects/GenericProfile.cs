@@ -23,6 +23,8 @@ namespace Amino.Objects
         public int communityId { get; private set; }
         public string json { get; private set; }
         [JsonPropertyName("avatarFrame")] public GenericAvatarFrame AvatarFrame { get; set; }
+        [JsonPropertyName("influencerInfo")] public InfluencerPriceInfo InfluencerInfo { get; set; }
+
 
         public GenericProfile(JObject _json)
         {
