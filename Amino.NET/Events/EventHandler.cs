@@ -28,7 +28,7 @@ namespace Amino.Events
             try
             {
                 JsonElement root = JsonDocument.Parse(webSocketMessage.ToString()).RootElement;
-                SocketBase sBase = JsonSerializer.Deserialize<SocketBase>(root.GetProperty("o"));
+                SocketBase sBase = System.Text.Json.JsonSerializer.Deserialize<SocketBase>(root.GetProperty("o"));
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(webSocketMessage.ToString());
                 if(jsonObj["o"]["chatMessage"]["mediaType"] != null)
                 {
