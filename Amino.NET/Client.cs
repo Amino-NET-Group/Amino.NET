@@ -749,11 +749,11 @@ namespace Amino
         /// <param name="start"></param>
         /// <param name="size"></param>
         /// <returns>List : Amino.Objects.CommunityProfile</returns>
-        public List<Objects.CommunityProfile> get_subClient_profiles(int start = 0, int size = 25)
+        public List<Objects.GenericProfile> get_subClient_profiles(int start = 0, int size = 25)
         {
             if (sessionID == null) { throw new Exception("ErrorCode: 0: Client not logged in"); }
             if (start < 0) { throw new Exception("start cannot be lower than 0"); }
-            List<Objects.CommunityProfile> profileList = new List<Objects.CommunityProfile>();
+            List<Objects.GenericProfile> profileList = new List<Objects.GenericProfile>();
             RestClient client = new RestClient(helpers.BaseUrl);
             RestRequest request = new RestRequest($"/g/s/community/joined?v=1&start={start}&size={size}");
             request.AddHeaders(headers);
@@ -767,7 +767,7 @@ namespace Amino
             .ToList();
             foreach (var profile in profiles)
             {
-                Objects.CommunityProfile C_Profile = new Objects.CommunityProfile(profile);
+                Objects.GenericProfile C_Profile = new Objects.GenericProfile(profile);
                 profileList.Add(C_Profile);
             }
 

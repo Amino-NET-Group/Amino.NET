@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 
 namespace Amino.Objects
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class CommunityProfile
+    public class GenericProfile
     {
         public int status { get; private set; }
         public bool isNicknameVerified { get; private set; }
@@ -21,8 +22,9 @@ namespace Amino.Objects
         public string iconUrl { get; private set; }
         public int communityId { get; private set; }
         public string json { get; private set; }
+        [JsonPropertyName("avatarFrame")] public GenericAvatarFrame AvatarFrame { get; set; }
 
-        public CommunityProfile(JObject _json)
+        public GenericProfile(JObject _json)
         {
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
 

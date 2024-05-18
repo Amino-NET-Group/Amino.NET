@@ -38,8 +38,8 @@ namespace Amino.Objects
         [JsonPropertyName("templateId")] public int TemplateId { get; set; }
         [JsonPropertyName("createdTime")] public string CreatedTime { get; set; }
 
-        [JsonPropertyName("communityHeadList")] public List<CommunityProfile> CommunityHeadList { get; set; }
-        [JsonPropertyName("agent")] public CommunityProfile Agent { get; set; }
+        [JsonPropertyName("communityHeadList")] public List<GenericProfile> CommunityHeadList { get; set; }
+        [JsonPropertyName("agent")] public GenericProfile Agent { get; set; }
         [JsonPropertyName("themePack")] public CommunityThemePack ThemePack { get; set; }
         [JsonPropertyName("advancedSettings")] public CommunityAdvancedSettings AdvancedSettings { get; }
     }
