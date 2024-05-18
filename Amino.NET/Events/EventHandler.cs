@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Amino.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -25,9 +27,12 @@ namespace Amino.Events
             eventCall.callWebSocketMessageEvent(client, webSocketMessage);
             try
             {
+                JsonElement root = JsonDocument.Parse(webSocketMessage.ToString()).RootElement;
+                SocketBase sBase = JsonSerializer.Deserialize<SocketBase>(root.GetProperty("o"));
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(webSocketMessage.ToString());
                 if(jsonObj["o"]["chatMessage"]["mediaType"] != null)
                 {
+
                     switch((int)jsonObj["o"]["chatMessage"]["mediaType"])
                     {
                         case 0: //TextMessage / MessageDeleted / ChatMember Left, ChatMember Joined / ChatBackground changed / ChatTitle changed / ChatContent chaaged / ChatAnnouncementPin / ChatAnnouncementUnpin / ChatViewOnlyOn / ChatViewOnlyOff / ChatTipEnabled / ChatTipDisabled / MessageForceRemoved / ChatTip
