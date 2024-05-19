@@ -11,7 +11,7 @@ namespace Amino.Objects
 {
     public class Blog
     {
-        public string json { get; } // NEEDS TO BE ADDED AFTER
+        public string json { get; set; } // NEEDS TO BE ADDED AFTER
         [JsonPropertyName("globalVotesCount")]public int GlobalVotesCount { get; set; } = 0;
         [JsonPropertyName("globalVotedValue")]public int GlobalVotedValue { get; set; } = 0;
         [JsonPropertyName("votedValue")]public int VotedValue { get; set; } = 0;
@@ -36,6 +36,6 @@ namespace Amino.Objects
         [JsonPropertyName("ndcId")]public int CommunityId { get; set; } = 0;
         [JsonPropertyName("endTime")]public string EndTime { get; set; }
         [JsonPropertyName("commentsCount")]public int commentsCount { get; set; } = 0;
-        [JsonPropertyName("author")]public GenericProfile Author { get; }
+        [JsonPropertyName("author")]public GenericProfile Author { get; set; }
     }
 }

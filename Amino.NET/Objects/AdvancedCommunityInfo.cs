@@ -41,6 +41,6 @@ namespace Amino.Objects
         [JsonPropertyName("communityHeadList")] public List<GenericProfile> CommunityHeadList { get; set; }
         [JsonPropertyName("agent")] public GenericProfile Agent { get; set; }
         [JsonPropertyName("themePack")] public CommunityThemePack ThemePack { get; set; }
-        [JsonPropertyName("advancedSettings")] public CommunityAdvancedSettings AdvancedSettings { get; }
+        [JsonPropertyName("advancedSettings")] public CommunityAdvancedSettings AdvancedSettings { get; set; }
     }
 }

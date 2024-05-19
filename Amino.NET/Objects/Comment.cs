@@ -19,7 +19,6 @@ namespace Amino.Objects
         [JsonPropertyName("createdTime")]public string CreatedTime { get; set; }
         [JsonPropertyName("subcommentsCount")]public int SubcommentsCount { get; set; }
         [JsonPropertyName("type")]public int Type { get; set; }
-        public GenericProfile Author { get; private set; }
-
+        [JsonPropertyName("author")]public GenericProfile Author { get; set; }
     }
 }

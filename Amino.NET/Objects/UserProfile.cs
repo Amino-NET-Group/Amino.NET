@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Amino.Objects
 {
@@ -38,6 +40,8 @@ namespace Amino.Objects
         public int blogsCount { get; }
         public string json { get; }
         public _Extensions Extensions { get; }
+        [JsonPropertyName("influencerInfo")]public InfluencerInfo InfluencerInfo { get; set; }
+        [JsonPropertyName("fanClubList")] public List<InfluencerFanClubMember> FanClubList { get; set; }
 
         public UserProfile(JObject _json)
         {

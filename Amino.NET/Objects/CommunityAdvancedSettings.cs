@@ -16,6 +16,7 @@ namespace Amino.Objects
         [JsonPropertyName("pollMinFullBarCount")] public int PollMinFullBarCount { get; set; }
         [JsonPropertyName("catalogEnabled")] public bool CatalogEnabled { get; set; }
         [JsonPropertyName("newsFeedPages")] public List<CommunityNewsFeed> NewsFeed { get; set; }
-        [JsonPropertyName("rankingTable")] public List<CommunityRankingTable> Ranks { get; set; } 
+        [JsonPropertyName("rankingTable")] public List<CommunityRankingTable> Ranks { get; set; }
+        [JsonPropertyName("welcomeMessageText")] public string WelcomeMessageText { get; set; }
     }
 }
