@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 namespace Amino.Objects
 {
 
-    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class UserProfile
     {
         public int status { get; }
