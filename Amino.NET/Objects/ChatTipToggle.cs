@@ -8,7 +8,7 @@ namespace Amino.Objects
     // ROOT JSON ELEMENT: o/chatMessage
     public class ChatTipToggle
     {
-        public string json { get; set; } // NEEDS TO BE ADDED AFTER
+        public string Json { get; set; } // NEEDS TO BE ADDED AFTER
         public SocketBase SocketBase { get; set; } // NEEDS TO BE ADDED AFTER
 
         [JsonPropertyName("threadId")]public string ChatId { get; set; }

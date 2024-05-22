@@ -970,7 +970,7 @@ namespace Amino
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
             if (debug) { Trace.WriteLine(response.Content); }
             dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(response.Content);
-            JArray chatMessageList = jsonObj["messageList"];
+            JArray chatMessageList = jsonObj["messageList"]; // no need
             foreach (JObject chatMessage in chatMessageList)
             {
                 Objects.MessageCollection message = new Objects.MessageCollection(chatMessage, JObject.Parse(response.Content));

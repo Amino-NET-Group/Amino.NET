@@ -14,7 +14,7 @@ namespace Amino.Objects
         // Base JSON key: community
 
         public bool IsCurrentUserJoined { get; set; } // MUST BE SET AFTER
-        public string json { get; set; } // MUST BE SET AFTER
+        public string Json { get; set; } // MUST BE SET AFTER
         [JsonPropertyName("searchable")] public bool Searchable { get; set; }
         [JsonPropertyName("isStandaloneAppDepricated")] public bool IsStandaloneAppDeprecated { get; set; }
         [JsonPropertyName("listedStatus")] public int ListedStatus { get; set; }

@@ -7,7 +7,7 @@ namespace Amino.Objects
 {
     public class Chat
     {
-        public string json { get; set; } // NEEDS TO BE ADDED LATER
+        public string Json { get; set; } // NEEDS TO BE ADDED LATER
         [JsonPropertyName("uid")]public string UserId { get; set; }
         [JsonPropertyName("membersQuota")]public int MembersQuota { get; set; }
         [JsonPropertyName("threadId")]public string ThreadId { get; set; }

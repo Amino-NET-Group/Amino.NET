@@ -11,7 +11,7 @@ namespace Amino.Objects
 {
     public class ChatMember
     {
-        public string json { get; set; } // NEEDS TO BE ADDED AFTER
+        public string Json { get; set; } // NEEDS TO BE ADDED AFTER
         [JsonPropertyName("status")]public int Status { get; set; }
         [JsonPropertyName("isNicknameVerified")]public bool IsNicknameVerified { get; set; }
         [JsonPropertyName("uid")]public string UserId { get; set; }

@@ -7,7 +7,7 @@ namespace Amino.Objects
     // ROOT JSON ELEMENT: o/chatMessage
     public class ChatAnnouncement
     {
-        public string json { get; set; } // NEEDS TO BE SET AFTER
+        public string Json { get; set; } // NEEDS TO BE SET AFTER
         public SocketBase SocketBase { get; set; } // NEEDS TO BE SET AFTER
         [JsonPropertyName("threadId")]public string ChatId { get; set; }
         [JsonPropertyName("mediaType")]public int MediaType { get; set; }

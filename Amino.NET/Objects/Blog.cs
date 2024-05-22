@@ -11,7 +11,7 @@ namespace Amino.Objects
 {
     public class Blog
     {
-        public string json { get; set; } // NEEDS TO BE ADDED AFTER
+        public string Json { get; set; } // NEEDS TO BE ADDED AFTER
         [JsonPropertyName("globalVotesCount")]public int GlobalVotesCount { get; set; } = 0;
         [JsonPropertyName("globalVotedValue")]public int GlobalVotedValue { get; set; } = 0;
         [JsonPropertyName("votedValue")]public int VotedValue { get; set; } = 0;
