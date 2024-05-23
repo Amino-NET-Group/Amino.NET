@@ -76,7 +76,7 @@ namespace Amino
                     {
                         Trace.WriteLine($"WebSocket: Received Message: {msg.Text}");
                     }
-                    eventHandler.ReceiveEvent(JObject.Parse(msg.Text), _client);
+                    eventHandler.ReceiveEvent(msg.Text, _client);
                 });
 
                 await ws_client.Start();

@@ -240,13 +240,13 @@
 
         public enum Supported_Languages
         {
-            english,
-            spanish,
-            portuguese,
-            arabic,
-            russian,
-            french,
-            german
+            English,
+            Spanish,
+            Portuguese,
+            Arabic,
+            Russian,
+            French,
+            German
         }
 
         public enum Wallet_Config_Levels
