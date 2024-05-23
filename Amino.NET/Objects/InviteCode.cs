@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 namespace Amino.Objects
 {
     public class InviteCode

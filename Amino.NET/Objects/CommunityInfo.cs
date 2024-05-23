@@ -1,10 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Amino.Objects
 {
-    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class CommunityInfo
     {
         [JsonPropertyName("objectType")]public int ObjectType { get; set; }

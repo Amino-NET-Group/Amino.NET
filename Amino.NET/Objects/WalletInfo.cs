@@ -1,34 +1,18 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Serialization;
 
 namespace Amino.Objects
 {
 
-    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
+    // ROOT JSON ELEMENT: wallet
     public class WalletInfo
     {
-        public float totalCoinsFloat { get; }
-        public bool adsEnabled { get; }
-        public string adsVideoStats { get; }
-        public string adsFlag { get; }
-        public int totalCoins { get; }
-        public bool businessCoinsEnabled { get; }
-        public int totalBusinessCoins { get; }
-        public float totalBusinessCoinsFloat { get; }
-        public string json { get; }
-
-        public WalletInfo(JObject _json)
-        {
-            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            totalCoinsFloat = (float)jsonObj["wallet"]["totalCoinsFloat"];
-            adsEnabled = (bool)jsonObj["wallet"]["adsEnabled"];
-            adsVideoStats = (string)jsonObj["wallet"]["adsVideoStats"];
-            adsFlag = (string)jsonObj["wallet"]["adsFlag"];
-            totalCoins = (int)jsonObj["wallet"]["totalCoins"];
-            businessCoinsEnabled = (bool)jsonObj["wallet"]["businessCoinsEnabled"];
-            totalBusinessCoins = (int)jsonObj["wallet"]["totalBusinessCoins"];
-            totalBusinessCoinsFloat = (float)jsonObj["wallet"]["totalBusinessCoinsFloat"];
-            json = _json.ToString();
-        }
+        [JsonPropertyName("totalCoinsFloat")]public float TotalCoinsFloat { get; set; }
+        [JsonPropertyName("adsEnabled")]public bool AdsEnabled { get; set; }
+        [JsonPropertyName("adsVideoStats")]public string AdsVideoStats { get; set; }
+        [JsonPropertyName("adsFlag")]public string AdsFlag { get; set; }
+        [JsonPropertyName("totalCoins")]public int TotalCoins { get; set; }
+        [JsonPropertyName("businessCoinsEnabled")]public bool BusinessCoinsEnabled { get; set; }
+        [JsonPropertyName("totalBusinessCoins")]public int TotalBusinessCoins { get; set; }
+        [JsonPropertyName("totalBusinessCoinsFloat")]public float TotalBusinessCoinsFloat { get; set; }
     }
 }
