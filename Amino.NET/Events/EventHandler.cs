@@ -76,35 +76,51 @@ namespace Amino.Events
                                     eventCall.callChatContentChangedEvent(client, _chatContentChanged);
                                     break;
                                 case 119: // MessageForceRemovedByAdmin
-                                    Amino.Objects.SpecialChatEvent _messageForceRemovedByAdmin = new Objects.SpecialChatEvent(webSocketMessage);
+                                    Amino.Objects.SpecialChatEvent _messageForceRemovedByAdmin = JsonSerializer.Deserialize<SpecialChatEvent>(element);
+                                    _messageForceRemovedByAdmin.Json = webSocketMessage;
+                                    _messageForceRemovedByAdmin.SocketBase = _socketBase;
                                     eventCall.callMessageForceRemovedByAdminEvent(client, _messageForceRemovedByAdmin);
                                     break;
                                 case 120: // ChatTip
-                                    Amino.Objects.ChatTip _chatTip = new Objects.ChatTip(webSocketMessage);
+                                    Amino.Objects.ChatTip _chatTip = JsonSerializer.Deserialize<ChatTip>(element);
+                                    _chatTip.Json = webSocketMessage;
+                                    _chatTip.SocketBase = _socketBase;
                                     eventCall.callChatTipEvent(client, _chatTip);
                                     break;
                                 case 121: // ChatAnnouncementPin
-                                    Amino.Objects.ChatAnnouncement _chatAnnouncementPinEvent = new Objects.ChatAnnouncement(webSocketMessage);
+                                    Amino.Objects.ChatAnnouncement _chatAnnouncementPinEvent = JsonSerializer.Deserialize<ChatAnnouncement>(element);
+                                    _chatAnnouncementPinEvent.Json = webSocketMessage;
+                                    _chatAnnouncementPinEvent.SocketBase = _socketBase;
                                     eventCall.callChatPinAnnouncementEvent(client, _chatAnnouncementPinEvent);
                                     break;
                                 case 125: // ChatViewModeOn
-                                    Amino.Objects.ViewMode _viewModeOn = new Objects.ViewMode(webSocketMessage);
+                                    Amino.Objects.ViewMode _viewModeOn = JsonSerializer.Deserialize<ViewMode>(element);
+                                    _viewModeOn.Json = webSocketMessage;
+                                    _viewModeOn.SocketBase = _socketBase;
                                     eventCall.callChatViewModeOnEvent(client, _viewModeOn);
                                     break;
                                 case 126: // ChatViewModeOff
-                                    Amino.Objects.ViewMode _viewModeOff = new Objects.ViewMode(webSocketMessage);
+                                    Amino.Objects.ViewMode _viewModeOff = JsonSerializer.Deserialize<ViewMode>(element);
+                                    _viewModeOff.Json = webSocketMessage;
+                                    _viewModeOff.SocketBase = _socketBase;
                                     eventCall.callChatViewModeOffEvent(client, _viewModeOff);
                                     break;
                                 case 127: // ChatAnnouncementUnPin
-                                    Amino.Objects.ChatEvent _chatAnnouncementUnPin = new Objects.ChatEvent(webSocketMessage);
+                                    Amino.Objects.ChatEvent _chatAnnouncementUnPin = JsonSerializer.Deserialize<ChatEvent>(element);
+                                    _chatAnnouncementUnPin.Json = webSocketMessage;
+                                    _chatAnnouncementUnPin.SocketBase = _socketBase;
                                     eventCall.callChatUnpinAnnouncementEvent(client, _chatAnnouncementUnPin);
                                     break;
                                 case 128: // ChatTipEnabled
-                                    Amino.Objects.ChatTipToggle _chatTipEnabled = new Objects.ChatTipToggle(webSocketMessage);
+                                    Amino.Objects.ChatTipToggle _chatTipEnabled = JsonSerializer.Deserialize<ChatTipToggle>(element);
+                                    _chatTipEnabled.Json = webSocketMessage;
+                                    _chatTipEnabled.SocketBase = _socketBase;
                                     eventCall.callChatTipEnabledEvent(client, _chatTipEnabled);
                                     break;
                                 case 129: // ChatTipDisabled
-                                    Amino.Objects.ChatTipToggle _chatTipDisabled = new Objects.ChatTipToggle(webSocketMessage);
+                                    Amino.Objects.ChatTipToggle _chatTipDisabled = JsonSerializer.Deserialize<ChatTipToggle>(element);
+                                    _chatTipDisabled.Json = webSocketMessage;
+                                    _chatTipDisabled.SocketBase = _socketBase;
                                     eventCall.callChatTipDisabledEvent(client, _chatTipDisabled);
                                     break;
                                 
@@ -112,19 +128,27 @@ namespace Amino.Events
 
                             break;
                         case 100: //ImageMessage
-                            Amino.Objects.ImageMessage _imageMessage = new Amino.Objects.ImageMessage(webSocketMessage);
+                            Amino.Objects.ImageMessage _imageMessage = JsonSerializer.Deserialize<ImageMessage>(element);
+                            _imageMessage.Json = webSocketMessage;
+                            _imageMessage.SocketBase = _socketBase;
                             eventCall.callImageMessageEvent(client, _imageMessage);
                             break;
                         case 103: //YouTubeMessage
-                            Amino.Objects.YouTubeMessage _youtubeMessage = new Objects.YouTubeMessage(webSocketMessage);
+                            Amino.Objects.YouTubeMessage _youtubeMessage = JsonSerializer.Deserialize<YouTubeMessage>(element);
+                            _youtubeMessage.Json = webSocketMessage;
+                            _youtubeMessage.SocketBase = _socketBase;
                             eventCall.callYouTubeMessageEvent(client, _youtubeMessage);
                             break;
                         case 110: //VoiceMessage
-                            Amino.Objects.VoiceMessage _voiceMessage = new Objects.VoiceMessage(webSocketMessage);
+                            Amino.Objects.VoiceMessage _voiceMessage = JsonSerializer.Deserialize<VoiceMessage>(element);
+                            _voiceMessage.Json = webSocketMessage;
+                            _voiceMessage.SocketBase = _socketBase;
                             eventCall.callVoiceMessageEvent(client, _voiceMessage);
                             break;
                         case 113: //StickerMessage
-                            Amino.Objects.StickerMessage _stickerMessage = new Objects.StickerMessage(webSocketMessage);
+                            Amino.Objects.StickerMessage _stickerMessage = JsonSerializer.Deserialize<StickerMessage>(element);
+                            _stickerMessage.Json = webSocketMessage;
+                            _stickerMessage.SocketBase = _socketBase;
                             eventCall.callStickerMessageEvent(client, _stickerMessage);
                             break;
                     }
