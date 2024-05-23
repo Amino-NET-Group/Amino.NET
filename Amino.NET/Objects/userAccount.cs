@@ -1,34 +1,34 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 
 namespace Amino.Objects
 {
-    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
+    // ROOT JSON ELEMENT: account
     public class UserAccount
     {
-        public string userName { get; private set; }
-        public int? status { get; private set; }
-        public string userId { get; private set; }
-        public string modifiedTime { get; private set; }
-        public string twitterID { get; private set; }
-        public int? activation { get; private set; }
-        public int? phoneNumberActivation { get; private set; }
-        public int? emailActivation { get; private set; }
-        public string appleID { get; private set; }
-        public string facebookID { get; private set; }
-        public string nickName { get; private set; }
-        public string googleID { get; private set; }
-        public string iconUrl { get; private set; }
-        public int? securityLevel { get; private set; }
-        public string phoneNumber { get; private set; }
-        public int? role { get; private set; }
-        public bool aminoIdEditable { get; private set; } = false;
-        public string aminoId { get; private set; }
-        public string createdTime { get; private set; }
-        public string email { get; private set; }
-        public string json { get; private set; }
-        public _AdvancedSettings AdvancedSettings { get; }
-        public _Extensions Extensions { get; }
+        [JsonPropertyName("username")]public string Username { get; set; }
+        [JsonPropertyName("status")]public int Status { get; set; }
+        [JsonPropertyName("uid")]public string UserId { get; set; }
+        [JsonPropertyName("modifiedTime")]public string ModifiedTime { get; set; }
+        [JsonPropertyName("twitterID")]public string TwitterId { get; set; }
+        [JsonPropertyName("activation")]public int Activation { get; set; }
+        [JsonPropertyName("phoneNumberActivation")]public int PhoneNumberActivation { get; set; }
+        [JsonPropertyName("emailActivation")]public int EmailActivation { get; set; }
+        [JsonPropertyName("appleID")]public string AppleId { get; set; }
+        [JsonPropertyName("facebookID")]public string FacebookId { get; set; }
+        [JsonPropertyName("nickname")]public string Nickname { get; set; }
+        [JsonPropertyName("googleID")]public string GoogleId { get; set; }
+        [JsonPropertyName("icon")]public string IconUrl { get; set; }
+        [JsonPropertyName("securityLevel")]public int SecurityLevel { get; set; }
+        [JsonPropertyName("phoneNumber")]public string PhoneNumber { get; set; }
+        [JsonPropertyName("role")]public int Role { get; set; }
+        [JsonPropertyName("aminoIdEditable")]public bool AminoIdEditable { get; set; }
+        [JsonPropertyName("aminoId")]public string AminoId { get; set; }
+        [JsonPropertyName("createdTime")]public string CreatedTime { get; set; }
+        [JsonPropertyName("email")]public string Email { get; set; }
+        [JsonPropertyName("advancedSettings")]public UserAccountAdvancedSettings AdvancedSettings { get; set; }
+        [JsonPropertyName("extensions")]public UserAccountExtensions Extensions { get; set; }
 
         public UserAccount(JObject _json)
         {

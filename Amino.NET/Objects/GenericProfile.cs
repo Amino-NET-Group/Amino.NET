@@ -24,6 +24,7 @@ namespace Amino.Objects
 
         [JsonPropertyName("avatarFrame")] public GenericAvatarFrame AvatarFrame { get; set; }
         [JsonPropertyName("influencerInfo")] public InfluencerPriceInfo InfluencerInfo { get; set; }
+        [JsonPropertyName("extensions")] public GenericAuthorExtensions Extensions { get; set; }
 
     }
 }

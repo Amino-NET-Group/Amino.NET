@@ -28,12 +28,12 @@ namespace Amino.Events
             try
             {
                 JsonElement root = JsonDocument.Parse(webSocketMessage.ToString()).RootElement;
-                SocketBase sBase = System.Text.Json.JsonSerializer.Deserialize<SocketBase>(root.GetProperty("o"));
                 dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(webSocketMessage.ToString());
                 if(jsonObj["o"]["chatMessage"]["mediaType"] != null)
                 {
-
-                    switch((int)jsonObj["o"]["chatMessage"]["mediaType"])
+                    
+                    SocketBase sBase = System.Text.Json.JsonSerializer.Deserialize<SocketBase>(root.GetProperty("o"));
+                    switch ((int)jsonObj["o"]["chatMessage"]["mediaType"])
                     {
                         case 0: //TextMessage / MessageDeleted / ChatMember Left, ChatMember Joined / ChatBackground changed / ChatTitle changed / ChatContent chaaged / ChatAnnouncementPin / ChatAnnouncementUnpin / ChatViewOnlyOn / ChatViewOnlyOff / ChatTipEnabled / ChatTipDisabled / MessageForceRemoved / ChatTip
                             switch((int)jsonObj["o"]["chatMessage"]["type"])
