@@ -2548,11 +2548,11 @@ namespace Amino
                 }
             }
 
-            public void callWebSocketMessageEvent(Amino.Client _client, JObject _webSocketMessage)
+            public void callWebSocketMessageEvent(Amino.Client _client, string _webSocketMessage)
             {
                 if (_client.onWebSocketMessage != null)
                 {
-                    _client.onWebSocketMessage.Invoke(_webSocketMessage.ToString());
+                    _client.onWebSocketMessage.Invoke(_webSocketMessage);
                 }
             }
 

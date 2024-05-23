@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Threading.Tasks;
 using Amino.Objects;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+
 
 namespace Amino.Events
 {
@@ -21,49 +16,63 @@ namespace Amino.Events
         /// <param name="webSocketMessage"></param>
         /// <param name="client"></param>
         /// <returns></returns>
-        public Task ReceiveEvent(JObject webSocketMessage, Client client)
+        public Task ReceiveEvent(string webSocketMessage, Client client)
         {
             Client.Events eventCall = new Client.Events();
             eventCall.callWebSocketMessageEvent(client, webSocketMessage);
             try
             {
                 JsonElement root = JsonDocument.Parse(webSocketMessage.ToString()).RootElement;
-                dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(webSocketMessage.ToString());
-                if(jsonObj["o"]["chatMessage"]["mediaType"] != null)
+                if(root.GetProperty("o").GetProperty("chatMessage").GetProperty("mediaType").ValueKind != JsonValueKind.Null)
                 {
-                    
-                    SocketBase sBase = System.Text.Json.JsonSerializer.Deserialize<SocketBase>(root.GetProperty("o"));
-                    switch ((int)jsonObj["o"]["chatMessage"]["mediaType"])
+                    SocketBase _socketBase = JsonSerializer.Deserialize<SocketBase>(root.GetProperty("o").GetRawText());
+                    string element = root.GetProperty("o").GetProperty("chatMessage").GetRawText();
+                    switch (root.GetProperty("o").GetProperty("chatMessage").GetProperty("mediaType").GetInt32())
                     {
                         case 0: //TextMessage / MessageDeleted / ChatMember Left, ChatMember Joined / ChatBackground changed / ChatTitle changed / ChatContent chaaged / ChatAnnouncementPin / ChatAnnouncementUnpin / ChatViewOnlyOn / ChatViewOnlyOff / ChatTipEnabled / ChatTipDisabled / MessageForceRemoved / ChatTip
-                            switch((int)jsonObj["o"]["chatMessage"]["type"])
+                            switch(root.GetProperty("o").GetProperty("chatMessage").GetProperty("type").GetInt32())
                             {
                                 case 0: //Textmessage recevied
-                                    Amino.Objects.Message _message = new Amino.Objects.Message(webSocketMessage);
+                                    Objects.Message _message = JsonSerializer.Deserialize<Message>(element);
+                                    _message.Json = webSocketMessage;
+                                    _message.SocketBase = _socketBase;
+                                    
                                     eventCall.callMessageEvent(client, this, _message);
                                     break;
                                 case 100: // Textmessage deleted
-                                    Amino.Objects.DeletedMessage _deletedMessage = new Objects.DeletedMessage(webSocketMessage);
+                                    Amino.Objects.DeletedMessage _deletedMessage = JsonSerializer.Deserialize<DeletedMessage>(element);
+                                    _deletedMessage.SocketBase = _socketBase;
+                                    _deletedMessage.Json = webSocketMessage;
                                     eventCall.callMessageDeletedEvent(client, _deletedMessage);
                                     break;
                                 case 101: // ChatMember Joined
-                                    Amino.Objects.JoinedChatMember _joinedMember = new Objects.JoinedChatMember(webSocketMessage);
+                                    Amino.Objects.JoinedChatMember _joinedMember = JsonSerializer.Deserialize<JoinedChatMember>(element);
+                                    _joinedMember.Json = webSocketMessage;
+                                    _joinedMember.SocketBase = _socketBase;
                                     eventCall.callChatMemberJoinEvent(client, _joinedMember);
                                     break;
                                 case 102: // ChatMember Left
-                                    Amino.Objects.LeftChatMember _leftMember = new Objects.LeftChatMember(webSocketMessage);
+                                    Amino.Objects.LeftChatMember _leftMember = JsonSerializer.Deserialize<LeftChatMember>(element);
+                                    _leftMember.Json = webSocketMessage;
+                                    _leftMember.SocketBase = _socketBase;
                                     eventCall.callChatMemberLeaveEvent(client, _leftMember);
                                     break;
                                 case 104: // ChatBackground changed
-                                    Amino.Objects.ChatEvent _chatBackgroundChanged = new Objects.ChatEvent(webSocketMessage);
+                                    Amino.Objects.ChatEvent _chatBackgroundChanged = JsonSerializer.Deserialize<ChatEvent>(element);
+                                    _chatBackgroundChanged.SocketBase = _socketBase;
+                                    _chatBackgroundChanged.Json = webSocketMessage;
                                     eventCall.callChatBackgroundChangedEvent(client, _chatBackgroundChanged);
                                     break;
                                 case 105: // ChatTitle changed
-                                    Amino.Objects.ChatEvent _chatTitleChanged = new Objects.ChatEvent(webSocketMessage);
+                                    Amino.Objects.ChatEvent _chatTitleChanged = JsonSerializer.Deserialize<ChatEvent>(element);
+                                    _chatTitleChanged.SocketBase = _socketBase;
+                                    _chatTitleChanged.Json = webSocketMessage;
                                     eventCall.callChatTitleChangedEvent(client, _chatTitleChanged);  
                                     break;
                                 case 113: // ChatContent Changed
-                                    Amino.Objects.ChatEvent _chatContentChanged = new Objects.ChatEvent(webSocketMessage);
+                                    Amino.Objects.ChatEvent _chatContentChanged = JsonSerializer.Deserialize<ChatEvent>(element);
+                                    _chatContentChanged.Json = webSocketMessage;
+                                    _chatContentChanged.SocketBase = _socketBase;
                                     eventCall.callChatContentChangedEvent(client, _chatContentChanged);
                                     break;
                                 case 119: // MessageForceRemovedByAdmin
