@@ -1363,7 +1363,7 @@ namespace Amino
         public Task join_chat(string chatId)
         {
             RestClient client = new RestClient(helpers.BaseUrl);
-            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.userID}");
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.UserId}");
             request.AddHeaders(headers);
             var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -1374,7 +1374,7 @@ namespace Amino
         public Task leave_chat(string chatId)
         {
             RestClient client = new RestClient(helpers.BaseUrl);
-            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.userID}");
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/member/{this.client.UserId}");
             request.AddHeaders(headers);
             var response = client.Delete(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
@@ -1498,18 +1498,13 @@ namespace Amino
 
         public List<Objects.Wiki> get_user_wikis(string userId, int start = 0, int size = 25)
         {
-            List<Objects.Wiki> wikis = new List<Objects.Wiki>();
             RestClient client = new RestClient(helpers.BaseUrl);
             RestRequest request = new RestRequest($"/x{communityId}/s/item?type=user-all&start={start}&size={size}&cv=1.2&uid={userId}");
             request.AddHeaders(headers);
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
-            foreach (JObject wiki in JObject.Parse(response.Content)["itemList"])
-            {
-                wikis.Add(new Objects.Wiki(wiki));
-            }
-            return wikis;
+            if (Debug) { Trace.WriteLine(response.Content); }
+            return System.Text.Json.JsonSerializer.Deserialize<List<Wiki>>(JsonDocument.Parse(response.Content).RootElement.GetProperty("itemList").GetRawText());
         }
 
         public Objects.UserAchievements get_user_achievements(string userId)
@@ -1519,8 +1514,8 @@ namespace Amino
             request.AddHeaders(headers);
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
-            return new Objects.UserAchievements((JObject)JObject.Parse(response.Content)["achievements"]);
+            if (Debug) { Trace.WriteLine(response.Content); }
+            return System.Text.Json.JsonSerializer.Deserialize<UserAchievements>(JsonDocument.Parse(response.Content).RootElement.GetProperty("achievements").GetRawText());
         }
 
         public Objects.InfluencerInfo get_influencer_info(string userId, int start = 0, int size = 25)
@@ -1530,8 +1525,8 @@ namespace Amino
             request.AddHeaders(headers);
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
-            return new(JObject.Parse(response.Content));
+            if (Debug) { Trace.WriteLine(response.Content); }
+            return System.Text.Json.JsonSerializer.Deserialize<InfluencerInfo>(JsonDocument.Parse(response.Content).RootElement.GetRawText());
 
         }
 
@@ -1549,7 +1544,7 @@ namespace Amino
             request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
             var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
+            if (Debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
         public Task remove_influencer(string userId)
@@ -1559,7 +1554,7 @@ namespace Amino
             request.AddHeaders(headers);
             var response = client.Delete(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
+            if (Debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
 
@@ -1582,50 +1577,41 @@ namespace Amino
             request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
             var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
+            if (Debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
 
-        public List<Objects.BlockedUser> get_blocked_users(int start = 0, int size = 25)
+        public List<Objects.UserProfile> get_blocked_users(int start = 0, int size = 25)
         {
-            List<Objects.BlockedUser> blocked = new List<Objects.BlockedUser>();
             RestClient client = new RestClient(helpers.BaseUrl);
             RestRequest request = new RestRequest($"/x{communityId}/s/block?start={start}&size={size}");
             request.AddHeaders(headers);
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
-            foreach (JObject user in JObject.Parse(response.Content)["userProfileList"])
-            {
-                blocked.Add(new(user));
-            }
-            return blocked;
+            if (Debug) { Trace.WriteLine(response.Content); }
+            return System.Text.Json.JsonSerializer.Deserialize<List<UserProfile>>(JsonDocument.Parse(response.Content).RootElement.GetProperty("userProfileList").GetRawText());
         }
 
         public List<string> get_blocker_users(int start = 0, int size = 25)
         {
-            List<string> blockers = new();
             RestClient client = new RestClient(helpers.BaseUrl);
             RestRequest request = new RestRequest($"/x{communityId}/s/block?start={start}&size={size}");
             request.AddHeaders(headers);
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
-            foreach (string blocker in JObject.Parse(response.Content)["blockerUidList"]) { blockers.Add(blocker); }
-            return blockers;
+            if (Debug) { Trace.WriteLine(response.Content); }
+            return System.Text.Json.JsonSerializer.Deserialize<List<string>>(JsonDocument.Parse(response.Content).RootElement.GetProperty("blockerUidList").GetRawText());
         }
 
         public List<Objects.UserProfile> get_leaderboard_info(Types.Leaderboard_Ranking_Types type, int start = 0, int size = 25)
         {
-            List<Objects.UserProfile> leaderboard = new();
             RestClient client = new RestClient(helpers.BaseUrl);
             RestRequest request = new RestRequest($"/g/s-x{communityId}/community/leaderboard?rankingType={(int)type}&start={start}&size={size}");
             request.AddHeaders(headers);
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
-            foreach (JObject user in JObject.Parse(response.Content)["userProfileList"]) { leaderboard.Add(new(user)); }
-            return leaderboard;
+            if (Debug) { Trace.WriteLine(response.Content); }
+            return System.Text.Json.JsonSerializer.Deserialize<List<UserProfile>>(JsonDocument.Parse(response.Content).RootElement.GetProperty("userProfileList").GetRawText());
         }
 
 
@@ -1636,8 +1622,8 @@ namespace Amino
             request.AddHeaders(headers);
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
-            return new((JObject)JObject.Parse(response.Content)["item"]);
+            if (Debug) { Trace.WriteLine(response.Content); }
+            return System.Text.Json.JsonSerializer.Deserialize<Wiki>(JsonDocument.Parse(response.Content).RootElement.GetProperty("item").GetRawText());
         }
 
         public Task kick_from_chat(string userId, string chatId, bool allowRejoin = true)
@@ -1649,7 +1635,7 @@ namespace Amino
 
             var response = client.Delete(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
+            if (Debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
 
@@ -1660,7 +1646,7 @@ namespace Amino
             request.AddHeaders(headers);
             var response = client.Delete(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
+            if (Debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
 
@@ -1673,7 +1659,7 @@ namespace Amino
             request.AddHeaders(headers);
             var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
+            if (Debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
 
@@ -1709,7 +1695,7 @@ namespace Amino
             request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(JsonConvert.SerializeObject(data)));
             var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
-            if (debug) { Trace.WriteLine(response.Content); }
+            if (Debug) { Trace.WriteLine(response.Content); }
             return Task.CompletedTask;
         }
 
