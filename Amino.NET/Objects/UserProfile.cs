@@ -14,7 +14,7 @@ namespace Amino.Objects
         [JsonPropertyName("modifiedTime")]public string ModifiedTime { get; set; }
         [JsonPropertyName("followingStatus")]public int FollowingStatus { get; set; }
         [JsonPropertyName("onlineStatus")]public int OnlineStatus { get; set; }
-        [JsonPropertyName("accountMembership")]public int AccountMembershipStatus { get; set; }
+        [JsonPropertyName("accountMembershipStatus")]public int AccountMembershipStatus { get; set; }
         [JsonPropertyName("isGlobal")]public bool IsGlobal { get; set; }
         [JsonPropertyName("reputation")]public int Reputation { get; set; }
         [JsonPropertyName("postsCount")]public int PostsCount { get; set; }
