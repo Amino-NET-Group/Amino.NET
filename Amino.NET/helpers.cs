@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -257,8 +258,5 @@ namespace Amino
         public static string sid_to_ip_address(string session) { return DecodeSid(session)["4"]; }
         public static string sid_created_time(string session) { return DecodeSid(session)["5"]; }
         public static string sid_to_client_type(string session) { return DecodeSid(session)["6"]; }
-
-
-
     }
 }

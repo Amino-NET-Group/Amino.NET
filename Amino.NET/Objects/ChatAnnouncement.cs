@@ -1,49 +1,22 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Serialization;
 
 namespace Amino.Objects
 {
-
-    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
+    // ROOT JSON ELEMENT: o/chatMessage
     public class ChatAnnouncement
     {
-        public int _type { get; }
-        public int communityId { get; }
-        public int alertOption { get; }
-        public int membershipStatus { get; }
-
-        public string chatId { get; }
-        public int mediaType { get; }
-        public string content { get; }
-        public int clientRefId { get; }
-        public string messageId { get; }
-        public string userId { get; }
-        public string createdTime { get; }
-        public int type { get; }
-        public bool isHidden { get; }
-        public bool includedInSummary { get; }
-        public string json { get; }
-
-        public ChatAnnouncement(JObject _json)
-        {
-            dynamic jsonObj = (JObject)JsonConvert.DeserializeObject(_json.ToString());
-            _type = (int)jsonObj["t"];
-            communityId = (int)jsonObj["o"]["ndcId"];
-            alertOption = (int)jsonObj["o"]["alertOption"];
-            membershipStatus = (int)jsonObj["o"]["membershipStatus"];
-
-            chatId = (string)jsonObj["o"]["chatMessage"]["threadId"];
-            mediaType = (int)jsonObj["o"]["chatMessage"]["mediaType"];
-            content = (string)jsonObj["o"]["chatMessage"]["content"];
-            clientRefId = (int)jsonObj["o"]["chatMessage"]["clientRefId"];
-            messageId = (string)jsonObj["o"]["chatMessage"]["messageId"];
-            userId = (string)jsonObj["o"]["chatMessage"]["uid"];
-            createdTime = (string)jsonObj["o"]["chatMessage"]["createdTime"];
-            type = (int)jsonObj["o"]["chatMessage"]["type"];
-            isHidden = (bool)jsonObj["o"]["chatMessage"]["isHidden"];
-            includedInSummary = (bool)jsonObj["o"]["chatMessage"]["includedInSummary"];
-            json = _json.ToString();
-        }
+        public string Json { get; set; } // NEEDS TO BE SET AFTER
+        public SocketBase SocketBase { get; set; } // NEEDS TO BE SET AFTER
+        [JsonPropertyName("threadId")]public string ChatId { get; set; }
+        [JsonPropertyName("mediaType")]public int MediaType { get; set; }
+        [JsonPropertyName("content")]public string Content { get; set; }
+        [JsonPropertyName("clientRefId")]public int ClientRefId { get; set; }
+        [JsonPropertyName("messageId")]public string MessageId { get; set; }
+        [JsonPropertyName("uid")]public string UserId { get; set; }
+        [JsonPropertyName("createdTime")]public string CreatedTime { get; set; }
+        [JsonPropertyName("type")]public int Type { get; set; }
+        [JsonPropertyName("isHidden")]public bool IsHidden { get; set; }
+        [JsonPropertyName("includedInSummary")]public bool IncludedInSummary { get; set; }
 
     }
 }
