@@ -36,5 +36,9 @@ namespace Amino.Objects
         [JsonPropertyName("agent")] public GenericProfile Agent { get; set; }
         [JsonPropertyName("themePack")] public CommunityThemePack ThemePack { get; set; }
         [JsonPropertyName("advancedSettings")] public CommunityAdvancedSettings AdvancedSettings { get; set; }
+
+        [JsonPropertyName("userAddedTopicList")] public List<Topic> UserAddedTopicList { get; set; }
+        [JsonPropertyName("mediaList")] public List<List<string>> MediaList { get; set; }
+
     }
 }
