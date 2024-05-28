@@ -408,7 +408,7 @@ namespace Amino
 
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
-                { "secret", $"12 {googleToken}" },
+                { "secret", $"32 {googleToken}" },
                 { "secret2", $"0 {password}" },
                 { "deviceID", deviceId },
                 { "clientType", 100 },
