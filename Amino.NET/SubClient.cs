@@ -1192,7 +1192,7 @@ namespace Amino
                     data.Add("mediaType", 110);
                     break;
             }
-            data.Add("mediaUploadValue", Encoding.UTF8.GetString(Convert.FromBase64String(Convert.ToBase64String(file))));
+            data.Add("mediaUploadValue", Convert.ToBase64String(file));
 
 
             RestClient client = new RestClient(helpers.BaseUrl);

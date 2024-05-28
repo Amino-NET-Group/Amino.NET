@@ -408,7 +408,7 @@ namespace Amino
 
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
-                { "secret", $"12 {googleToken}" },
+                { "secret", $"32 {googleToken}" },
                 { "secret2", $"0 {password}" },
                 { "deviceID", deviceId },
                 { "clientType", 100 },
@@ -1130,7 +1130,7 @@ namespace Amino
             JObject data = new JObject()
                 {
                     { "adminOpName", 102 },
-                    { "adminOpNote", new JObject() { "content", reason } },
+                    { "adminOpNote", new JObject() { { "content", reason } } },
                     { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
             RestClient client = new RestClient(helpers.BaseUrl);
@@ -2167,7 +2167,7 @@ namespace Amino
                     data.Add("mediaType", 110);
                     break;
             }
-            data.Add("mediaUploadValue", Encoding.UTF8.GetString(Convert.FromBase64String(Convert.ToBase64String(file))));
+            data.Add("mediaUploadValue", Convert.ToBase64String(file));
 
 
             RestClient client = new RestClient(helpers.BaseUrl);
