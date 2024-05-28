@@ -1130,7 +1130,7 @@ namespace Amino
             JObject data = new JObject()
                 {
                     { "adminOpName", 102 },
-                    { "adminOpNote", new JObject() { "content", reason } },
+                    { "adminOpNote", new JObject() { { "content", reason } } },
                     { "timestamp", helpers.GetTimestamp() * 1000 }
                 };
             RestClient client = new RestClient(helpers.BaseUrl);
