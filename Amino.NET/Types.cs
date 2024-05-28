@@ -276,5 +276,12 @@
             CheckIn = 4,
             quiz = 5
         }
+
+        public enum RoleTypes
+        {
+            Agent,
+            Leader,
+            Curator
+        }
     }
 }
