@@ -4,6 +4,6 @@ namespace Amino.Objects
 {
     public class VoiceMessageExtensions
     {
-        [JsonPropertyName("duration")] public float Duration { get; set; }
+        [JsonPropertyName("duration")] public float? Duration { get; set; }
     }
 }

@@ -4,7 +4,7 @@ namespace Amino.Objects
 {
     public class FromInvite
     {
-        [JsonPropertyName("isCurrentlyJoined")]public bool IsCurrentUserJoined { get; set; }
+        [JsonPropertyName("isCurrentlyJoined")]public bool? IsCurrentUserJoined { get; set; }
         [JsonPropertyName("path")]public string Path { get; set; }
         [JsonPropertyName("invitationId")]public string InvitationId { get; set; }
         [JsonPropertyName("community")]public AdvancedCommunityInfo Community { get; set; }

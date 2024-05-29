@@ -4,6 +4,6 @@ namespace Amino.Objects
 {
     public class ChatTipExtensions
     {
-        [JsonPropertyName("tippingCoins")] public int TippedCoins { get; set; }
+        [JsonPropertyName("tippingCoins")] public int? TippedCoins { get; set; }
     }
 }

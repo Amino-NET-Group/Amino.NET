@@ -4,6 +4,6 @@ namespace Amino.Objects
 {
     public class DeviceInfo
     {
-        [JsonPropertyName("lastClientType")] public int LastClientType { get; set; }
+        [JsonPropertyName("lastClientType")] public int? LastClientType { get; set; }
     }
 }
