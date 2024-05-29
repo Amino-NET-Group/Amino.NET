@@ -10,14 +10,14 @@ namespace Amino.Objects
 
         [JsonPropertyName("mediaValue")]public string MediaValue { get; set; }
         [JsonPropertyName("threadId")]public string ChatId { get; set; }
-        [JsonPropertyName("mediaType")]public int mediaType { get; set; }
-        [JsonPropertyName("clientRefId")]public int ClientRefId { get; set; }
+        [JsonPropertyName("mediaType")]public int? mediaType { get; set; }
+        [JsonPropertyName("clientRefId")]public int? ClientRefId { get; set; }
         [JsonPropertyName("messageId")]public string MessageId { get; set; }
         [JsonPropertyName("uid")]public string ObjectId { get; set; }
         [JsonPropertyName("createdTime")]public string CreatedTime { get; set; }
-        [JsonPropertyName("type")]public int Type { get; set; }
-        [JsonPropertyName("isHidden")]public bool IsHidden { get; set; }
-        [JsonPropertyName("includedInSummary")]public bool IncludedInSummary { get; set; }
+        [JsonPropertyName("type")]public int? Type { get; set; }
+        [JsonPropertyName("isHidden")]public bool? IsHidden { get; set; }
+        [JsonPropertyName("includedInSummary")]public bool? IncludedInSummary { get; set; }
         [JsonPropertyName("author")]public GenericProfile Author { get; set; }
         [JsonPropertyName("extensions")]public VoiceMessageExtensions Extensions { get; set; }
     }

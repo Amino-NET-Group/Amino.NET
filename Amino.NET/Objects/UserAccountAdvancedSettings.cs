@@ -4,6 +4,6 @@ namespace Amino.Objects
 {
     public class UserAccountAdvancedSettings
     {
-        [JsonPropertyName("analyticsEnabled")] public int AnalyticsEnabled { get; set; }
+        [JsonPropertyName("analyticsEnabled")] public int? AnalyticsEnabled { get; set; }
     }
 }
