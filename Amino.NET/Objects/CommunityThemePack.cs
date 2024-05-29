@@ -6,7 +6,7 @@ namespace Amino.Objects
     {
         [JsonPropertyName("themeColor")] public string ThemeColor { get; set; }
         [JsonPropertyName("themePackHash")] public string ThemePackHash { get; set; }
-        [JsonPropertyName("themePackRevision")] public string ThemePackRevision { get; set; }
+        [JsonPropertyName("themePackRevision")] public int ThemePackRevision { get; set; }
         [JsonPropertyName("themePackUrl")] public string ThemePackUrl { get; set; }
     }
 }
