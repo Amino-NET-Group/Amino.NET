@@ -1,5 +1,4 @@
-﻿using Amino.NET.Builders;
-using Amino.Objects;
+﻿using Amino.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -15,6 +14,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Amino.Builders;
 
 namespace Amino
 {

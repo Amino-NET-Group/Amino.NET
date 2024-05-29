@@ -363,7 +363,8 @@ namespace Amino
         public Task login_sid(string sessionId, bool fetchProfile = true, bool connectSocket = true)
         {
             this.SessionId = sessionId;
-
+            this.UserId = helpers.sid_to_uid(sessionId);
+            headerBuilder();
             if (fetchProfile)
             {
                 Objects.UserAccount currentAccount = get_account_info();
@@ -767,10 +768,12 @@ namespace Amino
             RestClient client = new RestClient(helpers.BaseUrl);
             RestRequest request = new RestRequest("/g/s/account");
             request.AddHeaders(headers);
+            request.AddHeader("SMDEVICEID", Guid.NewGuid().ToString());
+            request.AddOrUpdateHeader("Content-Type", "application/x-www-form-urlencoded");
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
             if (Debug) { Trace.WriteLine(response.Content); }
-            return System.Text.Json.JsonSerializer.Deserialize<UserAccount>(JsonDocument.Parse(response.Content).RootElement.GetRawText());
+            return System.Text.Json.JsonSerializer.Deserialize<UserAccount>(JsonDocument.Parse(response.Content).RootElement.GetProperty("account").GetRawText());
 
         }
         /// <summary>
@@ -1802,7 +1805,7 @@ namespace Amino
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
             if (Debug) { Trace.WriteLine(response.Content); }
-            return System.Text.Json.JsonSerializer.Deserialize<WalletInfo>(JsonDocument.Parse(response.Content).RootElement.GetRawText());
+            return System.Text.Json.JsonSerializer.Deserialize<WalletInfo>(JsonDocument.Parse(response.Content).RootElement.GetProperty("wallet").GetRawText());
         }
 
         /// <summary>

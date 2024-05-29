@@ -235,28 +235,35 @@ namespace Amino
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public static dynamic DecodeSid(string session)
+        public static Dictionary<string, object> DecodeSid(string sid)
         {
-            // Replace characters and adjust padding
-            session = session.Replace('-', '_').Replace('+', '/');
-            int padding = session.Length % 4;
-            if (padding > 0)
+            sid = sid.Replace('-', '+').Replace('_', '/');
+
+            int padding = 4 - (sid.Length % 4);
+            if (padding < 4)
             {
-                session = session.PadRight(session.Length + (4 - padding), '=');
+                sid += new string('=', padding);
             }
 
-            // Decode base64, remove the first byte, and remove the last 21 bytes
-            byte[] bytes = Convert.FromBase64String(session);
-            bytes = bytes.Skip(1).Take(bytes.Length - 21).ToArray();
+            byte[] decodedBytes = Convert.FromBase64String(sid);
 
-            // Convert bytes to UTF-8 string and parse JSON directly
-            string jsonString = Encoding.UTF8.GetString(bytes);
-            return System.Text.Json.JsonSerializer.Deserialize<dynamic>(jsonString);
+            byte[] trimmedBytes = new byte[decodedBytes.Length - 21];
+            Array.Copy(decodedBytes, 1, trimmedBytes, 0, trimmedBytes.Length);
+            string jsonString = Encoding.UTF8.GetString(trimmedBytes);
+
+            // Deserialize JSON string to dictionary
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var dictionary = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString, options);
+
+            return dictionary;
         }
 
-        public static string sid_to_uid(string session) { return DecodeSid(session)["2"]; }
-        public static string sid_to_ip_address(string session) { return DecodeSid(session)["4"]; }
-        public static string sid_created_time(string session) { return DecodeSid(session)["5"]; }
-        public static string sid_to_client_type(string session) { return DecodeSid(session)["6"]; }
+        public static string sid_to_uid(string session) { return DecodeSid(session)["2"].ToString(); }
+        public static string sid_to_ip_address(string session) { return DecodeSid(session)["4"].ToString(); }
+        public static string sid_created_time(string session) { return DecodeSid(session)["5"].ToString(); }
+        public static string sid_to_client_type(string session) { return DecodeSid(session)["6"].ToString(); }
     }
 }
