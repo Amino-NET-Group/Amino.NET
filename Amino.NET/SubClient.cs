@@ -873,7 +873,7 @@ namespace Amino
             int optInAdsFlags = 2147483647;
             int tzf = helpers.TzFilter();
             data.Add("userActiveTimeChunkList", timeData);
-            data.Add("OptInAdsFlags", optInAdsFlags);
+            data.Add("optInAdsFlags", optInAdsFlags);
             data.Add("timestamp", (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds);
             data.Add("timezone", tzf);
 
