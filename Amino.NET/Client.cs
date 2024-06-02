@@ -1856,7 +1856,7 @@ namespace Amino
             var response = client.ExecuteGet(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
             if (Debug) { Trace.WriteLine(response.Content); }
-            return System.Text.Json.JsonSerializer.Deserialize<FromCode>(JsonDocument.Parse(response.Content).RootElement.GetRawText());
+            return System.Text.Json.JsonSerializer.Deserialize<FromCode>(JsonDocument.Parse(response.Content).RootElement.GetProperty("linkInfoV2").GetRawText());
         }
 
         /// <summary>
@@ -1889,7 +1889,7 @@ namespace Amino
             var response = client.ExecutePost(request);
             if ((int)response.StatusCode != 200) { throw new Exception(response.Content); }
             if (Debug) { Trace.WriteLine(response.Content); }
-            return System.Text.Json.JsonSerializer.Deserialize<FromCode>(JsonDocument.Parse(response.Content).RootElement.GetRawText());
+            return System.Text.Json.JsonSerializer.Deserialize<FromCode>(JsonDocument.Parse(response.Content).RootElement.GetProperty("linkInfoV2").GetRawText());
         }
 
         /// <summary>
