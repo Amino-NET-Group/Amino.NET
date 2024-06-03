@@ -283,5 +283,25 @@
             Leader,
             Curator
         }
+
+        public enum ModuleTypes
+        {
+            Chat,
+            LiveChat,
+            ScreeningRoom,
+            PublicChats,
+            Posts,
+            Ranking,
+            Leaderboards,
+            Featured,
+            FeaturedPosts,
+            FeaturedUsers,
+            FeaturedChats,
+            SharedFolder,
+            Influencer,
+            Catalog,
+            ExternalContent,
+            TopicCategories
+        }
     }
 }

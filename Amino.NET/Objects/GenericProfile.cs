@@ -19,6 +19,7 @@ namespace Amino.Objects
         [JsonPropertyName("nickname")]public string Nickname { get; set; }
         [JsonPropertyName("icon")]public string IconUrl { get; set; }
         [JsonPropertyName("ndcId")]public int? CommunityId { get; set; }
+        [JsonPropertyName("role")] public int? Role { get; set; }
 
         [JsonPropertyName("avatarFrame")] public GenericAvatarFrame AvatarFrame { get; set; }
         [JsonPropertyName("influencerInfo")] public InfluencerPriceInfo InfluencerInfo { get; set; }
