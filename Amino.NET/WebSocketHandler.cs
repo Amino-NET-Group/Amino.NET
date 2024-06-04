@@ -24,7 +24,7 @@ namespace Amino
 
         private async Task StartWebSocket(Amino.Client _client)
         {
-            var final = $"{_client.deviceID}|{(Math.Round(helpers.GetTimestamp())) * 1000}";
+            var final = $"{_client.DeviceId}|{(Math.Round(helpers.GetTimestamp())) * 1000}";
             WebSocketURL += $"/?signbody={final.Replace("|", "%7C")}";
 
             var factory = new Func<ClientWebSocket>(() =>
@@ -36,8 +36,8 @@ namespace Amino
                         KeepAliveInterval = TimeSpan.FromSeconds(30)
                     }
                 };
-                client.Options.SetRequestHeader("NDCDEVICEID", _client.deviceID);
-                client.Options.SetRequestHeader("NDCAUTH", $"sid={_client.sessionID}");
+                client.Options.SetRequestHeader("NDCDEVICEID", _client.DeviceId);
+                client.Options.SetRequestHeader("NDCAUTH", $"sid={_client.SessionId}");
                 client.Options.SetRequestHeader("NDC-MSG-SIG", helpers.generate_signiture(final));
                 client.Options.SetRequestHeader("Upgrade", "websocket");
                 client.Options.SetRequestHeader("Connection", "Upgrade");
@@ -53,7 +53,7 @@ namespace Amino
                 ws_client.ReconnectTimeout = TimeSpan.FromSeconds(45);
                 ws_client.DisconnectionHappened.Subscribe(info =>
                 {
-                    if (_client.debug)
+                    if (_client.Debug)
                     {
                         Trace.WriteLine($"WebSocket: Disconnected\nReason: {info.CloseStatusDescription}");
                         // Attempt reconnection only if the disconnection wasn't triggered by the user
@@ -65,18 +65,18 @@ namespace Amino
                 });
                 ws_client.ReconnectionHappened.Subscribe(info =>
                 {
-                    if (_client.debug)
+                    if (_client.Debug)
                     {
                         Trace.WriteLine($"WebSocket: Reconnected\nMessage: {info.Type}");
                     }
                 });
                 ws_client.MessageReceived.Subscribe(msg =>
                 {
-                    if (_client.debug)
+                    if (_client.Debug)
                     {
                         Trace.WriteLine($"WebSocket: Received Message: {msg.Text}");
                     }
-                    eventHandler.ReceiveEvent(JObject.Parse(msg.Text), _client);
+                    eventHandler.ReceiveEvent(msg.Text, _client);
                 });
 
                 await ws_client.Start();
@@ -100,7 +100,7 @@ namespace Amino
         {
             await ws_client.Stop(WebSocketCloseStatus.NormalClosure, "WebSocket closed successfully");
             ws_client.Dispose();
-            if (_client.debug)
+            if (_client.Debug)
             {
                 Trace.WriteLine("WebSocket closed successfully.");
             }

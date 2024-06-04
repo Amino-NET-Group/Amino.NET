@@ -133,6 +133,13 @@
             Wiki,
             Chat
         }
+
+        public enum Join_Types
+        {
+            Open = 0,
+            Request = 1,
+            Private = 2
+        }
         public enum Object_Types
         {
             User = 0,
@@ -240,13 +247,13 @@
 
         public enum Supported_Languages
         {
-            english,
-            spanish,
-            portuguese,
-            arabic,
-            russian,
-            french,
-            german
+            English,
+            Spanish,
+            Portuguese,
+            Arabic,
+            Russian,
+            French,
+            German
         }
 
         public enum Wallet_Config_Levels
@@ -268,6 +275,33 @@
             Reputation = 3,
             CheckIn = 4,
             quiz = 5
+        }
+
+        public enum RoleTypes
+        {
+            Agent,
+            Leader,
+            Curator
+        }
+
+        public enum ModuleTypes
+        {
+            Chat,
+            LiveChat,
+            ScreeningRoom,
+            PublicChats,
+            Posts,
+            Ranking,
+            Leaderboards,
+            Featured,
+            FeaturedPosts,
+            FeaturedUsers,
+            FeaturedChats,
+            SharedFolder,
+            Influencer,
+            Catalog,
+            ExternalContent,
+            TopicCategories
         }
     }
 }

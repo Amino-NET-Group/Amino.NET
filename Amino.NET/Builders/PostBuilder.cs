@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection.Metadata.Ecma335;
 
-namespace Amino.NET.Builders
+namespace Amino.Builders
 {
     public class PostBuilder
     {
