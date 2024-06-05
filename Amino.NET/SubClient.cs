@@ -15,16 +15,18 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Amino.Builders;
+using System.Security.Cryptography.X509Certificates;
+
 
 namespace Amino
 {
     public class SubClient
     {
-
         private Amino.Client client;
         public bool Debug { get; set; }
         private string communityId;
 
+        private RestClient RClient;
 
 
         //headers.
@@ -57,6 +59,8 @@ namespace Amino
             client = _client;
             Debug = client.Debug;
             communityId = _communityId;
+            RClient = new RestClient();
+            RClient.AddDefaultHeaders(_client.headers);
             headerBuilder();
         }
 
@@ -93,6 +97,7 @@ namespace Amino
             return System.Text.Json.JsonSerializer.Deserialize<List<InviteCode>>(JsonDocument.Parse(response.Content).RootElement.GetProperty("communityInvitationList").GetRawText());
 
         }
+
 
         /// <summary>
         /// Allows you to generate a Community invite code (might require staff permissions)
@@ -1699,6 +1704,122 @@ namespace Amino
             return Task.CompletedTask;
         }
 
+        public Task accept_wiki_request(string requestId, IEnumerable<string> destinationCategoryIdList)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "destinationCategoryIdList", destinationCategoryIdList.ToList() },
+                { "actionType", "create" },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            RestRequest request = new RestRequest($"/x{communityId}/s/knowledge-base-request/{requestId}/approve");
+            request.AddHeader("NDC-MSG-SIG", System.Text.Json.JsonSerializer.Serialize(data));
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            var response = RClient.ExecutePost(request);
+            if(!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Debug) {  Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task reject_wiki_request(string requestId)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            RestRequest request = new RestRequest($"/x{communityId}/s/knowledge-base-request/{requestId}/reject");
+            request.AddHeader("NDC-MSG-SIG", System.Text.Json.JsonSerializer.Serialize(data));
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            var response = RClient.ExecutePost(request);
+            if(!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public List<Objects.WikiSubmission> get_wiki_submissions(int start = 0, int size = 25)
+        {
+            RestRequest request = new RestRequest($"/x{communityId}/s/knowledge-base-request?type=all&start={start}&size={size}");
+            var response = RClient.ExecuteGet(request);
+            if (!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if (Debug) { Trace.WriteLine(response.Content); }
+            return System.Text.Json.JsonSerializer.Deserialize<List<WikiSubmission>>(JsonDocument.Parse(response.Content).RootElement.GetProperty("knowledgeBaseRequestList").GetRawText());
+        }
+
+        public Task add_poll_option(string postId, string option)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "mediaList", null },
+                { "title", option },
+                { "type", 0 },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            RestRequest request = new RestRequest($"/x{communityId}/s/blog/{postId}/poll/option");
+            request.AddHeader("NDC-MSG-SIG", System.Text.Json.JsonSerializer.Serialize(data));
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            var response = RClient.ExecutePost(request);
+            if (!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task apply_avatar_frame(string frameId, bool applyToAll = true)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "frameId", frameId },
+                { "applyToAll", applyToAll ? 1 : 0 },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            RestRequest request = new RestRequest($"/x{communityId}/s/avatar-frame/apply");
+            request.AddHeader("NDC-MSG-SIG", System.Text.Json.JsonSerializer.Serialize(data));
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            var response = RClient.ExecutePost(request);
+            if (!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task apply_chat_bubble(string bubbleId, string chatId, bool applyToAll = false)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "applyToAll", applyToAll ? 1 : 0 },
+                { "bubbleId", bubbleId },
+                { "threadId", chatId },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/apply-bubble");
+            request.AddHeader("NDC-MSG-SIG", System.Text.Json.JsonSerializer.Serialize(data));
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            var response = RClient.ExecutePost(request);
+            if(!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task ban(string userId, string reason = null, int? reasonType = null)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "reasonType", reasonType },
+                { "note", new Dictionary<string, object>() { { "content", reason } } },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            RestRequest request = new RestRequest($"/x{communityId}/s/user-profile/{userId}/ban");
+            request.AddHeader("NDC-MSG-SIG", System.Text.Json.JsonSerializer.Serialize(data));
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            var response = RClient.ExecutePost(request);
+            if(!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
+        public Task claim_vc_reputation(string chatId)
+        {
+            RestRequest request = new RestRequest($"/x{communityId}/s/chat/thread/{chatId}/avchat-reputation");
+            var response = RClient.ExecutePost(request);
+            if (!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
 
         public Amino.Client GetClient() => this.client;
         public string GetCurrentCommunityId() => this.communityId;
