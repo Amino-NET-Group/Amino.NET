@@ -1821,6 +1821,27 @@ namespace Amino
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Allows you to create a shared folder on a community
+        /// </summary>
+        /// <param name="name">The name of your folder</param>
+        /// <returns></returns>
+        public Task create_shared_folder(string name)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "title", name },
+                { "timestamp", helpers.GetTimestamp() * 1000 }
+            };
+            RestRequest request = new RestRequest($"/x{communityId}/s/shared-folder/folders");
+            request.AddHeader("NDC-MSG-SIG", helpers.generate_signiture(System.Text.Json.JsonSerializer.Serialize(data)));
+            request.AddJsonBody(System.Text.Json.JsonSerializer.Serialize(data));
+            var response = RClient.ExecutePost(request);
+            if(!response.IsSuccessStatusCode) { throw new Exception(response.Content); }
+            if(Debug) { Trace.WriteLine(response.Content); }
+            return Task.CompletedTask;
+        }
+
         public Amino.Client GetClient() => this.client;
         public string GetCurrentCommunityId() => this.communityId;
 
